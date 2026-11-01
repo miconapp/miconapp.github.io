@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mic On - Nayamankan Suaramu</title>
   <script>
-    const path = window.location.pathname.replace(/\/+$/, "");
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
 
-    if (path === "/micon") {
-      window.location.replace("/login");
+    // GitHub Pages: arahkan halaman utama langsung ke file login.
+    if (path === "/" || path === "/index.html" || path === "/micon") {
+      window.location.replace("/login.html");
     }
   </script>
 </head>
