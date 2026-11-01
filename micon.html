@@ -276,6 +276,358 @@
 
 
 
+<style id="micon-mobile-master">
+
+/* Satu-satunya aturan tata letak mobile MicOn. Desktop dan seluruh logika aplikasi tetap. */
+@media screen and (max-width:900px){
+  :root{color-scheme:light!important;--bg:#fff!important;--panel:#fff!important;--panel2:#fff!important;--line:#e5e7eb!important;--muted:#64748b!important;--text:#111827!important}
+  html,body{
+    width:100%!important;min-width:0!important;min-height:100%!important;height:auto!important;
+    max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;
+    background:#fff!important;color:#111827!important;
+  }
+  body{overscroll-behavior-y:auto!important}
+  .wrap{
+    display:block!important;width:100%!important;max-width:none!important;height:auto!important;
+    min-height:100dvh!important;max-height:none!important;margin:0!important;
+    padding:0!important;
+    overflow:visible!important;background:#fff!important;
+  }
+  .top,.hero{display:none!important}
+  #mainContent,.home-layout,.home-preview-column,.home-scroll-column,
+  .home-scroll-column>.grid,.home-scroll-column .grid,.grid,
+  #importSection,#transposeSection,.mobile-playlist-panel{
+    width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
+    max-height:none!important;margin:0!important;background:#fff!important;color:#111827!important;
+    overflow:visible!important;box-shadow:none!important;
+  }
+  #mainContent{display:block!important;padding:0!important}
+  .home-layout{display:flex!important;flex-direction:column!important;gap:0!important}
+  .home-preview-column{
+    display:block!important;order:0!important;position:relative!important;
+    padding:0!important;border:0!important;overflow:hidden!important;
+  }
+  #videoStage,.home-preview-column #videoStage{
+    position:relative!important;display:grid!important;place-items:center!important;
+    box-sizing:border-box!important;width:100%!important;height:auto!important;
+    min-height:0!important;max-height:none!important;aspect-ratio:16/9!important;
+    margin:0!important;padding:0!important;overflow:hidden!important;
+    border:0!important;border-radius:0!important;background:#000!important;
+  }
+  #videoStage:not(:has(#karaokeVideo))::before{
+    content:'Video akan diputar disini'!important;position:absolute!important;inset:0!important;
+    z-index:1!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    padding:12px!important;background:#000!important;color:#fff!important;
+    font:700 14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif!important;
+    text-align:center!important;pointer-events:none!important;
+  }
+  #videoStage #karaokeVideo{
+    position:relative!important;z-index:2!important;display:block!important;
+    width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9!important;
+    object-fit:contain!important;margin:0!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:#000!important;
+  }
+  .home-scroll-column{
+    display:flex!important;flex-direction:column!important;order:1!important;
+    padding:0!important;border:0!important;
+  }
+  .home-scroll-column>.grid,.home-scroll-column .grid,.grid{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    gap:0!important;padding:0!important;
+  }
+  #importSection,#transposeSection{
+    display:flex!important;flex-direction:column!important;position:relative!important;
+    padding:0!important;border:0!important;border-radius:0!important;
+  }
+  #importSection{order:1!important}
+  #transposeSection{order:2!important}
+  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
+  #transposeSection #dropZone,#transposeSection .keySelectWrap,
+  #transposeSection .stepper,#transposeSection .rangeLabels,
+  #transposeSection>.row,#transposeSection>.alert,#transposeSection .playrow,
+  #transposeSection>.hint,.mobile-fill,.mobile-ad-banner,
+  .home-scroll-column .foot,#mainContent>.foot,.foot{
+    display:none!important;
+  }
+  #importSection .filemeta{
+    display:flex!important;order:1!important;box-sizing:border-box!important;
+    width:calc(100% - 14px)!important;height:40px!important;min-height:40px!important;
+    margin:10px 7px!important;padding:5px 9px!important;gap:9px!important;
+    align-items:center!important;border:1px solid #e1e5eb!important;border-radius:13px!important;
+    background:#fff!important;color:#111827!important;box-shadow:none!important;
+  }
+  #importSection .fileIcon{
+    display:grid!important;place-items:center!important;flex:0 0 24px!important;
+    width:24px!important;height:26px!important;margin:0!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:#fff!important;
+    color:#f1f5f9!important;font-size:22px!important;
+  }
+  #importSection .filetext{display:block!important;flex:1!important;min-width:0!important}
+  #importSection .filetext b{
+    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
+    line-height:1.3!important;font-weight:800!important;
+  }
+  #importSection .filetext small{
+    display:block!important;margin-top:2px!important;color:#64748b!important;
+    font-size:8px!important;line-height:1.2!important;
+  }
+  #importSection .status{display:none!important}
+  body #mainContent #transposeSection .pitch-compact-row{
+    display:grid!important;grid-template-columns:minmax(0,1.8fr) repeat(3,minmax(0,.8fr)) minmax(0,.95fr)!important;
+    grid-auto-flow:row!important;grid-auto-rows:40px!important;
+    align-items:stretch!important;justify-content:stretch!important;
+    gap:7px!important;box-sizing:border-box!important;
+    width:calc(100% - 14px)!important;margin:0 7px 7px!important;
+    padding:0!important;overflow:visible!important;
+  }
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox,
+  body #mainContent #transposeSection .pitch-compact-row>.semitone,
+  body #mainContent #transposeSection .pitch-compact-row>#downBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{
+    display:flex!important;position:relative!important;float:none!important;
+    grid-row:1!important;align-self:stretch!important;justify-self:stretch!important;
+    width:100%!important;min-width:0!important;max-width:none!important;
+    height:40px!important;min-height:40px!important;max-height:40px!important;
+    margin:0!important;padding:0 3px!important;box-sizing:border-box!important;
+    align-items:center!important;justify-content:center!important;
+    border:1px solid #e1e5eb!important;border-radius:12px!important;
+    background:#fff!important;color:#111827!important;box-shadow:none!important;
+  }
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important}
+  body #mainContent #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;font-size:12px!important;font-weight:800!important;white-space:nowrap!important}
+  body #mainContent #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{grid-column:5!important;font-size:9px!important;font-weight:850!important;text-transform:uppercase!important;white-space:nowrap!important}
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox .note{
+    display:block!important;color:#111827!important;font-size:12px!important;
+    line-height:1!important;font-weight:850!important;text-transform:uppercase!important;
+  }
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+    display:block!important;color:#64748b!important;font-size:7px!important;
+    line-height:1!important;white-space:nowrap!important;
+  }
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
+  .mobile-playlist-panel{
+    display:block!important;order:3!important;padding:0 0 8px!important;
+  }
+  .mobile-playlist-import{
+    display:block!important;box-sizing:border-box!important;width:calc(100% - 14px)!important;
+    height:40px!important;margin:0 7px 10px!important;padding:0 10px!important;
+    border:1px solid #e1e5eb!important;border-radius:12px!important;
+    background:#fff!important;color:#111827!important;
+    font:800 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
+  }
+  .mobile-playlist-heading{
+    display:flex!important;box-sizing:border-box!important;align-items:center!important;
+    width:100%!important;height:34px!important;padding:0 18px!important;
+    border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;
+    background:#fff!important;color:#111827!important;
+    font:850 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
+  }
+  .mobile-playlist-list{
+    display:flex!important;flex-direction:column!important;gap:7px!important;
+    width:100%!important;margin:0!important;padding:9px 10px 5px!important;background:#fff!important;
+  }
+  .mobile-playlist-item{
+    display:flex!important;box-sizing:border-box!important;align-items:center!important;
+    gap:10px!important;width:100%!important;min-width:0!important;height:40px!important;
+    min-height:40px!important;margin:0!important;padding:5px 9px!important;
+    border:1px solid #e1e5eb!important;border-radius:13px!important;
+    background:#fff!important;color:#111827!important;text-align:left!important;box-shadow:none!important;
+  }
+  .mobile-playlist-item.active{border-color:#93c5fd!important;background:#f8fbff!important}
+  .mobile-playlist-icon{
+    display:grid!important;place-items:center!important;flex:0 0 24px!important;
+    width:24px!important;height:26px!important;color:#f1f5f9!important;font-size:21px!important;
+  }
+  .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
+  .mobile-playlist-copy strong{
+    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
+    line-height:1.35!important;font-weight:800!important;
+  }
+  .mobile-playlist-copy small{
+    display:block!important;margin-top:2px!important;color:#64748b!important;font-size:8px!important;line-height:1.2!important;
+  }
+  .mobile-playlist-empty{padding:12px 8px!important;text-align:center!important;background:#fff!important;color:#64748b!important;font-size:10px!important}
+  .mobile-playlist-picker{display:none!important}
+  .mobile-bottom-nav,.mobile-dock{display:none!important;visibility:hidden!important;pointer-events:none!important}
+  .mobile-profile-page{
+    display:none;position:fixed;inset:0;z-index:3000;background:#fff;color:#111827;
+    overflow-y:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
+  }
+  .mobile-profile-page.mobile-profile-page-open{display:block!important}
+  .mobile-profile-page .mobile-profile-page-header{
+    display:flex;align-items:center;gap:14px;padding:4px 0 20px;
+    border-bottom:1px solid #e5e7eb;margin-bottom:20px;
+  }
+  .mobile-profile-page .mobile-profile-back{
+    width:42px;height:42px;border:1px solid #e5e7eb;border-radius:13px;
+    background:#fff;color:#111827;font-size:24px;line-height:1;cursor:pointer;
+  }
+  .mobile-profile-page .mobile-profile-page-title{font-size:20px;font-weight:800;color:#111827}
+  .mobile-profile-page #micon-profile-menu{
+    display:block!important;position:static!important;width:100%!important;max-width:none!important;
+    margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+    background:transparent!important;box-shadow:none!important;color:#111827!important;
+  }
+  .mobile-profile-page #micon-profile-detail{
+    padding:18px!important;margin:0 0 18px!important;border:1px solid #e5e7eb!important;
+    border-radius:16px!important;background:#fff!important;
+  }
+  .mobile-profile-page #micon-profile-detail strong{font-size:17px!important;color:#111827!important}
+  .mobile-profile-page #micon-profile-detail small{font-size:13px!important;color:#64748b!important}
+  .mobile-profile-page #micon-profile-logout{display:block!important;width:100%!important;padding:15px!important;border-radius:13px!important}
+}
+
+
+/* Responsive controls: five items stay on one row across phone widths. */
+@media screen and (max-width:900px){
+  #transposeSection .pitch-compact-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,.7fr)) minmax(0,.95fr)!important;
+    grid-template-rows:clamp(34px,11vw,40px)!important;
+    grid-auto-flow:row!important;
+    gap:clamp(3px,1.5vw,7px)!important;
+    width:calc(100% - 14px)!important;
+    margin:0 7px 7px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    align-items:stretch!important;
+  }
+  #transposeSection .pitch-compact-row>*{
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:2px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    justify-self:stretch!important;
+    align-self:stretch!important;
+    white-space:normal!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important}
+  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;gap:1px!important;flex-direction:column!important}
+  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
+  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
+  #transposeSection .pitch-compact-row>#clearBtn{
+    grid-column:5!important;
+    font-size:clamp(7px,2.5vw,10px)!important;
+    line-height:1.05!important;
+    overflow-wrap:anywhere!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox .note{
+    font-size:clamp(9px,3.2vw,12px)!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+    font-size:clamp(6px,1.9vw,7px)!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #transposeSection .pitch-compact-row>.semitone{
+    font-size:clamp(9px,3vw,12px)!important;
+    line-height:1!important;
+  }
+  #transposeSection .pitch-compact-row>.semitone small{
+    display:block!important;
+    font-size:clamp(6px,1.9vw,8px)!important;
+    line-height:1!important;
+    white-space:normal!important;
+  }
+  #transposeSection .pitch-compact-row>#downBtn,
+  #transposeSection .pitch-compact-row>#upBtn{
+    font-size:clamp(16px,5.5vw,22px)!important;
+    line-height:1!important;
+  }
+}
+@media screen and (max-width:360px){
+  #transposeSection .pitch-compact-row{
+    grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.68fr)) minmax(0,.9fr)!important;
+    gap:3px!important;
+    width:calc(100% - 10px)!important;
+    margin-left:5px!important;
+    margin-right:5px!important;
+  }
+  #transposeSection .pitch-compact-row>#clearBtn{font-size:7px!important}
+}
+@media screen and (min-width:901px){
+  #transposeSection .pitch-compact-row{display:none!important}
+}
+
+
+@media screen and (max-width:900px){
+  /* Bayangan tipis ke arah dalam agar tidak tampak keluar dari batas kotak. */
+  body #importSection .filemeta,
+  body #transposeSection .pitch-compact-row>*,
+  body .mobile-playlist-import,
+  body .mobile-playlist-item,
+  body .mobile-playlist-panel,
+  body .card,
+  body .noteBox,
+  body .keySelect,
+  body .field input,
+  body #dropZone,
+  body .drop,
+  body .more-sheet,
+  body #micon-profile-menu,
+  body .mobile-profile-page .mobile-profile-back{
+    box-shadow:0 1px 4px rgba(15,23,42,.07)!important;
+    transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease!important;
+  }
+
+  /* Efek hover tetap berada di dalam area kotak; tidak menggeser atau membesar ke luar. */
+  body #importSection .filemeta:hover,
+  body #transposeSection .pitch-compact-row>*:hover,
+  body .mobile-playlist-import:hover,
+  body .mobile-playlist-item:hover,
+  body .card:hover,
+  body .noteBox:hover,
+  body .keySelect:hover,
+  body .field input:hover,
+  body #dropZone:hover,
+  body .drop:hover{
+    transform:none!important;
+    outline:none!important;
+    box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 1px 4px rgba(15,23,42,.07)!important;
+  }
+  body #transposeSection .pitch-compact-row>*:active,
+  body .mobile-playlist-import:active,
+  body .mobile-playlist-item:active{
+    transform:none!important;
+    box-shadow:inset 0 1px 3px rgba(15,23,42,.10)!important;
+  }
+}
+@media screen and (min-width:901px){
+  #micon-mobile-nav-shadow-hover-final{display:none!important}
+}
+
+
+@media screen and (max-width:900px){
+  html,body{margin:0!important;padding:0!important}
+  .wrap{padding-bottom:0!important;margin-bottom:0!important}
+  #mainContent{padding-bottom:0!important;margin-bottom:0!important}
+  .home-preview-column{width:100%!important;min-height:0!important;padding:0!important;margin:0!important}
+  #videoStage,.home-preview-column #videoStage{
+    width:100%!important;height:auto!important;min-height:0!important;
+    aspect-ratio:16/9!important;max-height:none!important;
+    margin:0!important;padding:0!important;overflow:hidden!important;
+  }
+  .home-scroll-column{padding-bottom:0!important;margin-bottom:0!important}
+}
+
+</style>
 </head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo">♫</div><div><h1><span class="brand-mic">Mic</span> <span class="brand-on">On</span></h1><p>Atur nada lagu sesuai suara kamu</p></div></div><nav class="desktop-nav" aria-label="Navigasi utama"><span class="nav-link" data-page="homePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>Home</span><span class="nav-link" data-page="karaokePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>Karaoke</span><span class="nav-link" data-page="youtubePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Video YouTube</span><span class="nav-link" data-page="packagePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"/></svg></span>Perpanjang Paket</span><a class="nav-link app-download-link" href="https://drive.google.com/file/d/1VqoCpksGtmBqHP6jQ9bYkwZMckLaNLbV/view?usp=drive_link" target="_blank" rel="noopener noreferrer" aria-label="Download Aplikasi MicOn"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Aplikasi MicOn</a><span class="social-icons" aria-label="Media sosial"><span class="social-icon whatsapp" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.4 9.8c-.4-.8-.8-.8-1.2-.8h-1c-.4 0-.9.2-1.4.7s-1.8 1.8-1.8 4.3 1.9 5 2.2 5.4c.3.3 3.7 5.9 9.1 7.4 4.5 1.3 5.4 1 6.4.9 1-.1 3.2-1.3 3.7-2.6.5-1.3.5-2.4.3-2.6-.2-.2-.5-.3-1.1-.6s-3.2-1.6-3.7-1.8c-.5-.2-.9-.3-1.2.3-.4.5-1.4 1.8-1.7 2.2-.3.4-.6.4-1.1.1-.5-.3-2.3-.9-4.3-2.7-1.6-1.4-2.7-3.1-3-3.6-.3-.5 0-.8.2-1.1.2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9-.1-.3-1.1-2.8-1.5-3.8Z" fill="currentColor" transform="translate(1 0) scale(.82)"/></svg></span><span class="social-icon tiktok" title="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 6.7a5.1 5.1 0 0 1-3.9-4.6V1.5h-3.8v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.1a7 7 0 1 0 5.8 6.9V8.4a8.7 8.7 0 0 0 4.9 1.5V6.8c-.3 0-.7 0-1-.1Z" fill="currentColor"/></svg></span><span class="social-icon facebook" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.47h-2.8v8.38C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/></svg></span></span></nav><div class="pill">IMPORT VIDEO · LOKAL</div>
@@ -1027,7 +1379,7 @@ try {
 
 
 
-\n
+
 
 
 
@@ -1648,382 +2000,16 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 
 
 
-<style id="micon-mobile-ui-single">
-/* Satu-satunya aturan tata letak mobile MicOn. Desktop dan seluruh logika aplikasi tetap. */
-@media screen and (max-width:900px){
-  :root{color-scheme:light!important;--bg:#fff!important;--panel:#fff!important;--panel2:#fff!important;--line:#e5e7eb!important;--muted:#64748b!important;--text:#111827!important}
-  html,body{
-    width:100%!important;min-width:0!important;min-height:100%!important;height:auto!important;
-    max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;
-    background:#fff!important;color:#111827!important;
-  }
-  body{overscroll-behavior-y:auto!important}
-  .wrap{
-    display:block!important;width:100%!important;max-width:none!important;height:auto!important;
-    min-height:100dvh!important;max-height:none!important;margin:0!important;
-    padding:0 0 calc(60px + env(safe-area-inset-bottom))!important;
-    overflow:visible!important;background:#fff!important;
-  }
-  .top,.hero{display:none!important}
-  #mainContent,.home-layout,.home-preview-column,.home-scroll-column,
-  .home-scroll-column>.grid,.home-scroll-column .grid,.grid,
-  #importSection,#transposeSection,.mobile-playlist-panel{
-    width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
-    max-height:none!important;margin:0!important;background:#fff!important;color:#111827!important;
-    overflow:visible!important;box-shadow:none!important;
-  }
-  #mainContent{display:block!important;padding:0!important}
-  .home-layout{display:flex!important;flex-direction:column!important;gap:0!important}
-  .home-preview-column{
-    display:block!important;order:0!important;position:relative!important;
-    padding:0!important;border:0!important;overflow:hidden!important;
-  }
-  #videoStage,.home-preview-column #videoStage{
-    position:relative!important;display:grid!important;place-items:center!important;
-    box-sizing:border-box!important;width:100%!important;height:auto!important;
-    min-height:0!important;max-height:none!important;aspect-ratio:16/9!important;
-    margin:0!important;padding:0!important;overflow:hidden!important;
-    border:0!important;border-radius:0!important;background:#000!important;
-  }
-  #videoStage:not(:has(#karaokeVideo))::before{
-    content:'Video akan diputar disini'!important;position:absolute!important;inset:0!important;
-    z-index:1!important;display:flex!important;align-items:center!important;justify-content:center!important;
-    padding:12px!important;background:#000!important;color:#fff!important;
-    font:700 14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif!important;
-    text-align:center!important;pointer-events:none!important;
-  }
-  #videoStage #karaokeVideo{
-    position:relative!important;z-index:2!important;display:block!important;
-    width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9!important;
-    object-fit:contain!important;margin:0!important;padding:0!important;
-    border:0!important;border-radius:0!important;background:#000!important;
-  }
-  .home-scroll-column{
-    display:flex!important;flex-direction:column!important;order:1!important;
-    padding:0!important;border:0!important;
-  }
-  .home-scroll-column>.grid,.home-scroll-column .grid,.grid{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    gap:0!important;padding:0!important;
-  }
-  #importSection,#transposeSection{
-    display:flex!important;flex-direction:column!important;position:relative!important;
-    padding:0!important;border:0!important;border-radius:0!important;
-  }
-  #importSection{order:1!important}
-  #transposeSection{order:2!important}
-  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
-  #transposeSection #dropZone,#transposeSection .keySelectWrap,
-  #transposeSection .stepper,#transposeSection .rangeLabels,
-  #transposeSection>.row,#transposeSection>.alert,#transposeSection .playrow,
-  #transposeSection>.hint,.mobile-fill,.mobile-ad-banner,
-  .home-scroll-column .foot,#mainContent>.foot,.foot{
-    display:none!important;
-  }
-  #importSection .filemeta{
-    display:flex!important;order:1!important;box-sizing:border-box!important;
-    width:calc(100% - 14px)!important;height:40px!important;min-height:40px!important;
-    margin:10px 7px!important;padding:5px 9px!important;gap:9px!important;
-    align-items:center!important;border:1px solid #e1e5eb!important;border-radius:13px!important;
-    background:#fff!important;color:#111827!important;box-shadow:none!important;
-  }
-  #importSection .fileIcon{
-    display:grid!important;place-items:center!important;flex:0 0 24px!important;
-    width:24px!important;height:26px!important;margin:0!important;padding:0!important;
-    border:0!important;border-radius:0!important;background:#fff!important;
-    color:#f1f5f9!important;font-size:22px!important;
-  }
-  #importSection .filetext{display:block!important;flex:1!important;min-width:0!important}
-  #importSection .filetext b{
-    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
-    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
-    line-height:1.3!important;font-weight:800!important;
-  }
-  #importSection .filetext small{
-    display:block!important;margin-top:2px!important;color:#64748b!important;
-    font-size:8px!important;line-height:1.2!important;
-  }
-  #importSection .status{display:none!important}
-  body #mainContent #transposeSection .pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.8fr) repeat(3,minmax(0,.8fr)) minmax(0,.95fr)!important;
-    grid-auto-flow:row!important;grid-auto-rows:40px!important;
-    align-items:stretch!important;justify-content:stretch!important;
-    gap:7px!important;box-sizing:border-box!important;
-    width:calc(100% - 14px)!important;margin:0 7px 7px!important;
-    padding:0!important;overflow:visible!important;
-  }
-  body #mainContent #transposeSection .pitch-compact-row>.noteBox,
-  body #mainContent #transposeSection .pitch-compact-row>.semitone,
-  body #mainContent #transposeSection .pitch-compact-row>#downBtn,
-  body #mainContent #transposeSection .pitch-compact-row>#upBtn,
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{
-    display:flex!important;position:relative!important;float:none!important;
-    grid-row:1!important;align-self:stretch!important;justify-self:stretch!important;
-    width:100%!important;min-width:0!important;max-width:none!important;
-    height:40px!important;min-height:40px!important;max-height:40px!important;
-    margin:0!important;padding:0 3px!important;box-sizing:border-box!important;
-    align-items:center!important;justify-content:center!important;
-    border:1px solid #e1e5eb!important;border-radius:12px!important;
-    background:#fff!important;color:#111827!important;box-shadow:none!important;
-  }
-  body #mainContent #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important}
-  body #mainContent #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;font-size:12px!important;font-weight:800!important;white-space:nowrap!important}
-  body #mainContent #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
-  body #mainContent #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{grid-column:5!important;font-size:9px!important;font-weight:850!important;text-transform:uppercase!important;white-space:nowrap!important}
-  body #mainContent #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
-  body #mainContent #transposeSection .pitch-compact-row>.noteBox .note{
-    display:block!important;color:#111827!important;font-size:12px!important;
-    line-height:1!important;font-weight:850!important;text-transform:uppercase!important;
-  }
-  body #mainContent #transposeSection .pitch-compact-row>.noteBox #noteDesc{
-    display:block!important;color:#64748b!important;font-size:7px!important;
-    line-height:1!important;white-space:nowrap!important;
-  }
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
-  .mobile-playlist-panel{
-    display:block!important;order:3!important;padding:0 0 8px!important;
-  }
-  .mobile-playlist-import{
-    display:block!important;box-sizing:border-box!important;width:calc(100% - 14px)!important;
-    height:40px!important;margin:0 7px 10px!important;padding:0 10px!important;
-    border:1px solid #e1e5eb!important;border-radius:12px!important;
-    background:#fff!important;color:#111827!important;
-    font:800 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
-  }
-  .mobile-playlist-heading{
-    display:flex!important;box-sizing:border-box!important;align-items:center!important;
-    width:100%!important;height:34px!important;padding:0 18px!important;
-    border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;
-    background:#fff!important;color:#111827!important;
-    font:850 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
-  }
-  .mobile-playlist-list{
-    display:flex!important;flex-direction:column!important;gap:7px!important;
-    width:100%!important;margin:0!important;padding:9px 10px 5px!important;background:#fff!important;
-  }
-  .mobile-playlist-item{
-    display:flex!important;box-sizing:border-box!important;align-items:center!important;
-    gap:10px!important;width:100%!important;min-width:0!important;height:40px!important;
-    min-height:40px!important;margin:0!important;padding:5px 9px!important;
-    border:1px solid #e1e5eb!important;border-radius:13px!important;
-    background:#fff!important;color:#111827!important;text-align:left!important;box-shadow:none!important;
-  }
-  .mobile-playlist-item.active{border-color:#93c5fd!important;background:#f8fbff!important}
-  .mobile-playlist-icon{
-    display:grid!important;place-items:center!important;flex:0 0 24px!important;
-    width:24px!important;height:26px!important;color:#f1f5f9!important;font-size:21px!important;
-  }
-  .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
-  .mobile-playlist-copy strong{
-    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
-    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
-    line-height:1.35!important;font-weight:800!important;
-  }
-  .mobile-playlist-copy small{
-    display:block!important;margin-top:2px!important;color:#64748b!important;font-size:8px!important;line-height:1.2!important;
-  }
-  .mobile-playlist-empty{padding:12px 8px!important;text-align:center!important;background:#fff!important;color:#64748b!important;font-size:10px!important}
-  .mobile-playlist-picker{display:none!important}
-  .mobile-bottom-nav{
-    display:grid!important;position:fixed!important;z-index:3000!important;
-    left:0!important;right:0!important;bottom:0!important;width:100%!important;
-    box-sizing:border-box!important;height:51px!important;min-height:51px!important;
-    padding:5px 10px calc(5px + env(safe-area-inset-bottom))!important;
-    grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:9px!important;
-    align-items:center!important;border:0!important;border-top:1px solid #e5e7eb!important;
-    border-radius:0!important;background:#fff!important;box-shadow:none!important;
-  }
-  .mobile-bottom-nav button,.mobile-bottom-nav a{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    box-sizing:border-box!important;min-width:0!important;width:100%!important;height:39px!important;
-    margin:0!important;padding:0!important;border:1px solid #e1e5eb!important;
-    border-radius:11px!important;background:#fff!important;color:#fff!important;
-    font-size:0!important;box-shadow:none!important;
-  }
-  .mobile-bottom-nav .dock-nav-icon,.mobile-bottom-nav .dock-nav-label{display:none!important}
-  .mobile-profile-page{
-    display:none;position:fixed;inset:0;z-index:3000;background:#fff;color:#111827;
-    overflow-y:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
-  }
-  .mobile-profile-page.mobile-profile-page-open{display:block!important}
-  .mobile-profile-page .mobile-profile-page-header{
-    display:flex;align-items:center;gap:14px;padding:4px 0 20px;
-    border-bottom:1px solid #e5e7eb;margin-bottom:20px;
-  }
-  .mobile-profile-page .mobile-profile-back{
-    width:42px;height:42px;border:1px solid #e5e7eb;border-radius:13px;
-    background:#fff;color:#111827;font-size:24px;line-height:1;cursor:pointer;
-  }
-  .mobile-profile-page .mobile-profile-page-title{font-size:20px;font-weight:800;color:#111827}
-  .mobile-profile-page #micon-profile-menu{
-    display:block!important;position:static!important;width:100%!important;max-width:none!important;
-    margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
-    background:transparent!important;box-shadow:none!important;color:#111827!important;
-  }
-  .mobile-profile-page #micon-profile-detail{
-    padding:18px!important;margin:0 0 18px!important;border:1px solid #e5e7eb!important;
-    border-radius:16px!important;background:#fff!important;
-  }
-  .mobile-profile-page #micon-profile-detail strong{font-size:17px!important;color:#111827!important}
-  .mobile-profile-page #micon-profile-detail small{font-size:13px!important;color:#64748b!important}
-  .mobile-profile-page #micon-profile-logout{display:block!important;width:100%!important;padding:15px!important;border-radius:13px!important}
-}
-</style>
 
 
-<style id="micon-smartphone-responsive-final">
-/* Responsive controls: five items stay on one row across phone widths. */
-@media screen and (max-width:900px){
-  #transposeSection .pitch-compact-row{
-    display:grid!important;
-    grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,.7fr)) minmax(0,.95fr)!important;
-    grid-template-rows:clamp(34px,11vw,40px)!important;
-    grid-auto-flow:row!important;
-    gap:clamp(3px,1.5vw,7px)!important;
-    width:calc(100% - 14px)!important;
-    margin:0 7px 7px!important;
-    padding:0!important;
-    box-sizing:border-box!important;
-    align-items:stretch!important;
-  }
-  #transposeSection .pitch-compact-row>*{
-    grid-row:1!important;
-    min-width:0!important;
-    max-width:100%!important;
-    width:100%!important;
-    height:100%!important;
-    min-height:0!important;
-    max-height:none!important;
-    margin:0!important;
-    padding:2px!important;
-    box-sizing:border-box!important;
-    overflow:hidden!important;
-    justify-self:stretch!important;
-    align-self:stretch!important;
-    white-space:normal!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important}
-  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;gap:1px!important;flex-direction:column!important}
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
-  #transposeSection .pitch-compact-row>#clearBtn{
-    grid-column:5!important;
-    font-size:clamp(7px,2.5vw,10px)!important;
-    line-height:1.05!important;
-    overflow-wrap:anywhere!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox .note{
-    font-size:clamp(9px,3.2vw,12px)!important;
-    max-width:100%!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
-    font-size:clamp(6px,1.9vw,7px)!important;
-    max-width:100%!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone{
-    font-size:clamp(9px,3vw,12px)!important;
-    line-height:1!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone small{
-    display:block!important;
-    font-size:clamp(6px,1.9vw,8px)!important;
-    line-height:1!important;
-    white-space:normal!important;
-  }
-  #transposeSection .pitch-compact-row>#downBtn,
-  #transposeSection .pitch-compact-row>#upBtn{
-    font-size:clamp(16px,5.5vw,22px)!important;
-    line-height:1!important;
-  }
-}
-@media screen and (max-width:360px){
-  #transposeSection .pitch-compact-row{
-    grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.68fr)) minmax(0,.9fr)!important;
-    gap:3px!important;
-    width:calc(100% - 10px)!important;
-    margin-left:5px!important;
-    margin-right:5px!important;
-  }
-  #transposeSection .pitch-compact-row>#clearBtn{font-size:7px!important}
-}
-@media screen and (min-width:901px){
-  #transposeSection .pitch-compact-row{display:none!important}
-}
-</style>
 
 
-<style id="micon-mobile-nav-shadow-hover-final">
-@media screen and (max-width:900px){
-  /* Hilangkan dock navigasi bawah hanya pada tampilan smartphone. */
-  body .mobile-bottom-nav,
-  body .mobile-dock{display:none!important;visibility:hidden!important;pointer-events:none!important}
-
-  /* Bayangan tipis ke arah dalam agar tidak tampak keluar dari batas kotak. */
-  body #importSection .filemeta,
-  body #transposeSection .pitch-compact-row>*,
-  body .mobile-playlist-import,
-  body .mobile-playlist-item,
-  body .mobile-playlist-panel,
-  body .card,
-  body .noteBox,
-  body .keySelect,
-  body .field input,
-  body #dropZone,
-  body .drop,
-  body .more-sheet,
-  body #micon-profile-menu,
-  body .mobile-profile-page .mobile-profile-back{
-    box-shadow:0 1px 4px rgba(15,23,42,.07)!important;
-    transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease!important;
-  }
-
-  /* Efek hover tetap berada di dalam area kotak; tidak menggeser atau membesar ke luar. */
-  body #importSection .filemeta:hover,
-  body #transposeSection .pitch-compact-row>*:hover,
-  body .mobile-playlist-import:hover,
-  body .mobile-playlist-item:hover,
-  body .card:hover,
-  body .noteBox:hover,
-  body .keySelect:hover,
-  body .field input:hover,
-  body #dropZone:hover,
-  body .drop:hover{
-    transform:none!important;
-    outline:none!important;
-    box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 1px 4px rgba(15,23,42,.07)!important;
-  }
-  body #transposeSection .pitch-compact-row>*:active,
-  body .mobile-playlist-import:active,
-  body .mobile-playlist-item:active{
-    transform:none!important;
-    box-shadow:inset 0 1px 3px rgba(15,23,42,.10)!important;
-  }
-}
-@media screen and (min-width:901px){
-  #micon-mobile-nav-shadow-hover-final{display:none!important}
-}
-</style>
 
 
-<style id="micon-mobile-no-dock-spacing-fix">
-@media screen and (max-width:900px){
-  html,body{margin:0!important;padding:0!important}
-  .wrap{padding-bottom:0!important;margin-bottom:0!important}
-  #mainContent{padding-bottom:0!important;margin-bottom:0!important}
-  .home-preview-column{width:100%!important;min-height:0!important;padding:0!important;margin:0!important}
-  #videoStage,.home-preview-column #videoStage{
-    width:100%!important;height:auto!important;min-height:0!important;
-    aspect-ratio:16/9!important;max-height:none!important;
-    margin:0!important;padding:0!important;overflow:hidden!important;
-  }
-  .home-scroll-column{padding-bottom:0!important;margin-bottom:0!important}
-}
-</style>
+
+
+
+
 
 </body>
 </html>
