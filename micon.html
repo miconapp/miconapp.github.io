@@ -405,7 +405,7 @@ function setupVideo(){if(video)video.remove();video=document.createElement('vide
     if(ok&&video&&video.isConnected){window.__miconAdAuthorized=true;return video.play();}
   }).catch(error=>msg('Iklan belum dapat diputar: '+(error.message||error),true))
     .finally(()=>{window.__miconNativeAdPending=false;});
-});video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
+});video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconPlaylistHasNext&&typeof window.__miconPlaylistAdvance==='function'){window.__miconPlaylistAdvance();return;}if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
 async function getFormantNodeClass(){if(!hqConstructorPromise){hqConstructorPromise=import(HQ_MODULE).then(mod=>{if(!mod.FormantCorrectionNode)throw new Error('Modul koreksi formant tidak ditemukan.');return mod.FormantCorrectionNode;});}return hqConstructorPromise;}
 async function getMobileSoundTouchNodeClass(){if(!mobileConstructorPromise){mobileConstructorPromise=import(MOBILE_MODULE).then(mod=>{if(!mod.SoundTouchNode)throw new Error('Modul audio mobile tidak ditemukan.');return mod.SoundTouchNode;});}return mobileConstructorPromise;}
 function setFormantForPitch(n){if(!effect||engine!=='hq'||!effect.formantStrength)return;/* Koreksi formant hanya untuk jalur desktop; pada HP digunakan jalur SoundTouch yang lebih ringan. */effect.formantStrength.value=1;}
@@ -1576,6 +1576,32 @@ try {
   addButton.addEventListener('click',()=>playlistPicker.click());
 
   const playlist=[];
+  let currentIndex=-1;
+  let loadingIndex=-1;
+  function markActive(){
+    list.querySelectorAll('.desktop-playlist-item').forEach((el,index)=>{
+      el.classList.toggle('active',index===currentIndex);
+    });
+  }
+  function loadPlaylistItem(index){
+    if(index<0||index>=playlist.length)return;
+    const picker=document.getElementById('videoFile');
+    if(!picker)return;
+    currentIndex=index;
+    loadingIndex=index;
+    window.__miconPlaylistHasNext=index<playlist.length-1;
+    markActive();
+    try{
+      const transfer=new DataTransfer();
+      transfer.items.add(playlist[index].file);
+      picker.files=transfer.files;
+      picker.dispatchEvent(new Event('change',{bubbles:true}));
+      activate('transpose');
+    }catch(error){
+      loadingIndex=-1;
+      alert('Browser tidak dapat memuat video dari playlist: '+(error.message||error));
+    }
+  }
   function renderPlaylist(){
     list.replaceChildren();
     if(!playlist.length){list.appendChild(empty);return;}
@@ -1588,24 +1614,19 @@ try {
       const name=document.createElement('strong');name.textContent=item.file.name;
       const size=document.createElement('small');size.textContent=(item.file.size/1048576).toFixed(2)+' MB';
       copy.append(name,size);row.append(icon,copy);
-      row.addEventListener('click',()=>{
-        const picker=document.getElementById('videoFile');
-        if(!picker)return;
-        try{
-          const transfer=new DataTransfer();
-          transfer.items.add(item.file);
-          picker.files=transfer.files;
-          picker.dispatchEvent(new Event('change',{bubbles:true}));
-          list.querySelectorAll('.desktop-playlist-item').forEach(el=>el.classList.toggle('active',el===row));
-          activate('transpose');
-        }catch(error){
-          alert('Browser tidak dapat memuat video dari playlist: '+(error.message||error));
-        }
-      });
+      row.addEventListener('click',()=>loadPlaylistItem(index));
       list.appendChild(row);
     });
+    markActive();
   }
+  document.getElementById('videoFile')?.addEventListener('change',()=>{loadingIndex=-1;},{capture:true});
+  window.__miconPlaylistAdvance=()=>{
+    const nextIndex=currentIndex+1;
+    if(nextIndex<playlist.length)loadPlaylistItem(nextIndex);
+    else window.__miconPlaylistHasNext=false;
+  };
   playlistPicker.addEventListener('change',()=>{
+    const beforeCount=playlist.length;
     Array.from(playlistPicker.files||[]).forEach(file=>{
       if(/\.mp4$/i.test(file.name)||file.type==='video/mp4'||file.type==='application/mp4'){
         if(!playlist.some(item=>item.file.name===file.name&&item.file.size===file.size&&item.file.lastModified===file.lastModified)){
@@ -1615,6 +1636,10 @@ try {
     });
     playlistPicker.value='';
     renderPlaylist();
+    /* Impor batch pertama langsung memulai lagu pertama; batch tambahan tidak
+       mengganggu lagu yang sedang diputar dan masuk ke urutan antrean berikutnya. */
+    if(beforeCount===0&&playlist.length>0&&currentIndex===-1)loadPlaylistItem(0);
+    window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
   });
 })();
 </script>
