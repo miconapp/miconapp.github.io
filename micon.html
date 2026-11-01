@@ -1956,5 +1956,58 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 }
 </style>
 
+
+<style id="micon-mobile-nav-shadow-hover-final">
+@media screen and (max-width:900px){
+  /* Hilangkan dock navigasi bawah hanya pada tampilan smartphone. */
+  body .mobile-bottom-nav,
+  body .mobile-dock{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
+  /* Bayangan tipis ke arah dalam agar tidak tampak keluar dari batas kotak. */
+  body #importSection .filemeta,
+  body #transposeSection .pitch-compact-row>*,
+  body .mobile-playlist-import,
+  body .mobile-playlist-item,
+  body .mobile-playlist-panel,
+  body .card,
+  body .noteBox,
+  body .keySelect,
+  body .field input,
+  body #dropZone,
+  body .drop,
+  body .more-sheet,
+  body #micon-profile-menu,
+  body .mobile-profile-page .mobile-profile-back{
+    box-shadow:0 1px 4px rgba(15,23,42,.07)!important;
+    transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease!important;
+  }
+
+  /* Efek hover tetap berada di dalam area kotak; tidak menggeser atau membesar ke luar. */
+  body #importSection .filemeta:hover,
+  body #transposeSection .pitch-compact-row>*:hover,
+  body .mobile-playlist-import:hover,
+  body .mobile-playlist-item:hover,
+  body .card:hover,
+  body .noteBox:hover,
+  body .keySelect:hover,
+  body .field input:hover,
+  body #dropZone:hover,
+  body .drop:hover{
+    transform:none!important;
+    outline:none!important;
+    box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 1px 4px rgba(15,23,42,.07)!important;
+  }
+  body #transposeSection .pitch-compact-row>*:active,
+  body .mobile-playlist-import:active,
+  body .mobile-playlist-item:active{
+    transform:none!important;
+    box-shadow:inset 0 1px 3px rgba(15,23,42,.10)!important;
+  }
+}
+@media screen and (min-width:901px){
+  #micon-mobile-nav-shadow-hover-final{display:none!important}
+}
+</style>
+
 </body>
 </html>
