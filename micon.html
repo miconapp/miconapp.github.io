@@ -374,7 +374,7 @@
   }
   #importSection .status{display:none!important}
   body #mainContent #transposeSection .pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.8fr) repeat(3,minmax(0,.8fr)) minmax(0,.95fr)!important;
+    display:grid!important;grid-template-columns:minmax(0,1.65fr) repeat(3,minmax(0,.85fr))!important;
     grid-auto-flow:row!important;grid-auto-rows:40px!important;
     align-items:stretch!important;justify-content:stretch!important;
     gap:7px!important;box-sizing:border-box!important;
@@ -384,8 +384,7 @@
   body #mainContent #transposeSection .pitch-compact-row>.noteBox,
   body #mainContent #transposeSection .pitch-compact-row>.semitone,
   body #mainContent #transposeSection .pitch-compact-row>#downBtn,
-  body #mainContent #transposeSection .pitch-compact-row>#upBtn,
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn{
     display:flex!important;position:relative!important;float:none!important;
     grid-row:1!important;align-self:stretch!important;justify-self:stretch!important;
     width:100%!important;min-width:0!important;max-width:none!important;
@@ -399,7 +398,6 @@
   body #mainContent #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;font-size:12px!important;font-weight:800!important;white-space:nowrap!important}
   body #mainContent #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
   body #mainContent #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important;font-size:21px!important;font-weight:800!important;line-height:1!important}
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{grid-column:5!important;font-size:9px!important;font-weight:850!important;text-transform:uppercase!important;white-space:nowrap!important}
   body #mainContent #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
   body #mainContent #transposeSection .pitch-compact-row>.noteBox .note{
     display:block!important;color:#111827!important;font-size:12px!important;
@@ -409,10 +407,21 @@
     display:block!important;color:#64748b!important;font-size:7px!important;
     line-height:1!important;white-space:nowrap!important;
   }
-  body #mainContent #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
+
   .mobile-playlist-panel{
     display:block!important;order:3!important;padding:0 0 8px!important;
   }
+  .mobile-playlist-panel>.mobile-clear-video{
+    display:flex!important;box-sizing:border-box!important;
+    align-items:center!important;justify-content:center!important;
+    width:calc(100% - 14px)!important;height:40px!important;min-height:40px!important;
+    margin:0 7px 8px!important;padding:0 10px!important;
+    border:1px solid #e1e5eb!important;border-radius:12px!important;
+    background:#fff!important;color:#111827!important;
+    font:800 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
+    box-shadow:0 1px 4px rgba(15,23,42,.07)!important;
+  }
+  .mobile-playlist-panel>.mobile-clear-video:disabled{opacity:.45!important}
   .mobile-playlist-import{
     display:block!important;box-sizing:border-box!important;width:calc(100% - 14px)!important;
     height:40px!important;margin:0 7px 10px!important;padding:0 10px!important;
@@ -488,7 +497,7 @@
 @media screen and (max-width:900px){
   #transposeSection .pitch-compact-row{
     display:grid!important;
-    grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,.7fr)) minmax(0,.95fr)!important;
+    grid-template-columns:minmax(0,1.65fr) repeat(3,minmax(0,.85fr))!important;
     grid-template-rows:clamp(34px,11vw,40px)!important;
     grid-auto-flow:row!important;
     gap:clamp(3px,1.5vw,7px)!important;
@@ -518,12 +527,6 @@
   #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;gap:1px!important;flex-direction:column!important}
   #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
   #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
-  #transposeSection .pitch-compact-row>#clearBtn{
-    grid-column:5!important;
-    font-size:clamp(7px,2.5vw,10px)!important;
-    line-height:1.05!important;
-    overflow-wrap:anywhere!important;
-  }
   #transposeSection .pitch-compact-row>.noteBox .note{
     font-size:clamp(9px,3.2vw,12px)!important;
     max-width:100%!important;
@@ -554,13 +557,12 @@
 }
 @media screen and (max-width:360px){
   #transposeSection .pitch-compact-row{
-    grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.68fr)) minmax(0,.9fr)!important;
+    grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,.82fr))!important;
     gap:3px!important;
     width:calc(100% - 10px)!important;
     margin-left:5px!important;
     margin-right:5px!important;
   }
-  #transposeSection .pitch-compact-row>#clearBtn{font-size:7px!important}
 }
 @media screen and (min-width:901px){
   #transposeSection .pitch-compact-row{display:none!important}
@@ -1910,8 +1912,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   const compact=transpose&&transpose.querySelector('.pitch-compact-row');
   if(!scroll||!grid||!transpose||!compact)return;
 
-  /* Pindahkan tombol hapus ke baris kontrol ringkas tanpa mengubah handler aslinya. */
-  if(clear)compact.appendChild(clear);
+  /* Tombol Hapus Video dipindahkan ke baris penuh di atas Import Playlist; handler asli tetap. */
 
   const panel=document.createElement('section');
   panel.className='mobile-playlist-panel';
@@ -1925,6 +1926,11 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   const picker=document.createElement('input');
   picker.type='file';picker.accept='.mp4,video/mp4,video/*';picker.multiple=true;
   picker.className='mobile-playlist-picker';picker.setAttribute('aria-label','Pilih video untuk playlist');
+  if(clear){
+    clear.classList.add('mobile-clear-video');
+    clear.textContent='HAPUS VIDEO';
+    panel.appendChild(clear);
+  }
   panel.append(add,heading,list,picker);
   grid.insertAdjacentElement('afterend',panel);
   add.addEventListener('click',()=>picker.click());
