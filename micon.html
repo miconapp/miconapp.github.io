@@ -1812,7 +1812,15 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     adName.textContent=String(config.name||"Iklan").trim()||"Iklan";
     const destination=String(config.clickUrl||"").trim();
     if(destination){
-      try{const parsed=new URL(destination,location.href);if(parsed.protocol==="https:"||parsed.protocol==="http:"){adLink.href=parsed.href;adLink.textContent=destination;adLink.hidden=false;}else{adLink.removeAttribute("href");adLink.hidden=true;}}catch(_){adLink.removeAttribute("href");adLink.hidden=true;}
+      try{
+        const normalized=/^https?:\/\//i.test(destination)?destination:(/^\/\//.test(destination)?"https:"+destination:"https://"+destination.replace(/^\/+/,""));
+        const parsed=new URL(normalized);
+        if(parsed.protocol==="https:"||parsed.protocol==="http:"){
+          adLink.href=parsed.href;
+          adLink.textContent=destination.replace(/^https?:\/\//i,"");
+          adLink.hidden=false;
+        }else{adLink.removeAttribute("href");adLink.hidden=true;}
+      }catch(_){adLink.removeAttribute("href");adLink.hidden=true;}
     }else{adLink.removeAttribute("href");adLink.hidden=true;}
     adVideo.muted=false;
     adVideo.volume=1;
@@ -1840,7 +1848,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     if(!raw||raw==="#"||adLink.hidden)return;
     event.preventDefault();
     try{
-      const target=new URL(raw,location.href);
+      const target=new URL(raw);
       if(target.protocol!=="https:"&&target.protocol!=="http:")return;
       target.searchParams.set("utm_source","micon");
       target.searchParams.set("utm_medium","video_ad");
