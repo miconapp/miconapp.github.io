@@ -1691,23 +1691,24 @@ try {
 </style>
 
 <style id="micon-video-ad-style">
-#micon-video-ad-overlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(8,15,30,.88);backdrop-filter:blur(7px)}
+#videoStage{position:relative}
+#micon-video-ad-overlay{position:absolute;inset:0;z-index:30;display:none;align-items:stretch;justify-content:stretch;padding:0;background:#000}
 #micon-video-ad-overlay.is-open{display:flex}
-#micon-video-ad-card{width:min(760px,100%);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.4);color:#172033}
-#micon-video-ad-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:1px solid #e5eaf2}
-#micon-video-ad-head strong{font-size:14px}
-#micon-video-ad-label{font-size:11px;color:#64748b}
-#micon-video-ad-player{display:block;width:100%;max-height:min(62vh,480px);aspect-ratio:16/9;background:#000;object-fit:contain}
-#micon-video-ad-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px}
-#micon-video-ad-count{font-size:12px;color:#64748b}
+#micon-video-ad-card{position:relative;width:100%;height:100%;min-height:180px;background:#000;overflow:hidden;color:#fff}
+#micon-video-ad-head{position:absolute;z-index:2;left:12px;right:12px;top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border-radius:9px;background:rgba(0,0,0,.58)}
+#micon-video-ad-head strong{font-size:13px}
+#micon-video-ad-label{font-size:11px;color:#e2e8f0}
+#micon-video-ad-player{display:block;width:100%;height:100%;min-height:180px;aspect-ratio:16/9;background:#000;object-fit:contain}
+#micon-video-ad-controls{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
+#micon-video-ad-count{font-size:12px;color:#fff}
 #micon-video-ad-actions{display:flex;align-items:center;gap:8px}
-#micon-video-ad-sound,#micon-video-ad-skip,#micon-video-ad-start{border:0;border-radius:10px;padding:10px 13px;font:700 12px system-ui;cursor:pointer}
-#micon-video-ad-sound{background:#eef2f7;color:#334155}
+#micon-video-ad-sound,#micon-video-ad-skip,#micon-video-ad-start{border:0;border-radius:9px;padding:9px 12px;font:700 12px system-ui;cursor:pointer}
+#micon-video-ad-sound{background:#ffffffdf;color:#1e293b}
 #micon-video-ad-skip,#micon-video-ad-start{background:#2563eb;color:#fff}
-#micon-video-ad-skip:disabled{background:#dbe3ef;color:#64748b;cursor:not-allowed}
+#micon-video-ad-skip:disabled{background:#64748b;color:#e2e8f0;cursor:not-allowed}
 #micon-video-ad-start{display:none}
-#micon-video-ad-error{display:none;padding:0 16px 14px;color:#b42338;font-size:12px}
-@media(max-width:600px){#micon-video-ad-overlay{padding:10px}#micon-video-ad-card{border-radius:15px}#micon-video-ad-controls{padding:11px;align-items:flex-start}#micon-video-ad-actions{flex-wrap:wrap;justify-content:flex-end}#micon-video-ad-skip,#micon-video-ad-sound{padding:9px 10px}}
+#micon-video-ad-error{display:none;position:absolute;z-index:3;left:12px;right:12px;top:50px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.75);color:#fecaca;font-size:12px}
+@media(max-width:600px){#micon-video-ad-controls{padding:25px 8px 8px;align-items:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
 </style>
 <div id="micon-video-ad-overlay" role="dialog" aria-modal="true" aria-label="Iklan MicOn">
   <div id="micon-video-ad-card">
@@ -1730,7 +1731,10 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 
 (() => {
   const $ = id => document.getElementById(id);
-  const overlay=$("micon-video-ad-overlay"), adVideo=$("micon-video-ad-player");
+  const overlay=$("micon-video-ad-overlay");
+  const videoStage=document.getElementById("videoStage");
+  if(videoStage&&overlay&&overlay.parentElement!==videoStage)videoStage.appendChild(overlay);
+  const adVideo=$("micon-video-ad-player");
   const count=$("micon-video-ad-count"), skip=$("micon-video-ad-skip");
   const sound=$("micon-video-ad-sound"), start=$("micon-video-ad-start");
   const errorBox=$("micon-video-ad-error");
@@ -1797,7 +1801,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     showing=true;
     resolveGate=null;
     overlay.classList.add("is-open");
-    document.body.style.overflow="hidden";
+    document.body.style.overflow="";
     errorBox.style.display="none";
     start.style.display="none";
     skip.disabled=activeSkipAfter>0;
