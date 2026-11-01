@@ -1744,43 +1744,46 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     font-size:8px!important;line-height:1.2!important;
   }
   #importSection .status{display:none!important}
-  #transposeSection .pitch-compact-row{
-    display:grid!important;box-sizing:border-box!important;
-    grid-template-columns:minmax(0,1.65fr) repeat(4,minmax(0,.75fr))!important;
-    gap:8px!important;width:calc(100% - 14px)!important;
-    margin:0 7px 7px!important;padding:0!important;align-items:stretch!important;
+  body #mainContent #transposeSection .pitch-compact-row{
+    display:flex!important;flex-flow:row nowrap!important;align-items:stretch!important;
+    justify-content:stretch!important;gap:7px!important;
+    box-sizing:border-box!important;width:calc(100% - 14px)!important;
+    margin:0 7px 7px!important;padding:0!important;overflow:visible!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox,
-  #transposeSection .pitch-compact-row>.semitone,
-  #transposeSection .pitch-compact-row>#upBtn,
-  #transposeSection .pitch-compact-row>#downBtn,
-  #transposeSection .pitch-compact-row>#clearBtn{
-    display:flex!important;position:static!important;box-sizing:border-box!important;
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox,
+  body #mainContent #transposeSection .pitch-compact-row>.semitone,
+  body #mainContent #transposeSection .pitch-compact-row>#downBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{
+    display:flex!important;position:static!important;float:none!important;
+    flex-shrink:1!important;min-width:0!important;max-width:none!important;
+    height:40px!important;min-height:40px!important;max-height:40px!important;
+    margin:0!important;padding:0 3px!important;box-sizing:border-box!important;
     align-items:center!important;justify-content:center!important;
-    width:100%!important;min-width:0!important;height:40px!important;
-    min-height:40px!important;max-height:40px!important;margin:0!important;padding:0 4px!important;
     border:1px solid #e1e5eb!important;border-radius:12px!important;
     background:#fff!important;color:#111827!important;box-shadow:none!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important}
-  #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox{flex:1.8 1 0!important;flex-direction:column!important;gap:2px!important}
+  body #mainContent #transposeSection .pitch-compact-row>.semitone,
+  body #mainContent #transposeSection .pitch-compact-row>#downBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{flex:0.8 1 0!important}
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox .note{
     display:block!important;color:#111827!important;font-size:12px!important;
     line-height:1!important;font-weight:850!important;text-transform:uppercase!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+  body #mainContent #transposeSection .pitch-compact-row>.noteBox #noteDesc{
     display:block!important;color:#64748b!important;font-size:7px!important;
     line-height:1!important;white-space:nowrap!important;
   }
-  #transposeSection .pitch-compact-row>.semitone{
-    grid-column:2!important;font-size:12px!important;font-weight:800!important;
+  body #mainContent #transposeSection .pitch-compact-row>.semitone{font-size:12px!important;font-weight:800!important;white-space:nowrap!important}
+  body #mainContent #transposeSection .pitch-compact-row>#downBtn,
+  body #mainContent #transposeSection .pitch-compact-row>#upBtn{font-size:21px!important;font-weight:800!important;line-height:1!important}
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn{
+    font-size:9px!important;font-weight:850!important;text-transform:uppercase!important;white-space:nowrap!important;
   }
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important;font-size:21px!important;font-weight:800!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important;font-size:21px!important;font-weight:800!important}
-  #transposeSection .pitch-compact-row>#clearBtn{
-    grid-column:5!important;font-size:10px!important;font-weight:850!important;text-transform:uppercase!important;
-  }
-  #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
+  body #mainContent #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
   .mobile-playlist-panel{
     display:block!important;order:3!important;padding:0 0 8px!important;
   }
