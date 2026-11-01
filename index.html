@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
-  <title>micOn</title>
+  <title>MICON</title>
   <script>
-    // Halaman utama langsung membuka halaman login micOn.
-    window.location.replace("./login.html");
+    const path = window.location.pathname.replace(/\/+$/, "");
+
+    if (path === "/micon") {
+      window.location.replace("/login");
+    }
   </script>
 </head>
 <body>
-  <p>Membuka micOn...</p>
-  <a href="./login.html">Buka halaman login micOn</a>
+  <p>Membuka MICON...</p>
 </body>
 </html>
