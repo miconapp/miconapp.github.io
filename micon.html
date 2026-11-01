@@ -1757,6 +1757,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   const adName=$("micon-video-ad-name"), adLink=$("micon-video-ad-link");
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
+  let activeAdPhase="opening";
 
   function finishAd(){
     if(!showing)return;
@@ -1797,6 +1798,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     activeDuration=Math.max(1,Math.min(600,Number(config.durationSeconds)||30));
     activeSkipAfter=Math.max(0,Math.min(120,Number(config.skipAfterSeconds)||0));
     elapsed=0;
+    activeAdPhase=phase==="ending"?"ending":"opening";
     showing=true;
     resolveGate=null;
     overlay.classList.add("is-open");
@@ -1833,6 +1835,20 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     });
   }
 
+  adLink.addEventListener("click",event=>{
+    const raw=String(adLink.href||"").trim();
+    if(!raw||raw==="#"||adLink.hidden)return;
+    event.preventDefault();
+    try{
+      const target=new URL(raw,location.href);
+      if(target.protocol!=="https:"&&target.protocol!=="http:")return;
+      target.searchParams.set("utm_source","micon");
+      target.searchParams.set("utm_medium","video_ad");
+      target.searchParams.set("utm_campaign","micon_video_player");
+      target.searchParams.set("micon_ad_phase",activeAdPhase);
+      window.open(target.href,"_blank","noopener,noreferrer");
+    }catch(_){}
+  });
   sound.addEventListener("click",()=>{
     adVideo.muted=!adVideo.muted;
     sound.textContent=adVideo.muted?"Aktifkan suara":"Matikan suara";
