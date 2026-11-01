@@ -267,62 +267,74 @@
 }
 </style>
 
-<style id="micon-mobile-force-white-final">
-@media (max-width:760px){
-  :root{color-scheme:light!important;--bg:#fff!important;--panel:#fff!important;--panel2:#fff!important;--line:#e5e7eb!important;--muted:#64748b!important;--text:#172033!important}
-  html,body,#mainContent,.wrap,.home-scroll-column,.home-preview-column,
-  #importSection,#transposeSection,.grid,.foot,.mobile-fill{
-    background:#fff!important;color:#172033!important;
+
+<style id="micon-mobile-white-theme-single">
+@media screen and (max-width:760px){
+  :root{
+    color-scheme:light!important;
+    --bg:#fff!important;--panel:#fff!important;--panel2:#fff!important;
+    --line:#e5e7eb!important;--muted:#64748b!important;--text:#172033!important;
   }
-  .home-preview-column,#videoStage,#videoStage:empty{
-    background:#fff!important;border-color:#e5e7eb!important;
+  html,body,body #mainContent,body .wrap,body .home-layout,
+  body .home-preview-column,body .home-scroll-column,body .grid,
+  body #importSection,body #transposeSection,body .mobile-fill,
+  body .foot,body .foot-section,body #youtubeSection{
+    background:#fff!important;background-color:#fff!important;color:#172033!important;
   }
-  #importSection,#transposeSection,.card,.filemeta,.noteBox,.mobile-tip,
-  .mobile-ad-banner,.keySelect,#transposeSection .noteBox,
-  #transposeSection .semitone,.more-sheet,#micon-profile-menu{
-    background:#fff!important;color:#172033!important;
-    border-color:#e5e7eb!important;box-shadow:none!important;
+  body #videoStage,body #videoStage:empty,body .home-preview-column #videoStage{
+    background:#fff!important;background-color:#fff!important;border-color:#e5e7eb!important;
   }
-  #dropZone,.home-scroll-column #dropZone{
-    background:#fff!important;color:#172033!important;border-color:#cbd5e1!important;
+  body #importSection .filemeta,body #importSection .noteBox,
+  body #transposeSection .noteBox,body #transposeSection .keySelect,
+  body #transposeSection .keySelectWrap,body #transposeSection .step,
+  body #transposeSection .pitch-compact-row,
+  body .card,body .mobile-tip,body .config,body .configBody,
+  body .more-sheet,body #micon-profile-menu,body #micon-profile-trigger,
+  body .mobile-bottom-nav,body .mobile-dock,body .dock-item,
+  body .sheet-link,body .sheet-close,body .fileIcon,body .field input,
+  body #dropZone,body .drop,body .noteBox,body .stepper,
+  body .rangeLabels,body .progress{
+    background:#fff!important;background-color:#fff!important;
+    color:#172033!important;border-color:#e5e7eb!important;
+    box-shadow:none!important;
   }
-  #dropZone strong,.drop strong,.filetext b,.foot-title,
-  .mobile-tip b,.config summary,#transposeSection .note{
+  body .mobile-bottom-nav button,body .mobile-bottom-nav a,
+  body .dock-item,body .dock-nav-icon,body .dock-nav-label,
+  body .sheet-note,body .sheet-note small{
+    color:#334155!important;
+  }
+  body #dropZone strong,body .drop strong,body .filetext b,
+  body .foot-title,body .foot p,body .foot li,body .mobile-tip b,
+  body .mobile-tip p,body .config summary,body #transposeSection .note,
+  body #micon-profile-detail strong,body #micon-profile-contact{
     color:#172033!important;
   }
-  #dropZone small,.drop small,.filetext small,.foot,.foot p,.foot li,
-  .mobile-tip p,.sub,.hint,.mini,.rangeLabels,.noteBox small,
-  #noteDesc,.field label,.sheet-note small{
+  body #dropZone small,body .drop small,body .filetext small,
+  body .sub,body .mini,body .hint,body .rangeLabels,
+  body .noteBox small,body #noteDesc,body .field label,
+  body .foot,body .status{
     color:#64748b!important;
   }
-  .fileIcon,.step,.sheet-close,.sheet-link{
-    background:#f8fafc!important;color:#2563eb!important;border-color:#e2e8f0!important;
+  body .btn.secondary,body .btn.danger,body .step,
+  body .sheet-link,body .sheet-close{
+    background:#fff!important;color:#334155!important;border:1px solid #d1d5db!important;
   }
-  .field input{background:#fff!important;color:#172033!important;border-color:#d1d5db!important}
-  .btn.secondary,.btn.danger{
-    background:#f8fafc!important;color:#334155!important;border-color:#d1d5db!important;
+  body .alert.ok{background:#ecfdf5!important;color:#047857!important;border-color:#a7f3d0!important}
+  body .alert.err{background:#fff1f2!important;color:#be123c!important;border-color:#fecdd3!important}
+  body .progress>div{background:#0891b2!important}
+  body .mobile-bottom-nav .upload-dock,
+  body .mobile-bottom-nav .upload-dock .dock-nav-icon{
+    background:#fff!important;color:#2563eb!important;border-color:#2563eb!important;
   }
-  .mobile-bottom-nav,.mobile-dock{
-    background:rgba(255,255,255,.98)!important;color:#334155!important;
-    border-color:#e5e7eb!important;box-shadow:0 -3px 18px rgba(15,23,42,.08)!important;
+  body .mobile-bottom-nav button.active,
+  body .mobile-dock .dock-item.active{
+    background:#f8fafc!important;color:#2563eb!important;
   }
-  .mobile-bottom-nav button,.dock-item{
-    background:transparent!important;color:#64748b!important;
-  }
-  .mobile-bottom-nav button:active,.dock-item.active{
-    background:#eff6ff!important;color:#2563eb!important;
-  }
-  .mobile-bottom-nav .upload-dock .dock-nav-icon{
-    background:#fff!important;border-color:#2563eb!important;color:#2563eb!important;
-    box-shadow:0 0 0 3px #fff!important;
-  }
-  .progress{background:#e5e7eb!important}
-  .alert.ok{background:#ecfdf5!important;color:#047857!important;border-color:#a7f3d0!important}
-  .alert.err{background:#fff1f2!important;color:#be123c!important;border-color:#fecdd3!important}
-  #micon-profile-trigger{background:#fff!important;color:#172033!important;border-color:#e5e7eb!important}
-  #micon-profile-avatar{background:#eff6ff!important;color:#2563eb!important}
-  /* Video tetap mempertahankan tampilan aslinya saat video benar-benar diputar. */
-  #karaokeVideo{background:#000!important}
+  body #micon-profile-avatar{background:#fff!important;color:#2563eb!important;border:1px solid #e5e7eb!important}
+  /* Area pemutar kosong putih; ketika video ada, gambar video tetap tampil normal. */
+  body #karaokeVideo{background:#000!important}
+  body #micon-video-ad-overlay,body #micon-video-ad-card,
+  body #micon-video-ad-player{background:#000!important;color:#fff!important}
 }
 </style>
 
