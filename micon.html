@@ -1709,6 +1709,10 @@ try {
 #micon-video-ad-card{position:relative;width:100%;height:100%;min-height:180px;background:#000;overflow:hidden;color:#fff}
 #micon-video-ad-head{position:absolute;z-index:2;left:12px;right:12px;top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border-radius:9px;background:rgba(0,0,0,.58)}
 #micon-video-ad-head strong{font-size:13px}
+#micon-video-ad-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+#micon-video-ad-sponsor{font-size:11px;color:#facc15;font-weight:800;letter-spacing:.04em}
+#micon-video-ad-name{font-size:12px;color:#fff;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#micon-video-ad-link{font-size:11px;color:#bfdbfe;text-decoration:underline;overflow-wrap:anywhere}
 #micon-video-ad-label{font-size:11px;color:#e2e8f0}
 #micon-video-ad-player{display:block;width:100%;height:100%;min-height:180px;aspect-ratio:16/9;background:#000;object-fit:contain}
 #micon-video-ad-controls{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
@@ -1724,8 +1728,8 @@ try {
 </style>
 <div id="micon-video-ad-overlay" role="dialog" aria-modal="true" aria-label="Iklan MicOn">
   <div id="micon-video-ad-card">
-    <div id="micon-video-ad-head"><strong>Iklan</strong><span id="micon-video-ad-label">Iklan sebelum video diputar</span></div>
-    <video id="micon-video-ad-player" playsinline autoplay muted preload="auto"></video>
+    <div id="micon-video-ad-head"><div id="micon-video-ad-meta"><span id="micon-video-ad-sponsor">BERSPONSOR</span><strong id="micon-video-ad-name">Nama pengiklan</strong><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-label">Iklan sebelum video diputar</span></div>
+    <video id="micon-video-ad-player" playsinline autoplay preload="auto"></video>
     <div id="micon-video-ad-controls">
       <span id="micon-video-ad-count">Iklan dimulai…</span>
       <div id="micon-video-ad-actions">
@@ -1750,6 +1754,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   const count=$("micon-video-ad-count"), skip=$("micon-video-ad-skip");
   const sound=$("micon-video-ad-sound"), start=$("micon-video-ad-start");
   const errorBox=$("micon-video-ad-error");
+  const adName=$("micon-video-ad-name"), adLink=$("micon-video-ad-link");
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
 
@@ -1802,8 +1807,14 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     skip.textContent=activeSkipAfter>0?"Lewati dalam "+activeSkipAfter:"Lewati iklan";
     if(activeSkipAfter===0)skip.disabled=false;
     count.textContent="Iklan selesai otomatis dalam "+activeDuration+" detik";
-    adVideo.muted=true;
-    sound.textContent="Aktifkan suara";
+    adName.textContent=String(config.name||"Iklan").trim()||"Iklan";
+    const destination=String(config.clickUrl||"").trim();
+    if(destination){
+      try{const parsed=new URL(destination,location.href);if(parsed.protocol==="https:"||parsed.protocol==="http:"){adLink.href=parsed.href;adLink.textContent=destination;adLink.hidden=false;}else{adLink.removeAttribute("href");adLink.hidden=true;}}catch(_){adLink.removeAttribute("href");adLink.hidden=true;}
+    }else{adLink.removeAttribute("href");adLink.hidden=true;}
+    adVideo.muted=false;
+    adVideo.volume=1;
+    sound.textContent="Matikan suara";
     adVideo.src=source;
 
     count.textContent=phase==="ending"?"Iklan penutup setelah video karaoke":"Iklan sebelum video karaoke";
@@ -1812,8 +1823,11 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
       updateClock();
       timer=setInterval(updateClock,1000);
       adVideo.play().catch(()=>{
+        adVideo.muted=true;
+        sound.textContent="Aktifkan suara";
+        start.textContent="Putar iklan dengan suara";
         start.style.display="inline-block";
-        errorBox.textContent="Tekan Putar iklan jika video tidak berjalan otomatis.";
+        errorBox.textContent="Browser membatasi suara otomatis. Tekan Putar iklan dengan suara untuk memulai iklan bersuara.";
         errorBox.style.display="block";
       });
     });
@@ -1827,6 +1841,9 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   start.addEventListener("click",()=>{
     start.style.display="none";
     errorBox.style.display="none";
+    adVideo.muted=false;
+    adVideo.volume=1;
+    sound.textContent="Matikan suara";
     adVideo.play().catch(()=>{
       errorBox.textContent="Video iklan tidak dapat diputar pada perangkat ini.";
       errorBox.style.display="block";
