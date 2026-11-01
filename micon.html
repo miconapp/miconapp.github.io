@@ -1871,5 +1871,90 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 }
 </style>
 
+
+<style id="micon-smartphone-responsive-final">
+/* Responsive controls: five items stay on one row across phone widths. */
+@media screen and (max-width:900px){
+  #transposeSection .pitch-compact-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,.7fr)) minmax(0,.95fr)!important;
+    grid-template-rows:clamp(34px,11vw,40px)!important;
+    grid-auto-flow:row!important;
+    gap:clamp(3px,1.5vw,7px)!important;
+    width:calc(100% - 14px)!important;
+    margin:0 7px 7px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    align-items:stretch!important;
+  }
+  #transposeSection .pitch-compact-row>*{
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:2px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    justify-self:stretch!important;
+    align-self:stretch!important;
+    white-space:normal!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important}
+  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;gap:1px!important;flex-direction:column!important}
+  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
+  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
+  #transposeSection .pitch-compact-row>#clearBtn{
+    grid-column:5!important;
+    font-size:clamp(7px,2.5vw,10px)!important;
+    line-height:1.05!important;
+    overflow-wrap:anywhere!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox .note{
+    font-size:clamp(9px,3.2vw,12px)!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+    font-size:clamp(6px,1.9vw,7px)!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #transposeSection .pitch-compact-row>.semitone{
+    font-size:clamp(9px,3vw,12px)!important;
+    line-height:1!important;
+  }
+  #transposeSection .pitch-compact-row>.semitone small{
+    display:block!important;
+    font-size:clamp(6px,1.9vw,8px)!important;
+    line-height:1!important;
+    white-space:normal!important;
+  }
+  #transposeSection .pitch-compact-row>#downBtn,
+  #transposeSection .pitch-compact-row>#upBtn{
+    font-size:clamp(16px,5.5vw,22px)!important;
+    line-height:1!important;
+  }
+}
+@media screen and (max-width:360px){
+  #transposeSection .pitch-compact-row{
+    grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.68fr)) minmax(0,.9fr)!important;
+    gap:3px!important;
+    width:calc(100% - 10px)!important;
+    margin-left:5px!important;
+    margin-right:5px!important;
+  }
+  #transposeSection .pitch-compact-row>#clearBtn{font-size:7px!important}
+}
+@media screen and (min-width:901px){
+  #transposeSection .pitch-compact-row{display:none!important}
+}
+</style>
+
 </body>
 </html>
