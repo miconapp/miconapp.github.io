@@ -1707,13 +1707,14 @@ try {
 #micon-video-ad-overlay{position:absolute;inset:0;z-index:30;display:none;align-items:stretch;justify-content:stretch;padding:0;background:#000}
 #micon-video-ad-overlay.is-open{display:flex}
 #micon-video-ad-card{position:relative;width:100%;height:100%;min-height:180px;background:#000;overflow:hidden;color:#fff}
-#micon-video-ad-head{position:absolute;z-index:2;left:12px;right:auto;top:auto;bottom:47px;display:block;max-width:calc(100% - 24px);padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+#micon-video-ad-head{position:absolute;z-index:2;left:12px;right:auto;top:auto;bottom:48px;display:block;max-width:calc(100% - 24px);padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 #micon-video-ad-head strong{font-size:13px}
-#micon-video-ad-meta{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-#micon-video-ad-sponsor{font-size:11px;color:#facc15;font-weight:800;letter-spacing:.04em;text-shadow:0 1px 3px #000}
-#micon-video-ad-name{font-size:12px;color:#fff;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px #000}
-#micon-video-ad-link{font-size:11px;color:#bfdbfe;text-decoration:underline;overflow-wrap:anywhere;text-shadow:0 1px 3px #000}
+#micon-video-ad-meta{display:flex;flex-direction:row;align-items:center;gap:7px;min-width:0;flex-wrap:wrap}
+#micon-video-ad-sponsor{display:block;font-size:11px;line-height:1.25;color:#facc15;font-weight:800;letter-spacing:.04em;text-shadow:0 1px 3px #000;margin-bottom:3px}
+#micon-video-ad-name{font-size:12px;color:#fff;font-weight:700;white-space:nowrap;text-shadow:0 1px 3px #000}
+#micon-video-ad-link{font-size:11px;color:#facc15;text-decoration:underline;overflow-wrap:anywhere;text-shadow:0 1px 3px #000}
 #micon-video-ad-label{position:absolute;top:12px;right:12px;font-size:11px;color:#fff;text-shadow:0 1px 4px #000;background:transparent;padding:0;border:0;border-radius:0}
+#micon-video-ad-count{display:block;font-size:11px;line-height:1.35;color:#fff;text-shadow:0 1px 3px #000;margin-top:3px;max-width:min(480px,calc(100vw - 40px))}
 #micon-video-ad-player{display:block;width:100%;height:100%;min-height:180px;aspect-ratio:16/9;background:#000;object-fit:contain}
 #micon-video-ad-controls{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
 #micon-video-ad-count{font-size:12px;color:#fff}
@@ -1724,14 +1725,13 @@ try {
 #micon-video-ad-skip:disabled{background:#64748b;color:#e2e8f0;cursor:not-allowed}
 #micon-video-ad-start{display:none}
 #micon-video-ad-error{display:none;position:absolute;z-index:3;left:12px;right:12px;top:50px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.75);color:#fecaca;font-size:12px}
-@media(max-width:600px){#micon-video-ad-head{left:8px;bottom:45px;max-width:calc(100% - 16px)}#micon-video-ad-label{top:10px;right:8px}#micon-video-ad-controls{padding:25px 8px 8px;align-items:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
+@media(max-width:600px){#micon-video-ad-head{left:8px;bottom:48px;max-width:calc(100% - 16px)}#micon-video-ad-label{top:10px;right:8px}#micon-video-ad-controls{padding:25px 8px 8px;align-items:flex-end;justify-content:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
 </style>
 <div id="micon-video-ad-overlay" role="dialog" aria-modal="true" aria-label="Iklan MicOn">
   <div id="micon-video-ad-card">
-    <div id="micon-video-ad-head"><div id="micon-video-ad-meta"><span id="micon-video-ad-sponsor">BERSPONSOR</span><strong id="micon-video-ad-name">Nama pengiklan</strong><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-label">Iklan sebelum video diputar</span></div>
+    <div id="micon-video-ad-head"><span id="micon-video-ad-sponsor">Bersponsor</span><div id="micon-video-ad-meta"><strong id="micon-video-ad-name">Nama pengiklan</strong><span aria-hidden="true">|</span><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-count">Iklan selesai otomatis dalam 15 detik, Video akan diputar otomatis</span><span id="micon-video-ad-label">Iklan sebelum video diputar</span></div>
     <video id="micon-video-ad-player" playsinline autoplay preload="auto"></video>
     <div id="micon-video-ad-controls">
-      <span id="micon-video-ad-count">Iklan dimulai…</span>
       <div id="micon-video-ad-actions">
         <button type="button" id="micon-video-ad-sound">Aktifkan suara</button>
         <button type="button" id="micon-video-ad-skip" disabled>Lewati dalam 5</button>
@@ -1780,7 +1780,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
       skip.disabled=true;
       skip.textContent="Lewati dalam "+Math.ceil(activeSkipAfter-elapsed);
     }
-    count.textContent="Iklan selesai otomatis dalam "+remaining+" detik";
+    count.textContent="Iklan selesai otomatis dalam "+remaining+" detik, Video akan diputar otomatis";
     if(remaining<=0)finishAd();
     elapsed++;
   }
@@ -1827,7 +1827,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     sound.textContent="Matikan suara";
     adVideo.src=source;
 
-    count.textContent=phase==="ending"?"Iklan penutup setelah video karaoke":"Iklan sebelum video karaoke";
+    count.textContent="Iklan selesai otomatis dalam "+activeDuration+" detik, Video akan diputar otomatis";
     return new Promise(resolve=>{
       resolveGate=resolve;
       updateClock();
