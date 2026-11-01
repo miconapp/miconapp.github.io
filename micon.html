@@ -396,7 +396,7 @@ const pitchScaleNames={0:'Original',1:'C♯ / D♭',2:'D',3:'D♯ / E♭',4:'E',
 function pitchScaleName(n){return pitchScaleNames[n]||'Original'}
 function showTime(){if(!video)return;$('currentTime').textContent=fmt(video.currentTime);$('progressBar').style.width=(video.duration?video.currentTime/video.duration*100:0)+'%';}
 function setupVideo(){if(video)video.remove();video=document.createElement('video');video.id='karaokeVideo';video.controls=true;video.playsInline=true;video.preload='metadata';video.defaultPlaybackRate=1;video.playbackRate=1;video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';$('videoStage').appendChild(video);video.src=url;video.addEventListener('loadedmetadata',()=>{$('duration').textContent=fmt(video.duration);$('fileStatus').textContent='Video siap diputar';$('playBtn').disabled=false;$('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;});video.addEventListener('ratechange',()=>{if(video&&video.playbackRate!==1)video.playbackRate=1;});video.addEventListener('timeupdate',showTime);video.addEventListener('play',()=>{
-  if(window.__miconAdAuthorized){window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;}
+  if(window.__miconAdAuthorized||window.__miconAdForFileDone){window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;}
   /* Jika tombol play bawaan video dipakai, tahan video utama sampai iklan selesai/di-skip. */
   video.pause();
   if(window.__miconNativeAdPending)return;
@@ -405,7 +405,7 @@ function setupVideo(){if(video)video.remove();video=document.createElement('vide
     if(ok&&video&&video.isConnected){window.__miconAdAuthorized=true;return video.play();}
   }).catch(error=>msg('Iklan belum dapat diputar: '+(error.message||error),true))
     .finally(()=>{window.__miconNativeAdPending=false;});
-});video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
+});video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
 async function getFormantNodeClass(){if(!hqConstructorPromise){hqConstructorPromise=import(HQ_MODULE).then(mod=>{if(!mod.FormantCorrectionNode)throw new Error('Modul koreksi formant tidak ditemukan.');return mod.FormantCorrectionNode;});}return hqConstructorPromise;}
 async function getMobileSoundTouchNodeClass(){if(!mobileConstructorPromise){mobileConstructorPromise=import(MOBILE_MODULE).then(mod=>{if(!mod.SoundTouchNode)throw new Error('Modul audio mobile tidak ditemukan.');return mod.SoundTouchNode;});}return mobileConstructorPromise;}
 function setFormantForPitch(n){if(!effect||engine!=='hq'||!effect.formantStrength)return;/* Koreksi formant hanya untuk jalur desktop; pada HP digunakan jalur SoundTouch yang lebih ringan. */effect.formantStrength.value=1;}
@@ -544,6 +544,9 @@ $('videoFile').addEventListener('change',async e=>{
   try{
     await clearVideo();
     file=selectedFile;
+    window.__miconAdForFileDone=false;
+    window.__miconEndAdShown=false;
+    window.__miconOpeningAdRunning=false;
     url=URL.createObjectURL(selectedFile);
     $('fileName').textContent=selectedFile.name;
     $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video/mp4');
@@ -555,9 +558,23 @@ $('videoFile').addEventListener('change',async e=>{
     const loadedVideo=video;
     loadedVideo.addEventListener('loadedmetadata',()=>{
       if(loadedVideo!==video) return;
-      $('fileStatus').textContent='Video siap · audio siap diputar';
-      /* Jangan membuat AudioWorklet saat import. Audio asli diputar langsung; mesin transpose
-         baru diaktifkan oleh tindakan pengguna ketika nada memang diubah. */
+      $('fileStatus').textContent='Video berhasil diimpor · menyiapkan iklan';
+      /* Satu import sukses = satu iklan pembuka. Setelah iklan dilewati/selesai, video langsung play. */
+      if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
+        window.__miconOpeningAdRunning=true;
+        Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true).then(async passed=>{
+          if(!passed||loadedVideo!==video||!loadedVideo.isConnected)return;
+          window.__miconAdForFileDone=true;
+          $('fileStatus').textContent='Video siap diputar';
+          loadedVideo.currentTime=0;
+          loadedVideo.defaultPlaybackRate=1;
+          loadedVideo.playbackRate=1;
+          window.__miconAdAuthorized=true;
+          await loadedVideo.play();
+        }).catch(error=>msg('Gagal memulai video setelah iklan: '+(error.message||error),true))
+          .finally(()=>{window.__miconOpeningAdRunning=false;});
+      }
+      /* Mesin transpose tetap tidak dibuat saat import agar pemuatan video ringan. */
       updatePitch();
     },{once:true});
     loadedVideo.addEventListener('error',()=>{
@@ -573,12 +590,7 @@ $('playBtn').addEventListener('click',async()=>{
   if(!video)return;
   if(!video.paused){video.pause();return;}
   try{
-    /* Iklan pembuka dikontrol dari dashboard Super Admin sebelum video utama berjalan. */
-    if(window.miconAdGate){
-      const adPassed=await window.miconAdGate();
-      if(!adPassed)return;
-    }
-    /* Nada asli tidak perlu melewati AudioWorklet, sehingga pemutaran setelah import lebih ringan. */
+    /* Iklan pembuka sudah ditayangkan otomatis setelah import berhasil; tombol ini hanya resume/pause. */
     if(Number($('pitchRange').value)!==0||source) await setupAudio();
     video.defaultPlaybackRate=1;
     video.playbackRate=1;
@@ -1739,24 +1751,8 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   const sound=$("micon-video-ad-sound"), start=$("micon-video-ad-start");
   const errorBox=$("micon-video-ad-error");
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
-  let seenThisVisit=false, activeDuration=30, activeSkipAfter=5;
+  let activeDuration=30, activeSkipAfter=5;
 
-  function wasShown(frequency,uid){
-    const day=new Date().toISOString().slice(0,10);
-    try{
-      if(frequency==="once-per-day") return localStorage.getItem("micon-video-ad-day-"+uid)===day;
-      if(frequency==="every-session") return sessionStorage.getItem("micon-video-ad-session-"+uid)==="1";
-      return seenThisVisit;
-    }catch(_){return seenThisVisit;}
-  }
-  function markShown(frequency,uid){
-    const day=new Date().toISOString().slice(0,10);
-    seenThisVisit=true;
-    try{
-      if(frequency==="once-per-day") localStorage.setItem("micon-video-ad-day-"+uid,day);
-      else if(frequency==="every-session") sessionStorage.setItem("micon-video-ad-session-"+uid,"1");
-    }catch(_){}
-  }
   function finishAd(){
     if(!showing)return;
     showing=false;
@@ -1788,10 +1784,8 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     const data=snap.exists()?snap.data():{};
     return data.videoAd||{};
   }
-  async function showAd(config,uid){
+  async function showAd(config,uid,phase){
     if(showing)return false;
-    const frequency=config.frequency||"every-session";
-    if(wasShown(frequency,uid))return true;
     const source=String(config.url||"").trim();
     if(!config.enabled||!source)return true;
 
@@ -1811,8 +1805,8 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     adVideo.muted=true;
     sound.textContent="Aktifkan suara";
     adVideo.src=source;
-    markShown(frequency,uid);
 
+    count.textContent=phase==="ending"?"Iklan penutup setelah video karaoke":"Iklan sebelum video karaoke";
     return new Promise(resolve=>{
       resolveGate=resolve;
       updateClock();
@@ -1845,14 +1839,14 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     errorBox.style.display="block";
   });
 
-  window.miconAdGate=async()=>{
+  window.miconAdGate=async(phase="opening")=>{
     try{
       const authApp=getApp();
       const {getAuth}=await import("https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js");
       const user=getAuth(authApp).currentUser;
       if(!user)return true;
       const config=await loadAdConfig();
-      return await showAd(config,user.uid);
+      return await showAd(config,user.uid,phase);
     }catch(err){
       console.warn("MicOn video ad config could not be loaded:",err);
       /* Jika konfigurasi iklan gagal dibaca, jangan mengunci pemutaran video pengguna. */
