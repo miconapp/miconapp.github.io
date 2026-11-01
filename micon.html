@@ -303,45 +303,23 @@
     min-height:100dvh!important;max-height:none!important;margin:0!important;
     padding:0 0 28px!important;overflow:visible!important;background:var(--micon-bg)!important;
   }
+  /* Android app shell: compact toolbar, no website-style menu strip or hero banner. */
   .top{
-    display:flex!important;position:relative!important;flex-wrap:wrap!important;align-items:center!important;
+    display:flex!important;position:sticky!important;top:0!important;z-index:100!important;
+    flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;
     gap:10px!important;width:100%!important;box-sizing:border-box!important;margin:0!important;
-    padding:12px 14px 10px!important;border:0!important;border-bottom:1px solid #e7edf5!important;
-    border-radius:0!important;background:#fff!important;color:var(--micon-ink)!important;
-    box-shadow:0 2px 10px rgba(22,39,67,.035)!important;
+    padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important;
+    border:0!important;border-bottom:1px solid #edf0f5!important;border-radius:0!important;
+    background:rgba(255,255,255,.97)!important;color:var(--micon-ink)!important;
+    box-shadow:0 2px 8px rgba(18,32,56,.045)!important;backdrop-filter:blur(12px)!important;
   }
   .top .brand{display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important}
-  .top .logo{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;
-    border-radius:12px!important;background:linear-gradient(145deg,#2563eb,#60a5fa)!important;
-    color:#fff!important;font-size:21px!important}
-  .top .brand h1{margin:0!important;color:#172033!important;font-size:18px!important;font-weight:850!important;line-height:1.1!important}
-  .top .brand p{margin:3px 0 0!important;color:#718096!important;font-size:9px!important}
-  .top .desktop-nav{
-    display:flex!important;order:3!important;flex:1 1 100%!important;gap:7px!important;
-    width:100%!important;max-width:100%!important;margin:0!important;padding:2px 0 3px!important;
-    overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;
-    scrollbar-width:none!important;
-  }
-  .top .desktop-nav::-webkit-scrollbar{display:none!important}
-  .top .desktop-nav .nav-link{
-    display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;gap:6px!important;
-    min-height:34px!important;padding:0 10px!important;border:1px solid #e5ebf4!important;
-    border-radius:10px!important;background:#f8fafc!important;color:#475569!important;
-    font-size:10px!important;font-weight:700!important;
-  }
-  .top .desktop-nav .nav-ico{display:inline-flex!important;width:15px!important;height:15px!important}
-  .top .desktop-nav .nav-ico svg{width:15px!important;height:15px!important}
-  .top .social-icons{display:flex!important;align-items:center!important;gap:6px!important;margin-left:auto!important}
-  .top .social-icon{width:25px!important;height:25px!important}
-  .hero{
-    display:block!important;box-sizing:border-box!important;width:calc(100% - 26px)!important;
-    margin:13px 13px 0!important;padding:15px 16px!important;border:1px solid #dbeafe!important;
-    border-radius:16px!important;background:linear-gradient(135deg,#eff6ff,#fff)!important;
-    color:#172033!important;box-shadow:0 3px 12px rgba(22,39,67,.035)!important;
-  }
-  .hero h2{margin:0 0 5px!important;color:#172033!important;font-size:17px!important;line-height:1.25!important;font-weight:850!important}
-  .hero h2 span{color:#2563eb!important}
-  .hero p{margin:0!important;color:#64748b!important;font-size:10px!important;line-height:1.5!important}
+  .top .logo{display:grid!important;place-items:center!important;flex:0 0 38px!important;width:38px!important;height:38px!important;
+    border-radius:12px!important;background:#2563eb!important;color:#fff!important;font-size:21px!important}
+  .top .brand h1{margin:0!important;color:#172033!important;font-size:18px!important;font-weight:850!important;line-height:1.1!important;letter-spacing:-.4px!important}
+  .top .brand p{display:none!important}
+  .top .desktop-nav,.top .social-icons{display:none!important}
+  .hero{display:none!important}
   #mainContent{
     display:block!important;width:100%!important;max-width:none!important;
     margin:0!important;padding:0 0 24px!important;background:var(--micon-bg)!important;
@@ -372,6 +350,16 @@
     object-fit:contain!important;margin:0!important;padding:0!important;border:0!important;
     border-radius:0!important;background:#080b12!important;
   }
+  .home-scroll-column{padding:12px 12px 28px!important}
+  #importSection,#transposeSection{padding:14px!important;border-radius:17px!important;box-shadow:0 2px 8px rgba(20,35,60,.045)!important}
+  #importSection h3,#transposeSection h3{font-size:13px!important;letter-spacing:0!important}
+  #importSection>.sub,#transposeSection>.sub{font-size:10px!important}
+  .mobile-playlist-panel{padding:13px!important;border-radius:17px!important;box-shadow:0 2px 8px rgba(20,35,60,.045)!important}
+  .mobile-playlist-import{height:44px!important;border-radius:12px!important}
+  .mobile-playlist-item{height:58px!important;min-height:58px!important;border-radius:12px!important}
+  #transposeSection .pitch-compact-row{grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
+  #transposeSection .playbtn,#transposeSection #playBtn{height:48px!important;border-radius:14px!important}
+  .mobile-ad-banner,.mobile-fill,.home-scroll-column .foot{margin-top:10px!important}
   .home-scroll-column{
     display:flex!important;flex-direction:column!important;order:1!important;
     width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
@@ -671,6 +659,11 @@
   #transposeSection .pitch-compact-row>#downBtn,#transposeSection .pitch-compact-row>#upBtn{font-size:22px!important}
 }
 
+
+@media screen and (max-width:760px){
+  body:has(.home-layout) .top .desktop-nav{display:none!important}
+  body:has(.home-layout) .hero{display:none!important}
+}
 </style>
 
 </head>
