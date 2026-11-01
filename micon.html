@@ -2328,5 +2328,224 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 })();
 </script>
 
+
+<style id="micon-mobile-photo-match-final">
+/* Mobile: susunan dan proporsi mengikuti foto referensi. Tidak mengubah logika aplikasi. */
+@media screen and (max-width:760px){
+  html,body{
+    width:100%!important;min-width:0!important;min-height:100%!important;
+    height:auto!important;max-height:none!important;overflow-x:hidden!important;
+    overflow-y:auto!important;background:#fff!important;color:#111827!important;
+  }
+  body{overscroll-behavior-y:auto!important}
+  .wrap{
+    display:block!important;width:100%!important;max-width:none!important;
+    min-height:100dvh!important;height:auto!important;max-height:none!important;
+    margin:0!important;padding:0 0 calc(60px + env(safe-area-inset-bottom))!important;
+    overflow:visible!important;background:#fff!important;
+  }
+  #mainContent,.home-layout,.home-scroll-column,.home-scroll-column>.grid,
+  .home-preview-column{
+    width:100%!important;min-width:0!important;height:auto!important;
+    min-height:0!important;max-height:none!important;overflow:visible!important;
+    background:#fff!important;color:#111827!important;
+  }
+  .top,.hero{display:none!important}
+  #mainContent>.home-layout,.home-layout{
+    display:flex!important;flex-direction:column!important;gap:0!important;
+    margin:0!important;padding:0!important;
+  }
+  .home-preview-column{
+    display:block!important;order:0!important;position:relative!important;
+    padding:0!important;margin:0!important;border:0!important;
+    overflow:hidden!important;
+  }
+  #videoStage,.home-preview-column #videoStage{
+    position:relative!important;display:grid!important;place-items:center!important;
+    box-sizing:border-box!important;width:100%!important;height:auto!important;
+    min-width:0!important;min-height:0!important;max-height:none!important;
+    aspect-ratio:16/9!important;margin:0!important;padding:0!important;
+    overflow:hidden!important;border:0!important;border-radius:0!important;
+    background:#000!important;
+  }
+  #videoStage:not(:has(#karaokeVideo))::before{
+    content:'Video akan diputar disini'!important;
+    position:absolute!important;inset:0!important;z-index:1!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    padding:12px!important;background:#000!important;color:#fff!important;
+    font:700 14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif!important;
+    text-align:center!important;pointer-events:none!important;
+  }
+  #videoStage #karaokeVideo{
+    position:relative!important;z-index:2!important;display:block!important;
+    width:100%!important;height:100%!important;max-height:none!important;
+    aspect-ratio:16/9!important;object-fit:contain!important;
+    margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+    background:#000!important;
+  }
+  .home-scroll-column{
+    display:flex!important;flex-direction:column!important;order:1!important;
+    padding:0!important;margin:0!important;overflow:visible!important;
+  }
+  .home-scroll-column>.grid,.home-scroll-column .grid,.grid{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    gap:0!important;margin:0!important;padding:0!important;overflow:visible!important;
+    background:#fff!important;
+  }
+  #importSection,#transposeSection{
+    display:flex!important;flex-direction:column!important;position:relative!important;
+    width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;
+    max-height:none!important;overflow:visible!important;margin:0!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:#fff!important;
+    color:#111827!important;box-shadow:none!important;
+  }
+  #importSection{order:1!important}
+  #transposeSection{order:2!important}
+  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
+  #transposeSection #dropZone,#transposeSection .keySelectWrap,
+  #transposeSection .stepper,#transposeSection .rangeLabels,
+  #transposeSection>.row,#transposeSection>.alert,
+  #transposeSection .playrow,#transposeSection>.hint,
+  .mobile-fill,.mobile-ad-banner,.home-scroll-column .foot,.foot{
+    display:none!important;
+  }
+  #importSection .filemeta{
+    display:flex!important;order:1!important;box-sizing:border-box!important;
+    width:calc(100% - 14px)!important;min-width:0!important;height:40px!important;
+    min-height:40px!important;margin:10px 7px 10px!important;padding:5px 9px!important;
+    gap:9px!important;align-items:center!important;
+    border:1px solid #e1e5eb!important;border-radius:13px!important;
+    background:#fff!important;color:#111827!important;box-shadow:none!important;
+  }
+  #importSection .fileIcon{
+    display:grid!important;place-items:center!important;flex:0 0 24px!important;
+    width:24px!important;height:26px!important;margin:0!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:#fff!important;
+    color:#f1f5f9!important;font-size:22px!important;
+  }
+  #importSection .filetext{display:block!important;flex:1!important;min-width:0!important}
+  #importSection .filetext b{
+    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
+    line-height:1.3!important;font-weight:800!important;
+  }
+  #importSection .filetext small{
+    display:block!important;margin-top:2px!important;color:#64748b!important;
+    font-size:8px!important;line-height:1.2!important;
+  }
+  #importSection .status{display:none!important}
+  #transposeSection .pitch-compact-row{
+    display:grid!important;box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1.65fr) minmax(0,.75fr) minmax(0,.75fr) minmax(0,.75fr)!important;
+    gap:9px!important;width:calc(100% - 14px)!important;
+    margin:0 7px 7px!important;padding:0!important;align-items:stretch!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox,
+  #transposeSection .pitch-compact-row>#downBtn,
+  #transposeSection .pitch-compact-row>#upBtn,
+  #transposeSection .pitch-compact-row>#clearBtn{
+    display:flex!important;box-sizing:border-box!important;position:static!important;
+    align-items:center!important;justify-content:center!important;
+    width:100%!important;min-width:0!important;height:40px!important;
+    min-height:40px!important;max-height:40px!important;margin:0!important;
+    padding:0 5px!important;border:1px solid #e1e5eb!important;
+    border-radius:12px!important;background:#fff!important;color:#111827!important;
+    box-shadow:none!important;font-weight:800!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox{
+    grid-column:1!important;flex-direction:column!important;gap:2px!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox small{display:none!important}
+  #transposeSection .pitch-compact-row>.noteBox .note{
+    display:block!important;color:#111827!important;font-size:12px!important;
+    line-height:1!important;font-weight:850!important;text-transform:uppercase!important;
+  }
+  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+    display:block!important;color:#64748b!important;font-size:7px!important;
+    line-height:1!important;white-space:nowrap!important;
+  }
+  #transposeSection .pitch-compact-row>#downBtn{grid-column:2!important;font-size:21px!important}
+  #transposeSection .pitch-compact-row>#upBtn{grid-column:3!important;font-size:21px!important}
+  #transposeSection .pitch-compact-row>#clearBtn{
+    grid-column:4!important;font-size:10px!important;text-transform:uppercase!important;
+  }
+  #transposeSection .pitch-compact-row>#clearBtn:disabled{opacity:.45!important}
+  .mobile-playlist-panel{
+    display:block!important;order:3!important;width:100%!important;margin:0!important;
+    padding:0 0 8px!important;background:#fff!important;color:#111827!important;
+  }
+  .mobile-playlist-import{
+    display:block!important;box-sizing:border-box!important;width:calc(100% - 14px)!important;
+    height:40px!important;margin:0 7px 10px!important;padding:0 10px!important;
+    border:1px solid #e1e5eb!important;border-radius:12px!important;
+    background:#fff!important;color:#111827!important;
+    font:800 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
+  }
+  .mobile-playlist-heading{
+    display:flex!important;box-sizing:border-box!important;align-items:center!important;
+    width:100%!important;height:34px!important;padding:0 18px!important;
+    border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;
+    background:#fff!important;color:#111827!important;
+    font:850 11px system-ui,-apple-system,Segoe UI,sans-serif!important;
+  }
+  .mobile-playlist-list{
+    display:flex!important;flex-direction:column!important;gap:7px!important;
+    width:100%!important;margin:0!important;padding:9px 10px 5px!important;
+    background:#fff!important;
+  }
+  .mobile-playlist-item{
+    display:flex!important;box-sizing:border-box!important;align-items:center!important;
+    gap:10px!important;width:100%!important;min-width:0!important;
+    min-height:40px!important;height:40px!important;padding:5px 9px!important;
+    border:1px solid #e1e5eb!important;border-radius:13px!important;
+    background:#fff!important;color:#111827!important;text-align:left!important;
+    box-shadow:none!important;
+  }
+  .mobile-playlist-item.active{border-color:#93c5fd!important;background:#f8fbff!important}
+  .mobile-playlist-icon{
+    display:grid!important;place-items:center!important;flex:0 0 24px!important;
+    width:24px!important;height:26px!important;color:#f1f5f9!important;font-size:21px!important;
+  }
+  .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
+  .mobile-playlist-copy strong{
+    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:nowrap!important;color:#111827!important;font-size:9px!important;
+    line-height:1.35!important;font-weight:800!important;
+  }
+  .mobile-playlist-copy small{
+    display:block!important;margin-top:2px!important;color:#64748b!important;
+    font-size:8px!important;line-height:1.2!important;
+  }
+  .mobile-playlist-empty{
+    padding:12px 8px!important;text-align:center!important;
+    background:#fff!important;color:#64748b!important;font-size:10px!important;
+  }
+  .mobile-playlist-picker{display:none!important}
+  .mobile-bottom-nav{
+    display:grid!important;position:fixed!important;z-index:3000!important;
+    left:0!important;right:0!important;bottom:0!important;width:100%!important;
+    box-sizing:border-box!important;height:51px!important;min-height:51px!important;
+    padding:5px 10px calc(5px + env(safe-area-inset-bottom))!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:9px!important;
+    align-items:center!important;border:0!important;border-top:1px solid #e5e7eb!important;
+    border-radius:0!important;background:#fff!important;box-shadow:none!important;
+  }
+  .mobile-bottom-nav button,.mobile-bottom-nav a{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    box-sizing:border-box!important;min-width:0!important;width:100%!important;
+    height:39px!important;margin:0!important;padding:0!important;
+    border:1px solid #e1e5eb!important;border-radius:11px!important;
+    background:#fff!important;color:#fff!important;font-size:0!important;
+    box-shadow:none!important;
+  }
+  .mobile-bottom-nav .dock-nav-icon,.mobile-bottom-nav .dock-nav-label{display:none!important}
+  .mobile-bottom-nav .upload-dock{transform:none!important;overflow:visible!important}
+  .mobile-bottom-nav .upload-dock .dock-nav-icon{display:none!important}
+  /* Seluruh bidang mobile putih; hanya bidang preview video yang hitam. */
+  #mainContent,.home-scroll-column,.home-scroll-column>.grid,
+  #importSection,#transposeSection,.mobile-playlist-panel{background:#fff!important}
+}
+</style>
+
 </body>
 </html>
