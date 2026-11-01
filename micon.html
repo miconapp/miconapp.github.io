@@ -1716,20 +1716,20 @@ try {
 #micon-video-ad-label{position:absolute;top:12px;right:12px;font-size:11px;color:#fff;text-shadow:0 1px 4px #000;background:transparent;padding:0;border:0;border-radius:0}
 #micon-video-ad-count{display:block;font-size:11px;line-height:1.35;color:#fff;text-shadow:0 1px 3px #000;margin-top:3px;max-width:min(480px,calc(100vw - 40px))}
 #micon-video-ad-player{display:block;width:100%;height:100%;min-height:180px;aspect-ratio:16/9;background:#000;object-fit:contain}
-#micon-video-ad-controls{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
+#micon-video-ad-controls{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;align-items:flex-end;gap:10px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
 #micon-video-ad-count{font-size:12px;color:#fff}
-#micon-video-ad-actions{display:flex;align-items:center;gap:8px}
+#micon-video-ad-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
 #micon-video-ad-sound,#micon-video-ad-skip,#micon-video-ad-start{border:0;border-radius:9px;padding:9px 12px;font:700 12px system-ui;cursor:pointer}
 #micon-video-ad-sound{background:#ffffffdf;color:#1e293b}
 #micon-video-ad-skip,#micon-video-ad-start{background:#2563eb;color:#fff}
 #micon-video-ad-skip:disabled{background:#64748b;color:#e2e8f0;cursor:not-allowed}
 #micon-video-ad-start{display:none}
 #micon-video-ad-error{display:none;position:absolute;z-index:3;left:12px;right:12px;top:50px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.75);color:#fecaca;font-size:12px}
-@media(max-width:600px){#micon-video-ad-head{left:8px;bottom:48px;max-width:calc(100% - 16px)}#micon-video-ad-label{top:10px;right:8px}#micon-video-ad-controls{padding:25px 8px 8px;align-items:flex-end;justify-content:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
+@media(max-width:600px){#micon-video-ad-head{left:8px;bottom:48px;max-width:calc(100% - 16px)}#micon-video-ad-label{top:10px;right:8px}#micon-video-ad-controls{left:0;right:0;bottom:0;padding:25px 8px 8px;align-items:flex-end;justify-content:flex-end}#micon-video-ad-actions{margin-left:auto;justify-content:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
 </style>
 <div id="micon-video-ad-overlay" role="dialog" aria-modal="true" aria-label="Iklan MicOn">
   <div id="micon-video-ad-card">
-    <div id="micon-video-ad-head"><span id="micon-video-ad-sponsor">Bersponsor</span><div id="micon-video-ad-meta"><strong id="micon-video-ad-name">Nama pengiklan</strong><span aria-hidden="true">|</span><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-count">Iklan selesai otomatis dalam 15 detik, Video akan diputar otomatis</span></div>
+    <div id="micon-video-ad-head"><span id="micon-video-ad-sponsor">Bersponsor</span><div id="micon-video-ad-meta"><strong id="micon-video-ad-name">Nama pengiklan</strong><span aria-hidden="true">|</span><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-count">Iklan selesai otomatis dalam 15 detik, Video akan diputar otomatis</span><span id="micon-video-ad-label">Iklan sebelum video diputar</span></div>
     <video id="micon-video-ad-player" playsinline autoplay preload="auto"></video>
     <div id="micon-video-ad-controls">
       <div id="micon-video-ad-actions">
