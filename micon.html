@@ -2295,173 +2295,124 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 
 
 
-<style id="micon-mobile-header-sticky-single">
+
+
+
+<style id="micon-mobile-header-video-sticky">
 @media (max-width:760px) {
-  /* Satu shell: header asli + preview video asli. */
-  #micon-mobile-sticky-shell {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 5000 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: #fff !important;
+  html, body {
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
   }
-  #micon-mobile-sticky-shell > .top {
-    position: relative !important;
-    top: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    height: 64px !important;
-    min-height: 64px !important;
-    margin: 0 !important;
-    padding: 8px 14px !important;
-    background: #fff !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    box-shadow: 0 2px 8px rgba(15,23,42,.05) !important;
+  .wrap {
+    height:auto !important;
+    min-height:100vh !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding-top:0 !important;
   }
-  #micon-mobile-sticky-shell > .top .brand { min-width: 0 !important; }
-  #micon-mobile-sticky-shell > .top .brand h1 { font-size: 25px !important; }
-  #micon-mobile-sticky-shell > .top > .pill { display: none !important; }
-  #micon-mobile-sticky-shell > #videoStage {
-    position: relative !important;
-    display: grid !important;
-    place-items: center !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    aspect-ratio: 16 / 9 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: #080b12 !important;
+  /* Header dan preview video adalah satu elemen sticky yang sama. */
+  #micon-mobile-header-video-sticky-shell {
+    position:-webkit-sticky !important;
+    position:sticky !important;
+    top:0 !important;
+    z-index:9000 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-self:stretch !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    background:#fff !important;
+    transform:none !important;
   }
-  #micon-mobile-sticky-shell > #videoStage:empty::before {
-    content: "Video akan diputar di sini" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #f3f4f6 !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    background: #080b12 !important;
+  #micon-mobile-header-video-sticky-shell > .top {
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto !important;
+    display:flex !important;
+    width:100% !important;
+    min-height:64px !important;
+    height:64px !important;
+    margin:0 !important;
+    padding:8px 14px !important;
+    background:#fff !important;
+    border-bottom:1px solid #e5e7eb !important;
+    box-shadow:0 2px 8px rgba(15,23,42,.05) !important;
   }
-  #micon-mobile-sticky-shell > #videoStage #karaokeVideo {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-height: none !important;
-    aspect-ratio: 16 / 9 !important;
-    object-fit: contain !important;
-    margin: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: #080b12 !important;
+  #micon-mobile-header-video-sticky-shell > #videoStage {
+    position:relative !important;
+    flex:0 0 auto !important;
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:1.55 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#080b12 !important;
   }
-  #micon-mobile-sticky-shell ~ #mainContent { padding-top: 0 !important; }
-  #micon-floating-dock {
-    position: fixed !important;
-    z-index: 6000 !important;
-    left: 12px !important;
-    right: 12px !important;
-    bottom: calc(9px + env(safe-area-inset-bottom)) !important;
-    display: grid !important;
-    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
-    align-items: center !important;
-    gap: 4px !important;
-    min-height: 66px !important;
-    padding: 7px 8px !important;
-    border: 1px solid #e3eaf4 !important;
-    border-radius: 20px !important;
-    background: rgba(255,255,255,.97) !important;
-    box-shadow: 0 8px 28px rgba(24,42,70,.16) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    backdrop-filter: blur(16px) !important;
+  #micon-mobile-header-video-sticky-shell > #videoStage:empty::before {
+    content:"Video akan diputar di sini" !important;
+    position:absolute !important;
+    inset:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    color:#f3f4f6 !important;
+    background:#080b12 !important;
+    font-size:14px !important;
+    font-weight:750 !important;
   }
-  #micon-floating-dock .micon-dock-action {
-    appearance: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 50px !important;
-    padding: 3px 2px !important;
-    border: 0 !important;
-    border-radius: 13px !important;
-    background: transparent !important;
-    color: #64748b !important;
-    font: 700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif !important;
+  #micon-mobile-header-video-sticky-shell > #videoStage #karaokeVideo {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-height:none !important;
+    aspect-ratio:1.55 !important;
+    object-fit:contain !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#080b12 !important;
   }
-  #micon-floating-dock .micon-dock-action.active { background: #eff6ff !important; color: #2563eb !important; }
-  #micon-floating-dock .micon-dock-icon { display: grid !important; place-items: center !important; width: 24px !important; height: 24px !important; }
-  #micon-floating-dock .micon-dock-icon svg { display: block !important; width: 22px !important; height: 22px !important; fill: none !important; stroke: currentColor !important; stroke-width: 1.8 !important; stroke-linecap: round !important; stroke-linejoin: round !important; }
-  body { padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
 }
 @media (min-width:761px) {
-  #micon-mobile-sticky-shell, #micon-floating-dock { display: none !important; }
+  #micon-mobile-header-video-sticky-shell { display:none !important; }
 }
 </style>
-<script id="micon-mobile-header-sticky-single-js">
+<script id="micon-mobile-header-video-sticky-js">
 (function () {
-  function initMicOnMobileSticky() {
+  function buildMobileStickyShell() {
     if (!window.matchMedia('(max-width:760px)').matches) return;
+
     const header = document.querySelector('.wrap > .top');
     const video = document.getElementById('videoStage');
     if (!header || !video) return;
 
-    let shell = document.getElementById('micon-mobile-sticky-shell');
+    let shell = document.getElementById('micon-mobile-header-video-sticky-shell');
     if (!shell) {
       shell = document.createElement('div');
-      shell.id = 'micon-mobile-sticky-shell';
+      shell.id = 'micon-mobile-header-video-sticky-shell';
       header.parentNode.insertBefore(shell, header);
     }
     if (header.parentNode !== shell) shell.appendChild(header);
     if (video.parentNode !== shell) shell.appendChild(video);
-
-    if (!document.getElementById('micon-floating-dock')) {
-      const dock = document.createElement('nav');
-      dock.id = 'micon-floating-dock';
-      dock.setAttribute('aria-label', 'Menu utama');
-      dock.innerHTML = `
-        <button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button>
-        <button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button>
-        <button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button>
-        <button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>`;
-      document.body.appendChild(dock);
-      const activate = name => dock.querySelectorAll('.micon-dock-action').forEach(el => el.classList.toggle('active', el.dataset.action === name));
-      dock.addEventListener('click', event => {
-        const button = event.target.closest('[data-action]');
-        if (!button) return;
-        const action = button.dataset.action;
-        if (action === 'transpose') {
-          document.querySelector('.pitch-compact-row, #transposeSection')?.scrollIntoView({behavior:'smooth',block:'start'});
-        } else if (action === 'upload') {
-          document.getElementById('videoFile')?.click();
-        } else if (action === 'download') {
-          document.querySelector('[data-page="youtubePage"], #youtubeSection')?.scrollIntoView({behavior:'smooth',block:'start'});
-        } else if (action === 'profile') {
-          document.getElementById('micon-profile-trigger')?.click();
-        }
-        activate(action);
-      });
-    }
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMicOnMobileSticky, {once:true});
-  else initMicOnMobileSticky();
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', buildMobileStickyShell, {once:true});
+  } else {
+    buildMobileStickyShell();
+  }
 })();
 </script>
 
