@@ -2298,120 +2298,47 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 
 
 
-<style id="micon-mobile-header-video-sticky">
+
+
+
+<style id="micon-sticky-only">
 @media (max-width:760px) {
-  html, body {
-    height:auto !important;
-    min-height:100% !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
+  #micon-header-video-sticky {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
   }
-  .wrap {
-    height:auto !important;
-    min-height:100vh !important;
-    max-height:none !important;
-    overflow:visible !important;
-    padding-top:0 !important;
-  }
-  /* Header dan preview video adalah satu elemen sticky yang sama. */
-  #micon-mobile-header-video-sticky-shell {
-    position:-webkit-sticky !important;
-    position:sticky !important;
-    top:0 !important;
-    z-index:9000 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-self:stretch !important;
-    width:100% !important;
-    margin:0 !important;
-    padding:0 !important;
-    overflow:visible !important;
-    background:#fff !important;
-    transform:none !important;
-  }
-  #micon-mobile-header-video-sticky-shell > .top {
-    position:relative !important;
-    top:auto !important;
-    flex:0 0 auto !important;
-    display:flex !important;
-    width:100% !important;
-    min-height:64px !important;
-    height:64px !important;
-    margin:0 !important;
-    padding:8px 14px !important;
-    background:#fff !important;
-    border-bottom:1px solid #e5e7eb !important;
-    box-shadow:0 2px 8px rgba(15,23,42,.05) !important;
-  }
-  #micon-mobile-header-video-sticky-shell > #videoStage {
-    position:relative !important;
-    flex:0 0 auto !important;
-    display:grid !important;
-    place-items:center !important;
-    width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    aspect-ratio:1.55 !important;
-    margin:0 !important;
-    padding:0 !important;
-    overflow:hidden !important;
-    border:0 !important;
-    border-radius:0 !important;
-    background:#080b12 !important;
-  }
-  #micon-mobile-header-video-sticky-shell > #videoStage:empty::before {
-    content:"Video akan diputar di sini" !important;
-    position:absolute !important;
-    inset:0 !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    color:#f3f4f6 !important;
-    background:#080b12 !important;
-    font-size:14px !important;
-    font-weight:750 !important;
-  }
-  #micon-mobile-header-video-sticky-shell > #videoStage #karaokeVideo {
-    display:block !important;
-    width:100% !important;
-    height:100% !important;
-    max-height:none !important;
-    aspect-ratio:1.55 !important;
-    object-fit:contain !important;
-    margin:0 !important;
-    border:0 !important;
-    border-radius:0 !important;
-    background:#080b12 !important;
-  }
-}
-@media (min-width:761px) {
-  #micon-mobile-header-video-sticky-shell { display:none !important; }
 }
 </style>
-<script id="micon-mobile-header-video-sticky-js">
+<script id="micon-sticky-only-js">
 (function () {
-  function buildMobileStickyShell() {
+  function applyStickyOnly() {
     if (!window.matchMedia('(max-width:760px)').matches) return;
-
     const header = document.querySelector('.wrap > .top');
-    const video = document.getElementById('videoStage');
-    if (!header || !video) return;
+    const preview = document.getElementById('videoStage');
+    if (!header || !preview) return;
 
-    let shell = document.getElementById('micon-mobile-header-video-sticky-shell');
+    let shell = document.getElementById('micon-header-video-sticky');
     if (!shell) {
       shell = document.createElement('div');
-      shell.id = 'micon-mobile-header-video-sticky-shell';
+      shell.id = 'micon-header-video-sticky';
       header.parentNode.insertBefore(shell, header);
     }
     if (header.parentNode !== shell) shell.appendChild(header);
-    if (video.parentNode !== shell) shell.appendChild(video);
+    if (preview.parentNode !== shell) shell.appendChild(preview);
   }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', buildMobileStickyShell, {once:true});
+    document.addEventListener('DOMContentLoaded', applyStickyOnly, {once:true});
   } else {
-    buildMobileStickyShell();
+    applyStickyOnly();
   }
 })();
 </script>
