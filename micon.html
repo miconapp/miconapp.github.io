@@ -819,21 +819,7 @@
 </style>
 
 
-<style id="micon-mobile-final-correction">
-@media (max-width:760px) {
-  /* Header dan preview benar-benar berada dalam satu elemen sticky. */
-  #micon-sticky-shell { position:sticky!important; top:0!important; z-index:99999!important; display:flex!important; flex-direction:column!important; align-self:stretch!important; width:100%!important; background:#fff!important; isolation:isolate!important; }
-  #micon-sticky-shell > .top { position:relative!important; top:auto!important; z-index:2!important; flex:0 0 82px!important; height:82px!important; min-height:82px!important; }
-  #micon-sticky-shell > #videoStage { position:relative!important; top:auto!important; z-index:1!important; display:grid!important; width:100%!important; aspect-ratio:16/9!important; height:auto!important; min-height:0!important; max-height:none!important; overflow:hidden!important; margin:0!important; }
-  #micon-sticky-shell #karaokeVideo { width:100%!important; height:100%!important; max-height:none!important; object-fit:contain!important; }
-  /* Kotak informasi file lokal disembunyikan, input dan fungsi upload tetap ada. */
-  .micon-reference-stack .filemeta, #importSection .filemeta { display:none!important; }
-  /* Hapus Video dan Tambah Playlist memakai warna, ukuran, dan bentuk yang sama. */
-  .micon-reference-stack #clearBtn, .micon-reference-stack .mobile-playlist-import { box-sizing:border-box!important; display:flex!important; align-items:center!important; justify-content:center!important; width:100%!important; height:47px!important; min-height:47px!important; margin:0 0 14px!important; padding:0 12px!important; border:0!important; border-radius:14px!important; background:#9bb7f5!important; color:#fff!important; font-size:13px!important; font-weight:850!important; opacity:1!important; box-shadow:none!important; }
-  .micon-reference-stack #clearBtn:disabled { opacity:1!important; background:#9bb7f5!important; color:#fff!important; }
-}
-@media (min-width:761px) { #micon-sticky-shell, #micon-floating-dock { display:none!important; } }
-</style>
+
 </head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo">♫</div><div><h1><span class="brand-mic">Mic</span> <span class="brand-on">On</span></h1><p>Atur nada lagu sesuai suara kamu</p></div></div><nav class="desktop-nav" aria-label="Navigasi utama"><span class="nav-link" data-page="homePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>Home</span><span class="nav-link" data-page="karaokePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>Karaoke</span><span class="nav-link" data-page="youtubePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Video YouTube</span><span class="nav-link" data-page="packagePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"/></svg></span>Perpanjang Paket</span><a class="nav-link app-download-link" href="https://drive.google.com/file/d/1VqoCpksGtmBqHP6jQ9bYkwZMckLaNLbV/view?usp=drive_link" target="_blank" rel="noopener noreferrer" aria-label="Download Aplikasi MicOn"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Aplikasi MicOn</a><span class="social-icons" aria-label="Media sosial"><span class="social-icon whatsapp" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.4 9.8c-.4-.8-.8-.8-1.2-.8h-1c-.4 0-.9.2-1.4.7s-1.8 1.8-1.8 4.3 1.9 5 2.2 5.4c.3.3 3.7 5.9 9.1 7.4 4.5 1.3 5.4 1 6.4.9 1-.1 3.2-1.3 3.7-2.6.5-1.3.5-2.4.3-2.6-.2-.2-.5-.3-1.1-.6s-3.2-1.6-3.7-1.8c-.5-.2-.9-.3-1.2.3-.4.5-1.4 1.8-1.7 2.2-.3.4-.6.4-1.1.1-.5-.3-2.3-.9-4.3-2.7-1.6-1.4-2.7-3.1-3-3.6-.3-.5 0-.8.2-1.1.2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9-.1-.3-1.1-2.8-1.5-3.8Z" fill="currentColor" transform="translate(1 0) scale(.82)"/></svg></span><span class="social-icon tiktok" title="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 6.7a5.1 5.1 0 0 1-3.9-4.6V1.5h-3.8v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.1a7 7 0 1 0 5.8 6.9V8.4a8.7 8.7 0 0 0 4.9 1.5V6.8c-.3 0-.7 0-1-.1Z" fill="currentColor"/></svg></span><span class="social-icon facebook" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.47h-2.8v8.38C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/></svg></span></span></nav><div class="pill">IMPORT VIDEO · LOKAL</div>
@@ -2301,255 +2287,154 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 </script>
 
 
-<style id="micon-mobile-final-single">
+
+
+
+
+\n<style id="micon-mobile-sticky-one-clean">
 @media (max-width:760px) {
   body { padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
-
-  /* Header dan video adalah satu shell sticky, sehingga tidak saling menimpa. */
+  /* Header dan preview dipasang dalam satu sticky shell. */
   #micon-sticky-shell {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1500 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fff !important;
-    box-shadow: 0 3px 10px rgba(15,23,42,.07) !important;
+    position: -webkit-sticky !important; position: sticky !important;
+    top: 0 !important; z-index: 99999 !important;
+    display: flex !important; flex-direction: column !important;
+    width: 100% !important; margin: 0 !important; padding: 0 !important;
+    overflow: visible !important; background: #fff !important;
+    isolation: isolate !important;
   }
   #micon-sticky-shell > .top {
-    position: relative !important;
-    top: auto !important;
-    z-index: auto !important;
-    flex: 0 0 82px !important;
-    width: 100% !important;
-    height: 82px !important;
-    min-height: 82px !important;
-    margin: 0 !important;
+    position: relative !important; top: auto !important; z-index: 2 !important;
+    display: flex !important; flex: 0 0 82px !important;
+    width: 100% !important; height: 82px !important; min-height: 82px !important;
+    margin: 0 !important; padding: 10px 14px !important;
+    background: #fff !important;
   }
+  /* Kotak label IMPORT VIDEO · LOKAL di header dihilangkan. */
+  #micon-sticky-shell > .top > .pill { display: none !important; }
   #micon-sticky-shell > #videoStage {
-    position: relative !important;
-    top: auto !important;
-    z-index: auto !important;
-    display: grid !important;
-    place-items: center !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    aspect-ratio: 1.55 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: #080b12 !important;
+    position: relative !important; top: auto !important; z-index: 1 !important;
+    display: grid !important; place-items: center !important;
+    width: 100% !important; height: auto !important; min-height: 0 !important;
+    max-height: none !important; aspect-ratio: 1.55 !important;
+    margin: 0 !important; padding: 0 !important; overflow: hidden !important;
+    border: 0 !important; border-radius: 0 !important; background: #080b12 !important;
   }
   #micon-sticky-shell > #videoStage:empty::before {
-    content: 'Video akan diputar disini' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #f3f4f6 !important;
-    background: #080b12 !important;
-    font-size: 14px !important;
-    font-weight: 750 !important;
+    content: 'Video akan diputar disini' !important; position: absolute !important;
+    inset: 0 !important; display: flex !important; align-items: center !important;
+    justify-content: center !important; color: #f3f4f6 !important;
+    background: #080b12 !important; font-size: 14px !important; font-weight: 750 !important;
   }
   #micon-sticky-shell > #videoStage #karaokeVideo {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    aspect-ratio: 1.55 !important;
-    object-fit: contain !important;
-    margin: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: #080b12 !important;
+    display: block !important; width: 100% !important; height: 100% !important;
+    max-height: none !important; aspect-ratio: 1.55 !important;
+    object-fit: contain !important; margin: 0 !important; border: 0 !important;
+    border-radius: 0 !important; background: #080b12 !important;
   }
-
-  /* Hilangkan hanya kotak informasi/import lokal, tanpa menghapus input file atau handler. */
+  /* Sembunyikan kartu metadata file, bukan input atau fungsi pemilihan video. */
   .micon-reference-stack > .filemeta { display: none !important; }
-
-  /* Dua tombol dibuat identik ukuran dan radiusnya. */
+  /* Tombol Hapus Video dan Tambah Playlist: warna dan dimensi identik. */
   .micon-reference-stack > #clearBtn,
   .micon-reference-stack .mobile-playlist-import {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    height: 47px !important;
-    min-height: 47px !important;
-    border-radius: 14px !important;
-    font-size: 13px !important;
-    font-weight: 850 !important;
+    box-sizing: border-box !important; display: flex !important;
+    align-items: center !important; justify-content: center !important;
+    width: 100% !important; height: 47px !important; min-height: 47px !important;
+    margin: 0 0 14px !important; padding: 0 12px !important;
+    border: 0 !important; border-radius: 14px !important;
+    background: #9bb7f5 !important; color: #fff !important;
+    font: 850 13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif !important;
+    opacity: 1 !important; box-shadow: 0 4px 10px rgba(37,99,235,.10) !important;
   }
-  .micon-reference-stack > #clearBtn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 0 12px !important;
-    padding: 0 12px !important;
-    border: 0 !important;
-    background: #f1f5f9 !important;
-    color: #9ca3af !important;
-    box-shadow: none !important;
-  }
-  .micon-reference-stack > #clearBtn:disabled { opacity: 1 !important; }
-  .micon-reference-stack .mobile-playlist-import {
-    margin: 0 0 15px !important;
-    padding: 0 12px !important;
-    border: 0 !important;
-    background: #9bb7f5 !important;
-    color: #fff !important;
-  }
-
-  /* Satu dock mengambang, empat aksi. */
+  .micon-reference-stack > #clearBtn:disabled { opacity: 1 !important; background: #9bb7f5 !important; color: #fff !important; }
   #micon-floating-dock {
-    position: fixed !important;
-    z-index: 2000 !important;
-    left: 12px !important;
-    right: 12px !important;
+    position: fixed !important; z-index: 100000 !important;
+    left: 12px !important; right: 12px !important;
     bottom: calc(9px + env(safe-area-inset-bottom)) !important;
-    display: grid !important;
-    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
-    align-items: center !important;
-    gap: 4px !important;
-    min-height: 66px !important;
-    padding: 7px 8px !important;
-    border: 1px solid #e3eaf4 !important;
-    border-radius: 20px !important;
-    background: rgba(255,255,255,.97) !important;
+    display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    align-items: center !important; gap: 4px !important; min-height: 66px !important;
+    padding: 7px 8px !important; border: 1px solid #e3eaf4 !important;
+    border-radius: 20px !important; background: rgba(255,255,255,.97) !important;
     box-shadow: 0 8px 28px rgba(24,42,70,.16) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important; backdrop-filter: blur(16px) !important;
   }
   #micon-floating-dock .micon-dock-action {
-    appearance: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 50px !important;
-    padding: 3px 2px !important;
-    border: 0 !important;
-    border-radius: 13px !important;
-    background: transparent !important;
-    color: #64748b !important;
+    appearance: none !important; display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important; gap: 3px !important;
+    width: 100% !important; min-width: 0 !important; height: 50px !important;
+    padding: 3px 2px !important; border: 0 !important; border-radius: 13px !important;
+    background: transparent !important; color: #64748b !important;
     font: 700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif !important;
-    cursor: pointer !important;
   }
   #micon-floating-dock .micon-dock-action.active,
-  #micon-floating-dock .micon-dock-action:active {
-    background: #eff6ff !important;
-    color: #2563eb !important;
-  }
-  #micon-floating-dock .micon-dock-icon {
-    display: grid !important;
-    place-items: center !important;
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 21px !important;
-    line-height: 1 !important;
-  }
-  #micon-floating-dock .micon-dock-icon svg {
-    display: block !important;
-    width: 22px !important;
-    height: 22px !important;
-    fill: none !important;
-    stroke: currentColor !important;
-    stroke-width: 1.8 !important;
-    stroke-linecap: round !important;
-    stroke-linejoin: round !important;
-  }
+  #micon-floating-dock .micon-dock-action:active { background: #eff6ff !important; color: #2563eb !important; }
+  #micon-floating-dock .micon-dock-icon { display: grid !important; place-items: center !important; width: 24px !important; height: 24px !important; }
+  #micon-floating-dock .micon-dock-icon svg { display: block !important; width: 22px !important; height: 22px !important; fill: none !important; stroke: currentColor !important; stroke-width: 1.8 !important; stroke-linecap: round !important; stroke-linejoin: round !important; }
 }
-@media (min-width:761px) {
-  #micon-sticky-shell, #micon-floating-dock { display: none !important; }
-}
+@media (min-width:761px) { #micon-sticky-shell, #micon-floating-dock { display: none !important; } }
 </style>
+\n<script id="micon-mobile-sticky-one-clean-js">
+(function () {
+  function installMicOnMobileLayout() {
+    if (!window.matchMedia('(max-width:760px)').matches) return;
+    const header = document.querySelector('.wrap > .top') || document.querySelector('.top');
+    const video = document.getElementById('videoStage');
+    const stack = document.querySelector('#mainContent .micon-reference-stack');
+    if (!header || !video || !stack) return;
 
-<script id="micon-mobile-final-single-js">
-document.addEventListener("DOMContentLoaded", function () {
-  if (!window.matchMedia("(max-width:760px)").matches) return;
+    /* Satu-satunya pemindahan: header + preview masuk shell sticky. */
+    let shell = document.getElementById('micon-sticky-shell');
+    if (!shell) {
+      shell = document.createElement('div');
+      shell.id = 'micon-sticky-shell';
+      header.parentNode.insertBefore(shell, header);
+    }
+    if (header.parentNode !== shell) shell.appendChild(header);
+    if (video.parentNode !== shell) shell.appendChild(video);
 
-  const mobile = window.matchMedia('(max-width:760px)');
-  if (!mobile.matches) return;
-
-  const header = document.querySelector('.wrap > .top') || document.querySelector('.top');
-  const video = document.getElementById('videoStage');
-  const stack = document.querySelector('#mainContent .micon-reference-stack');
-
-  /* Pindahkan header dan preview sekali saja ke shell sticky yang sama. */
-  if (header && video && !document.getElementById('micon-sticky-shell')) {
-    const shell = document.createElement('div');
-    shell.id = 'micon-sticky-shell';
-    header.parentNode.insertBefore(shell, header);
-    shell.append(header, video);
+    /* Satu dock, dibuat sekali dan tidak diduplikasi. */
+    if (!document.getElementById('micon-floating-dock')) {
+      const dock = document.createElement('nav');
+      dock.id = 'micon-floating-dock';
+      dock.setAttribute('aria-label', 'Menu utama');
+      dock.innerHTML = `
+        <button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button>
+        <button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button>
+        <button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button>
+        <button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>`;
+      document.body.appendChild(dock);
+      const activate = name => dock.querySelectorAll('.micon-dock-action').forEach(el => el.classList.toggle('active', el.dataset.action === name));
+      const main = document.getElementById('mainContent');
+      const youtube = document.getElementById('youtubeSection');
+      dock.addEventListener('click', event => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'transpose') {
+          if (youtube) youtube.classList.remove('active');
+          if (main) main.classList.remove('hidden');
+          const target = stack.querySelector('.pitch-compact-row');
+          if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+        } else if (action === 'upload') {
+          if (youtube) youtube.classList.remove('active');
+          if (main) main.classList.remove('hidden');
+          const input = document.getElementById('videoFile');
+          if (input) input.click();
+        } else if (action === 'download') {
+          if (main) main.classList.add('hidden');
+          if (youtube) youtube.classList.add('active');
+          window.scrollTo({top:0, behavior:'smooth'});
+        } else if (action === 'profile') {
+          const profile = document.getElementById('micon-profile-trigger');
+          if (profile) profile.click();
+        }
+        activate(action);
+      });
+    }
   }
-
-  const localInfo = stack && stack.querySelector('.filemeta');
-  if (localInfo) localInfo.style.setProperty('display', 'none', 'important');
-
-  if (document.getElementById('micon-floating-dock')) return;
-
-  const dock = document.createElement('nav');
-  dock.id = 'micon-floating-dock';
-  dock.setAttribute('aria-label', 'Menu utama');
-  dock.innerHTML = `
-    <button type="button" class="micon-dock-action" data-action="transpose" aria-label="Transpose">
-      <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span>
-    </button>
-    <button type="button" class="micon-dock-action" data-action="upload" aria-label="Upload">
-      <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span>
-    </button>
-    <button type="button" class="micon-dock-action" data-action="download" aria-label="Download">
-      <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span>
-    </button>
-    <button type="button" class="micon-dock-action" data-action="profile" aria-label="Profil">
-      <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span>
-    </button>`;
-  document.body.appendChild(dock);
-
-  const getAction = name => dock.querySelector('[data-action="' + name + '"]');
-  const setActive = name => dock.querySelectorAll('.micon-dock-action').forEach(
-    item => item.classList.toggle('active', item === getAction(name))
-  );
-  const main = document.getElementById('mainContent');
-  const youtube = document.getElementById('youtubeSection');
-  const fileInput = document.getElementById('videoFile');
-
-  getAction('transpose').addEventListener('click', () => {
-    if (youtube) youtube.classList.remove('active');
-    if (main) main.classList.remove('hidden');
-    const target = document.querySelector('.micon-reference-stack .pitch-compact-row');
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setActive('transpose');
-  });
-
-  getAction('upload').addEventListener('click', () => {
-    if (youtube) youtube.classList.remove('active');
-    if (main) main.classList.remove('hidden');
-    if (fileInput) fileInput.click();
-    setActive('upload');
-  });
-
-  getAction('download').addEventListener('click', () => {
-    if (main) main.classList.add('hidden');
-    if (youtube) youtube.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setActive('download');
-  });
-
-  getAction('profile').addEventListener('click', () => {
-    const profileButton = document.getElementById('micon-profile-trigger');
-    if (profileButton) profileButton.click();
-    setActive('profile');
-  });
-
-});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installMicOnMobileLayout, {once:true});
+  else installMicOnMobileLayout();
+})();
 </script>
-
 </body>
 </html>
