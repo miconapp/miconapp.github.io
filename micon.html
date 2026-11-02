@@ -2284,5 +2284,127 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 })();
 </script>
 
+
+<style id="micon-sticky-video-and-floating-dock">
+@media(max-width:760px){
+  html,body{background:#fff!important}
+  body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+  .top{
+    position:sticky!important;top:0!important;z-index:1300!important;
+    height:82px!important;min-height:82px!important;
+    background:rgba(255,255,255,.98)!important;
+  }
+  .micon-reference-stack{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
+  .micon-reference-stack #videoStage{
+    position:sticky!important;top:82px!important;z-index:1200!important;
+    width:calc(100% + 30px)!important;
+    box-shadow:0 5px 12px rgba(8,11,18,.08)!important;
+  }
+  /* Hilangkan kotak informasi import lokal; tombol Upload di dock menjadi akses pemilih file. */
+  .micon-reference-stack .filemeta{display:none!important}
+  /* Tombol Hapus Video dan Tambah Playlist memiliki ukuran yang sama. */
+  .micon-reference-stack #clearBtn{
+    height:47px!important;min-height:47px!important;width:100%!important;
+    margin:0 0 12px!important;border-radius:14px!important;
+    border:0!important;background:#f1f5f9!important;color:#9ca3af!important;
+    font-size:13px!important;font-weight:850!important;
+  }
+  .micon-reference-stack #clearBtn:disabled{opacity:1!important}
+  .micon-reference-stack .mobile-playlist-import{
+    height:47px!important;min-height:47px!important;border-radius:14px!important;
+    margin:0 0 15px!important;
+  }
+  .micon-reference-stack .pitch-compact-row{scroll-margin-top:calc(82px + 63vw + 14px)!important}
+  #micon-floating-dock{
+    position:fixed!important;z-index:1400!important;
+    left:12px!important;right:12px!important;
+    bottom:calc(9px + env(safe-area-inset-bottom))!important;
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    align-items:center!important;gap:4px!important;
+    min-height:66px!important;padding:7px 8px!important;
+    border:1px solid #e3eaf4!important;border-radius:20px!important;
+    background:rgba(255,255,255,.97)!important;
+    box-shadow:0 8px 28px rgba(24,42,70,.16)!important;
+    -webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;
+  }
+  #micon-floating-dock .micon-dock-action{
+    appearance:none!important;display:flex!important;flex-direction:column!important;
+    align-items:center!important;justify-content:center!important;gap:3px!important;
+    width:100%!important;min-width:0!important;height:50px!important;padding:3px 2px!important;
+    border:0!important;border-radius:13px!important;background:transparent!important;
+    color:#64748b!important;font:700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif!important;
+    cursor:pointer!important;
+  }
+  #micon-floating-dock .micon-dock-action:active,
+  #micon-floating-dock .micon-dock-action.active{
+    background:#eff6ff!important;color:#2563eb!important;
+  }
+  #micon-floating-dock .micon-dock-icon{
+    display:grid!important;place-items:center!important;width:24px!important;height:24px!important;
+    font-size:21px!important;line-height:1!important;font-weight:700!important;
+  }
+  #micon-floating-dock .micon-dock-icon svg{
+    display:block!important;width:22px!important;height:22px!important;
+    fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
+    stroke-linecap:round!important;stroke-linejoin:round!important;
+  }
+  #youtubeSection.active{padding-bottom:calc(90px + env(safe-area-inset-bottom))!important}
+}
+@media(min-width:761px){#micon-floating-dock{display:none!important}}
+</style>
+<script id="micon-sticky-dock-actions">
+(function(){
+ const mobile=window.matchMedia('(max-width:760px)');
+ if(!mobile.matches)return;
+ if(document.getElementById('micon-floating-dock'))return;
+ const dock=document.createElement('nav');
+ dock.id='micon-floating-dock';
+ dock.setAttribute('aria-label','Menu utama');
+ dock.innerHTML=`
+  <button type="button" class="micon-dock-action" data-action="transpose" aria-label="Transpose">
+   <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span>
+  </button>
+  <button type="button" class="micon-dock-action" data-action="upload" aria-label="Upload">
+   <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span>
+  </button>
+  <button type="button" class="micon-dock-action" data-action="download" aria-label="Download">
+   <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span>
+  </button>
+  <button type="button" class="micon-dock-action" data-action="profile" aria-label="Profil">
+   <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span>
+  </button>`;
+ document.body.appendChild(dock);
+ const action=(name)=>dock.querySelector('[data-action="'+name+'"]');
+ const main=document.getElementById('mainContent');
+ const youtube=document.getElementById('youtubeSection');
+ const upload=document.getElementById('videoFile');
+ const profile=document.querySelector('.profile-dock');
+ function showHome(){
+   if(youtube)youtube.classList.remove('active');
+   if(main)main.classList.remove('hidden');
+ }
+ action('transpose').addEventListener('click',()=>{
+   showHome();
+   const target=document.querySelector('.micon-reference-stack .pitch-compact-row');
+   if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('transpose')));
+ });
+ action('upload').addEventListener('click',()=>{
+   showHome();
+   if(upload)upload.click();
+   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('upload')));
+ });
+ action('download').addEventListener('click',()=>{
+   if(main)main.classList.add('hidden');
+   if(youtube){youtube.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('download')));
+ });
+ action('profile').addEventListener('click',()=>{
+   if(profile)profile.click();
+   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('profile')));
+ });
+})();
+</script>
+
 </body>
 </html>
