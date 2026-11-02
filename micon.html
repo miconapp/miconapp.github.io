@@ -833,15 +833,7 @@
   </div>
 </div>
 </header>
- 
-<header id="micon-mobile-header" aria-label="MicOn">
-  <div class="micon-mobile-brand">
-    <span class="micon-mobile-logo" aria-hidden="true">♫</span>
-    <span class="micon-mobile-wordmark"><span>Mic</span><b>On</b></span>
-  </div>
-  <div id="micon-mobile-profile-slot"></div>
-</header>
-\n<div id="mainContent">
+ <div id="mainContent">
 <section class="hero" id="homeSection"><h2>Nyanyi di nada<br><span>yang paling nyaman.</span></h2><p>Import musik, naikkan atau turunkan nada hingga 6 semitone, lalu putar untuk latihan karaoke.</p></section>
 <div class="grid">
 <section class="card" id="importSection"><h3>01 · Import musik</h3><p class="sub">Pilih video MP4 dari perangkat kamu.</p>
@@ -2301,113 +2293,135 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 
 
 
-<style id="micon-mobile-header-rebuilt">
-/* Mobile header baru — terpisah dari header desktop */
-#micon-mobile-header { display:none; }
-@media (max-width:760px) {
-  body { padding-bottom:calc(88px + env(safe-area-inset-bottom)) !important; }
-  body > .wrap { padding-top:0 !important; }
-  .wrap > header.top { display:none !important; }
 
+
+<style id="micon-mobile-header-sticky-single">
+@media (max-width:760px) {
+  /* Satu shell: header asli + preview video asli. */
   #micon-mobile-sticky-shell {
-    position:sticky !important;
-    position:-webkit-sticky !important;
-    top:0 !important;
-    z-index:99990 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    width:100% !important;
-    margin:0 !important;
-    padding:0 !important;
-    overflow:visible !important;
-    background:#fff !important;
-    isolation:isolate !important;
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
   }
-  #micon-mobile-header {
-    display:flex !important;
-    align-items:center !important;
-    justify-content:space-between !important;
-    gap:12px !important;
-    width:100% !important;
-    height:68px !important;
-    min-height:68px !important;
-    margin:0 !important;
-    padding:8px 14px !important;
-    background:#fff !important;
-    border-bottom:1px solid #e8edf5 !important;
-    box-shadow:0 2px 8px rgba(15,23,42,.045) !important;
+  #micon-mobile-sticky-shell > .top {
+    position: relative !important;
+    top: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    margin: 0 !important;
+    padding: 8px 14px !important;
+    background: #fff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    box-shadow: 0 2px 8px rgba(15,23,42,.05) !important;
   }
-  .micon-mobile-brand { display:flex !important; align-items:center !important; gap:10px !important; min-width:0 !important; }
-  .micon-mobile-logo {
-    display:grid !important; place-items:center !important;
-    width:42px !important; height:42px !important; flex:0 0 42px !important;
-    border-radius:13px !important; background:#2864ed !important;
-    color:#fff !important; font-size:24px !important; font-weight:800 !important;
-  }
-  .micon-mobile-wordmark { display:flex !important; align-items:baseline !important; gap:1px !important; font:900 27px/1 system-ui,-apple-system,"Segoe UI",sans-serif !important; letter-spacing:-1px !important; }
-  .micon-mobile-wordmark span { color:#4c50d9 !important; }
-  .micon-mobile-wordmark b { color:#16a34a !important; }
-  #micon-mobile-profile-slot { display:flex !important; align-items:center !important; margin-left:auto !important; }
-  #micon-mobile-profile-slot #micon-account-profile { display:block !important; }
+  #micon-mobile-sticky-shell > .top .brand { min-width: 0 !important; }
+  #micon-mobile-sticky-shell > .top .brand h1 { font-size: 25px !important; }
+  #micon-mobile-sticky-shell > .top > .pill { display: none !important; }
   #micon-mobile-sticky-shell > #videoStage {
-    display:grid !important; place-items:center !important;
-    width:100% !important; height:auto !important; min-height:0 !important;
-    aspect-ratio:1.55 !important; max-height:none !important;
-    margin:0 !important; padding:0 !important; overflow:hidden !important;
-    border:0 !important; border-radius:0 !important; background:#080b12 !important;
+    position: relative !important;
+    display: grid !important;
+    place-items: center !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 16 / 9 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #080b12 !important;
   }
   #micon-mobile-sticky-shell > #videoStage:empty::before {
-    content:"Video akan diputar di sini" !important;
-    display:flex !important; align-items:center !important; justify-content:center !important;
-    position:absolute !important; inset:0 !important; color:#f3f4f6 !important;
-    background:#080b12 !important; font-size:14px !important; font-weight:750 !important;
+    content: "Video akan diputar di sini" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #f3f4f6 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    background: #080b12 !important;
   }
   #micon-mobile-sticky-shell > #videoStage #karaokeVideo {
-    display:block !important; width:100% !important; height:100% !important;
-    max-height:none !important; aspect-ratio:1.55 !important;
-    object-fit:contain !important; margin:0 !important;
-    border:0 !important; border-radius:0 !important; background:#080b12 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #080b12 !important;
   }
-  .micon-reference-stack > .filemeta { display:none !important; }
-
+  #micon-mobile-sticky-shell ~ #mainContent { padding-top: 0 !important; }
   #micon-floating-dock {
-    position:fixed !important; z-index:100000 !important;
-    left:12px !important; right:12px !important;
-    bottom:calc(9px + env(safe-area-inset-bottom)) !important;
-    display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    align-items:center !important; gap:4px !important; min-height:66px !important;
-    padding:7px 8px !important; border:1px solid #e3eaf4 !important;
-    border-radius:20px !important; background:rgba(255,255,255,.97) !important;
-    box-shadow:0 8px 28px rgba(24,42,70,.16) !important;
-    -webkit-backdrop-filter:blur(16px) !important; backdrop-filter:blur(16px) !important;
+    position: fixed !important;
+    z-index: 6000 !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(9px + env(safe-area-inset-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-height: 66px !important;
+    padding: 7px 8px !important;
+    border: 1px solid #e3eaf4 !important;
+    border-radius: 20px !important;
+    background: rgba(255,255,255,.97) !important;
+    box-shadow: 0 8px 28px rgba(24,42,70,.16) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
   }
   #micon-floating-dock .micon-dock-action {
-    appearance:none !important; display:flex !important; flex-direction:column !important;
-    align-items:center !important; justify-content:center !important; gap:3px !important;
-    width:100% !important; min-width:0 !important; height:50px !important;
-    padding:3px 2px !important; border:0 !important; border-radius:13px !important;
-    background:transparent !important; color:#64748b !important;
-    font:700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif !important;
+    appearance: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 50px !important;
+    padding: 3px 2px !important;
+    border: 0 !important;
+    border-radius: 13px !important;
+    background: transparent !important;
+    color: #64748b !important;
+    font: 700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif !important;
   }
-  #micon-floating-dock .micon-dock-action.active,
-  #micon-floating-dock .micon-dock-action:active { background:#eff6ff !important; color:#2563eb !important; }
-  #micon-floating-dock .micon-dock-icon { display:grid !important; place-items:center !important; width:24px !important; height:24px !important; }
-  #micon-floating-dock .micon-dock-icon svg { display:block !important; width:22px !important; height:22px !important; fill:none !important; stroke:currentColor !important; stroke-width:1.8 !important; stroke-linecap:round !important; stroke-linejoin:round !important; }
+  #micon-floating-dock .micon-dock-action.active { background: #eff6ff !important; color: #2563eb !important; }
+  #micon-floating-dock .micon-dock-icon { display: grid !important; place-items: center !important; width: 24px !important; height: 24px !important; }
+  #micon-floating-dock .micon-dock-icon svg { display: block !important; width: 22px !important; height: 22px !important; fill: none !important; stroke: currentColor !important; stroke-width: 1.8 !important; stroke-linecap: round !important; stroke-linejoin: round !important; }
+  body { padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
 }
 @media (min-width:761px) {
-  #micon-mobile-header, #micon-mobile-sticky-shell, #micon-floating-dock { display:none !important; }
+  #micon-mobile-sticky-shell, #micon-floating-dock { display: none !important; }
 }
 </style>
-<script id="micon-mobile-header-rebuilt-js">
+<script id="micon-mobile-header-sticky-single-js">
 (function () {
-  function mountMobileHeader() {
+  function initMicOnMobileSticky() {
     if (!window.matchMedia('(max-width:760px)').matches) return;
-    const header = document.getElementById('micon-mobile-header');
-    const oldHeader = document.querySelector('.wrap > .top');
+    const header = document.querySelector('.wrap > .top');
     const video = document.getElementById('videoStage');
-    const profile = document.getElementById('micon-account-profile');
-    const main = document.getElementById('mainContent');
-    if (!header || !oldHeader || !video || !main) return;
+    if (!header || !video) return;
 
     let shell = document.getElementById('micon-mobile-sticky-shell');
     if (!shell) {
@@ -2417,8 +2431,6 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     }
     if (header.parentNode !== shell) shell.appendChild(header);
     if (video.parentNode !== shell) shell.appendChild(video);
-    const profileSlot = document.getElementById('micon-mobile-profile-slot');
-    if (profile && profileSlot && profile.parentNode !== profileSlot) profileSlot.appendChild(profile);
 
     if (!document.getElementById('micon-floating-dock')) {
       const dock = document.createElement('nav');
@@ -2435,23 +2447,23 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
         const button = event.target.closest('[data-action]');
         if (!button) return;
         const action = button.dataset.action;
-        activate(action);
         if (action === 'transpose') {
-          document.querySelector('.pitch-compact-row, #transposeCard, .transposeCard')?.scrollIntoView({behavior:'smooth',block:'center'});
+          document.querySelector('.pitch-compact-row, #transposeSection')?.scrollIntoView({behavior:'smooth',block:'start'});
         } else if (action === 'upload') {
-          document.getElementById('fileInput')?.click();
+          document.getElementById('videoFile')?.click();
         } else if (action === 'download') {
-          document.querySelector('[data-page="youtubePage"]')?.click();
+          document.querySelector('[data-page="youtubePage"], #youtubeSection')?.scrollIntoView({behavior:'smooth',block:'start'});
         } else if (action === 'profile') {
           document.getElementById('micon-profile-trigger')?.click();
         }
+        activate(action);
       });
     }
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountMobileHeader, {once:true});
-  else mountMobileHeader();
-  window.addEventListener('resize', mountMobileHeader, {passive:true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMicOnMobileSticky, {once:true});
+  else initMicOnMobileSticky();
 })();
 </script>
-\n</body>
+
+</body>
 </html>
