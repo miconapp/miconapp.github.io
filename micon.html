@@ -2285,46 +2285,64 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 </script>
 
 
-<style id="micon-sticky-video-and-floating-dock">
+<style id="micon-requested-mobile-adjustments">
 @media(max-width:760px){
-  html,body{background:#fff!important}
-  body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
-  .top{
-    position:sticky!important;top:0!important;z-index:1300!important;
-    height:82px!important;min-height:82px!important;
-    background:rgba(255,255,255,.98)!important;
+  body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+  /* Header + preview berada dalam satu sticky shell agar keduanya tetap terlihat. */
+  #micon-sticky-shell{
+    position:sticky!important;top:0!important;z-index:1500!important;
+    display:flex!important;flex-direction:column!important;width:100%!important;
+    margin:0!important;padding:0!important;background:#fff!important;
+    box-shadow:0 3px 10px rgba(15,23,42,.07)!important;
   }
-  .micon-reference-stack{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
-  .micon-reference-stack #videoStage{
-    position:sticky!important;top:82px!important;z-index:1200!important;
-    width:calc(100% + 30px)!important;
-    box-shadow:0 5px 12px rgba(8,11,18,.08)!important;
+  #micon-sticky-shell>.top{
+    position:relative!important;top:auto!important;z-index:auto!important;
+    flex:0 0 82px!important;width:100%!important;height:82px!important;min-height:82px!important;
+    margin:0!important;
   }
-  /* Hilangkan kotak informasi import lokal; tombol Upload di dock menjadi akses pemilih file. */
-  .micon-reference-stack .filemeta{display:none!important}
-  /* Tombol Hapus Video dan Tambah Playlist memiliki ukuran yang sama. */
-  .micon-reference-stack #clearBtn{
-    height:47px!important;min-height:47px!important;width:100%!important;
-    margin:0 0 12px!important;border-radius:14px!important;
-    border:0!important;background:#f1f5f9!important;color:#9ca3af!important;
-    font-size:13px!important;font-weight:850!important;
+  #micon-sticky-shell>#videoStage{
+    position:relative!important;top:auto!important;z-index:auto!important;
+    display:grid!important;place-items:center!important;
+    width:100%!important;height:auto!important;min-height:0!important;
+    aspect-ratio:1.55!important;margin:0!important;padding:0!important;
+    overflow:hidden!important;border:0!important;border-radius:0!important;background:#080b12!important;
   }
-  .micon-reference-stack #clearBtn:disabled{opacity:1!important}
+  #micon-sticky-shell>#videoStage:empty:before{
+    content:'Video akan diputar disini'!important;position:absolute!important;inset:0!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    background:#080b12!important;color:#f3f4f6!important;font-size:14px!important;font-weight:750!important;
+  }
+  #micon-sticky-shell>#videoStage #karaokeVideo{
+    position:relative!important;z-index:2!important;display:block!important;
+    width:100%!important;height:100%!important;aspect-ratio:1.55!important;
+    object-fit:contain!important;margin:0!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:#080b12!important;
+  }
+  /* Kotak status/import lokal di bawah preview dihilangkan dari tampilan. */
+  .micon-reference-stack>.filemeta{display:none!important}
+  /* Tombol Hapus Video dibuat sama tinggi dan lebar dengan Tambah Playlist. */
+  .micon-reference-stack>#clearBtn,
   .micon-reference-stack .mobile-playlist-import{
-    height:47px!important;min-height:47px!important;border-radius:14px!important;
-    margin:0 0 15px!important;
+    box-sizing:border-box!important;width:100%!important;height:47px!important;min-height:47px!important;
+    border-radius:14px!important;font-size:13px!important;font-weight:850!important;
   }
-  .micon-reference-stack .pitch-compact-row{scroll-margin-top:calc(82px + 63vw + 14px)!important}
+  .micon-reference-stack>#clearBtn{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    margin:0 0 12px!important;padding:0 12px!important;
+    border:0!important;background:#f1f5f9!important;color:#9ca3af!important;box-shadow:none!important;
+  }
+  .micon-reference-stack>#clearBtn:disabled{opacity:1!important}
+  .micon-reference-stack .mobile-playlist-import{
+    margin:0 0 15px!important;padding:0 12px!important;
+    border:0!important;background:#9bb7f5!important;color:#fff!important;
+  }
   #micon-floating-dock{
-    position:fixed!important;z-index:1400!important;
-    left:12px!important;right:12px!important;
+    position:fixed!important;z-index:2000!important;left:12px!important;right:12px!important;
     bottom:calc(9px + env(safe-area-inset-bottom))!important;
     display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    align-items:center!important;gap:4px!important;
-    min-height:66px!important;padding:7px 8px!important;
+    align-items:center!important;gap:4px!important;min-height:66px!important;padding:7px 8px!important;
     border:1px solid #e3eaf4!important;border-radius:20px!important;
-    background:rgba(255,255,255,.97)!important;
-    box-shadow:0 8px 28px rgba(24,42,70,.16)!important;
+    background:rgba(255,255,255,.97)!important;box-shadow:0 8px 28px rgba(24,42,70,.16)!important;
     -webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;
   }
   #micon-floating-dock .micon-dock-action{
@@ -2333,30 +2351,36 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     width:100%!important;min-width:0!important;height:50px!important;padding:3px 2px!important;
     border:0!important;border-radius:13px!important;background:transparent!important;
     color:#64748b!important;font:700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif!important;
-    cursor:pointer!important;
   }
-  #micon-floating-dock .micon-dock-action:active,
-  #micon-floating-dock .micon-dock-action.active{
-    background:#eff6ff!important;color:#2563eb!important;
-  }
+  #micon-floating-dock .micon-dock-action.active,
+  #micon-floating-dock .micon-dock-action:active{background:#eff6ff!important;color:#2563eb!important}
   #micon-floating-dock .micon-dock-icon{
     display:grid!important;place-items:center!important;width:24px!important;height:24px!important;
     font-size:21px!important;line-height:1!important;font-weight:700!important;
   }
   #micon-floating-dock .micon-dock-icon svg{
-    display:block!important;width:22px!important;height:22px!important;
-    fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
-    stroke-linecap:round!important;stroke-linejoin:round!important;
+    display:block!important;width:22px!important;height:22px!important;fill:none!important;
+    stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;
   }
-  #youtubeSection.active{padding-bottom:calc(90px + env(safe-area-inset-bottom))!important}
 }
-@media(min-width:761px){#micon-floating-dock{display:none!important}}
+@media(min-width:761px){#micon-sticky-shell,#micon-floating-dock{display:none!important}}
 </style>
-<script id="micon-sticky-dock-actions">
+<script id="micon-requested-mobile-adjustments-js">
 (function(){
- const mobile=window.matchMedia('(max-width:760px)');
- if(!mobile.matches)return;
- if(document.getElementById('micon-floating-dock'))return;
+ if(!window.matchMedia('(max-width:760px)').matches)return;
+ const header=document.querySelector('.wrap>.top')||document.querySelector('.top');
+ const stack=document.querySelector('#mainContent .micon-reference-stack');
+ const video=document.getElementById('videoStage');
+ if(header&&video&&!document.getElementById('micon-sticky-shell')){
+   const shell=document.createElement('div');
+   shell.id='micon-sticky-shell';
+   header.parentNode.insertBefore(shell,header);
+   shell.appendChild(header);
+   shell.appendChild(video);
+ }
+ /* Keep file metadata nodes in DOM for existing app logic, but hide their local-import card. */
+ const localImport=stack&&stack.querySelector('.filemeta');
+ if(localImport)localImport.style.setProperty('display','none','important');
  const dock=document.createElement('nav');
  dock.id='micon-floating-dock';
  dock.setAttribute('aria-label','Menu utama');
@@ -2374,34 +2398,34 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
    <span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span>
   </button>`;
  document.body.appendChild(dock);
- const action=(name)=>dock.querySelector('[data-action="'+name+'"]');
+ const button=name=>dock.querySelector('[data-action="'+name+'"]');
+ const activate=name=>dock.querySelectorAll('.micon-dock-action').forEach(el=>el.classList.toggle('active',el===button(name)));
  const main=document.getElementById('mainContent');
  const youtube=document.getElementById('youtubeSection');
- const upload=document.getElementById('videoFile');
- const profile=document.querySelector('.profile-dock');
- function showHome(){
+ const input=document.getElementById('videoFile');
+ button('transpose').addEventListener('click',()=>{
    if(youtube)youtube.classList.remove('active');
    if(main)main.classList.remove('hidden');
- }
- action('transpose').addEventListener('click',()=>{
-   showHome();
    const target=document.querySelector('.micon-reference-stack .pitch-compact-row');
    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
-   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('transpose')));
+   activate('transpose');
  });
- action('upload').addEventListener('click',()=>{
-   showHome();
-   if(upload)upload.click();
-   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('upload')));
+ button('upload').addEventListener('click',()=>{
+   if(youtube)youtube.classList.remove('active');
+   if(main)main.classList.remove('hidden');
+   if(input)input.click();
+   activate('upload');
  });
- action('download').addEventListener('click',()=>{
+ button('download').addEventListener('click',()=>{
    if(main)main.classList.add('hidden');
-   if(youtube){youtube.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('download')));
+   if(youtube)youtube.classList.add('active');
+   window.scrollTo({top:0,behavior:'smooth'});
+   activate('download');
  });
- action('profile').addEventListener('click',()=>{
+ button('profile').addEventListener('click',()=>{
+   const profile=document.getElementById('micon-profile-trigger');
    if(profile)profile.click();
-   dock.querySelectorAll('.micon-dock-action').forEach(x=>x.classList.toggle('active',x===action('profile')));
+   activate('profile');
  });
 })();
 </script>
