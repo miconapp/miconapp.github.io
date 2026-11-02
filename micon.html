@@ -357,7 +357,7 @@
   .mobile-playlist-panel{padding:13px!important;border-radius:17px!important;box-shadow:0 2px 8px rgba(20,35,60,.045)!important}
   .mobile-playlist-import{height:44px!important;border-radius:12px!important}
   .mobile-playlist-item{height:58px!important;min-height:58px!important;border-radius:12px!important}
-  #transposeSection .pitch-compact-row{grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
+  .micon-reference-layout .pitch-compact-row{grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
   #transposeSection .playbtn,#transposeSection #playBtn{height:48px!important;border-radius:14px!important}
   .mobile-ad-banner,.mobile-fill,.home-scroll-column .foot{margin-top:10px!important}
   .home-scroll-column{
@@ -437,14 +437,14 @@
     border-radius:12px!important;background:#fff!important;color:var(--micon-ink)!important;
     font-size:12px!important;font-weight:650!important;box-shadow:none!important;
   }
-  #transposeSection .pitch-compact-row{
+  .micon-reference-layout .pitch-compact-row{
     display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
     grid-template-rows:clamp(42px,12vw,48px)!important;grid-auto-flow:row!important;
     gap:8px!important;align-items:stretch!important;justify-content:stretch!important;
     box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0!important;
     overflow:visible!important;
   }
-  #transposeSection .pitch-compact-row>*{
+  .micon-reference-layout .pitch-compact-row>*{
     display:flex!important;position:relative!important;float:none!important;grid-row:1!important;
     min-width:0!important;max-width:100%!important;width:100%!important;height:100%!important;
     min-height:0!important;max-height:none!important;margin:0!important;padding:3px!important;
@@ -453,37 +453,37 @@
     background:#fff!important;color:var(--micon-ink)!important;
     box-shadow:0 2px 7px rgba(22,39,67,.045)!important;overflow:hidden!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox{
+  .micon-reference-layout .pitch-compact-row>.noteBox{
     grid-column:1!important;flex-direction:column!important;gap:3px!important;
     background:var(--micon-blue-soft)!important;border-color:#dbeafe!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox small{
+  .micon-reference-layout .pitch-compact-row>.noteBox small{
     display:block!important;color:#64748b!important;font-size:8px!important;line-height:1!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox .note{
+  .micon-reference-layout .pitch-compact-row>.noteBox .note{
     display:block!important;color:#1d4ed8!important;font-size:clamp(12px,3.7vw,16px)!important;
     line-height:1.1!important;font-weight:850!important;text-transform:uppercase!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
+  .micon-reference-layout .pitch-compact-row>.noteBox #noteDesc{
     display:block!important;color:#64748b!important;font-size:7px!important;line-height:1!important;
     white-space:nowrap!important;
   }
-  #transposeSection .pitch-compact-row>.semitone{
+  .micon-reference-layout .pitch-compact-row>.semitone{
     grid-column:2!important;flex-direction:column!important;gap:2px!important;
     font-size:clamp(13px,4vw,16px)!important;font-weight:850!important;
   }
-  #transposeSection .pitch-compact-row>.semitone small{
+  .micon-reference-layout .pitch-compact-row>.semitone small{
     display:block!important;color:var(--micon-muted)!important;font-size:8px!important;font-weight:600!important;
   }
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
-  #transposeSection .pitch-compact-row>#downBtn,
-  #transposeSection .pitch-compact-row>#upBtn{
+  .micon-reference-layout .pitch-compact-row>#downBtn{grid-column:3!important}
+  .micon-reference-layout .pitch-compact-row>#upBtn{grid-column:4!important}
+  .micon-reference-layout .pitch-compact-row>#downBtn,
+  .micon-reference-layout .pitch-compact-row>#upBtn{
     font-size:25px!important;line-height:1!important;font-weight:500!important;
     color:var(--micon-blue)!important;background:#fff!important;
   }
-  #transposeSection .pitch-compact-row>#downBtn:disabled,
-  #transposeSection .pitch-compact-row>#upBtn:disabled{color:#aab6c7!important;background:#f8fafc!important}
+  .micon-reference-layout .pitch-compact-row>#downBtn:disabled,
+  .micon-reference-layout .pitch-compact-row>#upBtn:disabled{color:#aab6c7!important;background:#f8fafc!important}
   #transposeSection .stepper{
     display:flex!important;box-sizing:border-box!important;width:100%!important;height:34px!important;
     align-items:center!important;gap:8px!important;margin:0!important;padding:0 3px!important;
@@ -640,13 +640,13 @@
   .mobile-profile-page #micon-profile-detail small{font-size:13px!important;color:var(--micon-muted)!important}
   .mobile-profile-page #micon-profile-logout{display:block!important;width:100%!important;padding:15px!important;border-radius:13px!important}
   /* Semua efek interaksi tetap di dalam batas komponen. */
-  #importSection .filemeta:hover,#transposeSection .pitch-compact-row>*:hover,
+  #importSection .filemeta:hover,.micon-reference-layout .pitch-compact-row>*:hover,
   .mobile-clear-video:hover,.mobile-playlist-import:hover,.mobile-playlist-item:hover,
   #transposeSection .drop:hover,#transposeSection .keySelect:hover{
     transform:none!important;outline:none!important;
     box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 2px 7px rgba(22,39,67,.05)!important;
   }
-  #importSection .filemeta,#transposeSection .pitch-compact-row>*,
+  #importSection .filemeta,.micon-reference-layout .pitch-compact-row>*,
   .mobile-clear-video,.mobile-playlist-import,.mobile-playlist-item,#transposeSection .drop{
     transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease!important;
   }
@@ -654,9 +654,9 @@
 @media screen and (max-width:360px){
   .home-scroll-column{padding-left:10px!important;padding-right:10px!important}
   #importSection,#transposeSection,.mobile-playlist-panel{padding:12px!important}
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:11px!important}
-  #transposeSection .pitch-compact-row>#downBtn,#transposeSection .pitch-compact-row>#upBtn{font-size:22px!important}
+  .micon-reference-layout .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox .note{font-size:11px!important}
+  .micon-reference-layout .pitch-compact-row>#downBtn,.micon-reference-layout .pitch-compact-row>#upBtn{font-size:22px!important}
 }
 
 
@@ -751,25 +751,25 @@
   #transposeSection .drop .uploadIcon{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;flex-basis:30px!important;margin:0!important;border-radius:10px!important;background:#eaf2ff!important;color:#2563eb!important;font-size:17px!important}
   #transposeSection .drop strong{font-size:11px!important;color:#1d4ed8!important}
   #transposeSection .drop small{display:inline!important;margin:0 0 0 2px!important;font-size:9px!important;color:#718096!important}
-  #transposeSection .pitch-compact-row{
+  .micon-reference-layout .pitch-compact-row{
     order:3!important;display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
     grid-template-rows:49px!important;gap:8px!important;width:100%!important;height:49px!important;
     margin:0 0 15px!important;padding:0!important;
   }
-  #transposeSection .pitch-compact-row>*{
+  .micon-reference-layout .pitch-compact-row>*{
     display:flex!important;min-width:0!important;width:100%!important;height:49px!important;min-height:49px!important;
     margin:0!important;padding:3px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;
     border:1px solid #e1e8f2!important;border-radius:13px!important;background:#fff!important;
     box-shadow:0 2px 7px rgba(15,23,42,.04)!important;
   }
-  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:#eff6ff!important;border-color:#dbeafe!important}
-  #transposeSection .pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:1px!important;font-size:16px!important;font-weight:850!important}
-  #transposeSection .pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:3!important;color:#ef233c!important;font-size:22px!important}
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:4!important;color:#ef233c!important;font-size:22px!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:#eff6ff!important;border-color:#dbeafe!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
+  .micon-reference-layout .pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:1px!important;font-size:16px!important;font-weight:850!important}
+  .micon-reference-layout .pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
+  .micon-reference-layout .pitch-compact-row>#upBtn{grid-column:3!important;color:#ef233c!important;font-size:22px!important}
+  .micon-reference-layout .pitch-compact-row>#downBtn{grid-column:4!important;color:#ef233c!important;font-size:22px!important}
   #transposeSection .row{display:contents!important}
   #transposeSection #clearBtn,.mobile-playlist-panel>.mobile-clear-video{
     order:4!important;display:flex!important;align-items:center!important;justify-content:center!important;
@@ -813,8 +813,8 @@
   .mobile-profile-page{z-index:3000!important}
 }
 @media screen and (max-width:360px){
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:12px!important}
+  .micon-reference-layout .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
+  .micon-reference-layout .pitch-compact-row>.noteBox .note{font-size:12px!important}
 }
 </style>
 
@@ -2090,120 +2090,137 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 </script>
 
 
-<script id="micon-mobile-playlist-ui">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="micon-exact-reference-mobile">
+@media(max-width:760px){
+ html,body{background:#fff!important;color:#111827!important}
+ .wrap{width:100%!important;max-width:none!important;margin:0!important;padding:0 0 30px!important;background:#fff!important}
+ .top{height:82px!important;min-height:82px!important;padding:calc(10px + env(safe-area-inset-top)) 13px 10px!important;margin:0!important;gap:8px!important;background:#fff!important;border-bottom:1px solid #e5eaf2!important;box-shadow:0 1px 5px #0f172a0d!important}
+ .top .brand{gap:7px!important}.top .logo{width:40px!important;height:40px!important;flex:0 0 40px!important;border-radius:13px!important;background:#2864ed!important;color:#fff!important;font-size:22px!important}
+ .top .brand h1{font-size:27px!important;font-weight:900!important;letter-spacing:-1px!important;color:#4c50d9!important}
+ .top .brand-mic{color:#4c50d9!important}.top .brand-on{color:#16a34a!important}
+ #micon-account-profile{margin-left:auto!important}#micon-profile-trigger{width:42px!important;height:42px!important;max-width:42px!important;padding:4px!important;justify-content:center!important}
+ #mainContent{margin:0!important;padding:0!important;background:#fff!important}
+ .micon-reference-layout{display:flex!important;flex-direction:column!important;width:100%!important;margin:0!important;padding:0 15px 28px!important;gap:0!important;background:#fff!important}
+ #videoStage{order:0!important;position:relative!important;display:grid!important;place-items:center!important;width:calc(100% + 30px)!important;height:auto!important;min-height:0!important;aspect-ratio:1.55!important;margin:0 -15px 0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:#080b12!important}
+ #videoStage:empty:before{content:'Video akan diputar disini'!important;position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#f3f4f6!important;background:#080b12!important;font-size:14px!important;font-weight:750!important}
+ #videoStage #karaokeVideo{position:relative!important;z-index:2!important;width:100%!important;height:100%!important;aspect-ratio:1.55!important;object-fit:contain!important;border:0!important;border-radius:0!important;background:#080b12!important}
+ #importSection .filemeta{order:1!important;display:flex!important;width:100%!important;height:66px!important;min-height:66px!important;margin:14px 0 12px!important;padding:9px 12px!important;gap:10px!important;border:1px solid #e1e8f2!important;border-radius:15px!important;background:#fbfcff!important;box-shadow:0 2px 8px #0f172a08!important}
+ #importSection .fileIcon{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important}
+ #importSection .filetext b{font-size:11px!important;color:#111827!important}#importSection .filetext small{font-size:9px!important;color:#64748b!important}#importSection .status{display:inline!important;margin-left:7px!important;font-size:9px!important;color:#94a3b8!important}
+ #dropZone{order:2!important;display:flex!important;width:100%!important;height:60px!important;min-height:60px!important;margin:0 0 13px!important;padding:7px 10px!important;border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#2563eb!important}
+ #dropZone>div{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:9px!important}
+ #dropZone .uploadIcon{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;flex:0 0 30px!important;margin:0!important;border-radius:10px!important;background:#eaf2ff!important;color:#2563eb!important;font-size:17px!important}
+ #dropZone strong{font-size:11px!important;color:#1d4ed8!important}#dropZone small{display:inline!important;margin:0 0 0 2px!important;font-size:9px!important;color:#718096!important}
+ .micon-reference-layout .pitch-compact-row{order:3!important;display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;grid-template-rows:49px!important;gap:8px!important;width:100%!important;height:49px!important;margin:0 0 15px!important;padding:0!important}
+ .micon-reference-layout .pitch-compact-row>*{display:flex!important;min-width:0!important;width:100%!important;height:49px!important;min-height:49px!important;margin:0!important;padding:3px!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;border:1px solid #e1e8f2!important;border-radius:13px!important;background:#fff!important;box-shadow:0 2px 7px #0f172a0a!important}
+ .micon-reference-layout .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:#eff6ff!important;border-color:#dbeafe!important}
+ .micon-reference-layout .pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
+ .micon-reference-layout .pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
+ .micon-reference-layout .pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
+ .micon-reference-layout .pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:1px!important;font-size:16px!important;font-weight:850!important}
+ .micon-reference-layout .pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
+ .micon-reference-layout .pitch-compact-row>#upBtn{grid-column:3!important;color:#ef233c!important;font-size:22px!important}
+ .micon-reference-layout .pitch-compact-row>#downBtn{grid-column:4!important;color:#ef233c!important;font-size:22px!important}
+ #clearBtn{order:4!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 14px!important;padding:0 12px!important;border:1px solid #e5eaf2!important;border-radius:13px!important;background:#f8fafc!important;color:#9ca3af!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important}
+ #clearBtn:disabled{opacity:1!important}
+ .mobile-playlist-panel{order:5!important;display:flex!important;flex-direction:column!important;gap:0!important;width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+ .mobile-playlist-import{order:0!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:47px!important;min-height:47px!important;margin:0 0 15px!important;padding:0 12px!important;border:0!important;border-radius:14px!important;background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:850!important;box-shadow:0 4px 10px #2563eb1a!important}
+ .mobile-playlist-heading{order:1!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;width:calc(100% + 30px)!important;height:29px!important;min-height:29px!important;margin:0 -15px 15px!important;padding:0 15px 7px!important;border:0!important;border-top:1px solid #e5eaf2!important;border-bottom:1px solid #edf0f5!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:800!important;letter-spacing:0!important}
+ .mobile-playlist-list{order:2!important;display:flex!important;flex-direction:column!important;gap:12px!important;width:calc(100% + 4px)!important;margin:0 -2px!important;padding:0!important;background:#fff!important}
+ .mobile-playlist-item{display:flex!important;align-items:center!important;width:100%!important;height:60px!important;min-height:60px!important;padding:8px 11px!important;border:1px dashed #b8cbea!important;border-radius:15px!important;background:#f8fbff!important;color:#111827!important;box-shadow:none!important}
+ .mobile-playlist-icon{width:35px!important;height:35px!important;flex:0 0 35px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important}
+ .mobile-playlist-copy strong{font-size:10px!important;color:#111827!important}.mobile-playlist-copy small{font-size:8px!important;color:#16a34a!important}
+ .mobile-playlist-empty{display:none!important}
+ /* Hanya elemen yang terlihat pada foto referensi. */
+ #importSection,#transposeSection{display:contents!important}
+ #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
+ #transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,
+ #transposeSection #alert,#transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
+ .mobile-fill,.mobile-tip,.mobile-ad-banner,.foot,.mobile-dock,.mobile-bottom-nav{display:none!important}
+ #mainContent>.hero{display:none!important}
+}
+@media(max-width:360px){
+ .micon-reference-layout{padding-left:13px!important;padding-right:13px!important}
+ #videoStage{width:calc(100% + 26px)!important;margin-left:-13px!important;margin-right:-13px!important}
+ .micon-reference-layout .pitch-compact-row{gap:5px!important}
+}
+</style>
+<script id="micon-exact-reference-mobile-layout">
 (function(){
-  if(!window.matchMedia('(max-width:760px)').matches)return;
-  const scroll=document.querySelector('#mainContent>.home-layout>.home-scroll-column');
-  const grid=scroll&&scroll.querySelector(':scope > .grid');
-  const transpose=document.getElementById('transposeSection');
-  const clear=document.getElementById('clearBtn');
-  const compact=transpose&&transpose.querySelector('.pitch-compact-row');
-  if(!scroll||!grid||!transpose||!compact)return;
-
-  /* Tombol Hapus Video dipindahkan ke baris penuh di atas Import Playlist; handler asli tetap. */
-
-  const panel=document.createElement('section');
-  panel.className='mobile-playlist-panel';
-  panel.setAttribute('aria-label','Playlist video');
-  const add=document.createElement('button');
-  add.type='button';add.className='mobile-playlist-import';add.textContent='Tambah Playlist';
-  const heading=document.createElement('div');
-  heading.className='mobile-playlist-heading';heading.textContent='Playlist';
-  const list=document.createElement('div');
-  list.className='mobile-playlist-list';
-  const picker=document.createElement('input');
-  picker.type='file';picker.accept='.mp4,video/mp4,video/*';picker.multiple=true;
-  picker.className='mobile-playlist-picker';picker.setAttribute('aria-label','Pilih video untuk playlist');
-  if(clear){
-    clear.classList.add('mobile-clear-video');
-    clear.textContent='Hapus video';
-    panel.appendChild(clear);
-  }
-  panel.append(add,heading,list,picker);
-  grid.insertAdjacentElement('afterend',panel);
-  add.addEventListener('click',()=>picker.click());
-
-  const playlist=[];
-  let currentIndex=-1;
-  const videoPicker=document.getElementById('videoFile');
-  function markActive(){
-    list.querySelectorAll('.mobile-playlist-item').forEach((item,index)=>{
-      item.classList.toggle('active',index===currentIndex);
-    });
-  }
-  function loadItem(index){
-    if(index<0||index>=playlist.length||!videoPicker)return;
-    currentIndex=index;
-    window.__miconPlaylistHasNext=index<playlist.length-1;
-    markActive();
-    try{
-      const transfer=new DataTransfer();
-      transfer.items.add(playlist[index].file);
-      videoPicker.files=transfer.files;
-      videoPicker.dispatchEvent(new Event('change',{bubbles:true}));
-    }catch(error){
-      window.alert('Browser tidak dapat memuat video dari playlist: '+(error.message||error));
-    }
-  }
-  function render(){
-    list.replaceChildren();
-    if(!playlist.length){
-      const empty=document.createElement('div');
-      empty.className='mobile-playlist-empty';
-      empty.textContent='Playlist masih kosong';
-      list.appendChild(empty);
-      return;
-    }
-    playlist.forEach((entry,index)=>{
-      const row=document.createElement('button');
-      row.type='button';row.className='mobile-playlist-item';
-      const icon=document.createElement('span');icon.className='mobile-playlist-icon';icon.textContent='♫';
-      const copy=document.createElement('span');copy.className='mobile-playlist-copy';
-      const name=document.createElement('strong');name.textContent=entry.file.name;
-      const size=document.createElement('small');size.textContent=(entry.file.size/1048576).toFixed(2)+' MB · video/mp4';
-      copy.append(name,size);row.append(icon,copy);
-      row.addEventListener('click',()=>loadItem(index));
-      list.appendChild(row);
-    });
-    markActive();
-  }
-  picker.addEventListener('change',()=>{
-    const before=playlist.length;
-    Array.from(picker.files||[]).forEach(file=>{
-      if(/\.mp4$/i.test(file.name)||file.type==='video/mp4'||file.type==='application/mp4'){
-        if(!playlist.some(entry=>entry.file.name===file.name&&entry.file.size===file.size&&entry.file.lastModified===file.lastModified)){
-          playlist.push({file});
-        }
-      }
-    });
-    picker.value='';
-    render();
-    if(before===0&&playlist.length>0&&currentIndex===-1)loadItem(0);
-    window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
+ if(!window.matchMedia('(max-width:760px)').matches)return;
+ const main=document.getElementById('mainContent');
+ const grid=main&&main.querySelector(':scope > .grid');
+ const imp=document.getElementById('importSection');
+ const trans=document.getElementById('transposeSection');
+ const video=document.getElementById('videoStage');
+ const file=imp&&imp.querySelector('.filemeta');
+ const drop=document.getElementById('dropZone');
+ const compact=trans&&trans.querySelector('.pitch-compact-row');
+ const clear=document.getElementById('clearBtn');
+ if(!main||!grid||!imp||!trans||!video||!file||!drop||!compact||!clear)return;
+ const layout=document.createElement('div');
+ layout.className='micon-reference-layout';
+ main.insertBefore(layout,grid);
+ [video,file,drop,compact,clear].forEach(el=>layout.appendChild(el));
+ const panel=document.createElement('section');
+ panel.className='mobile-playlist-panel';
+ panel.setAttribute('aria-label','Playlist');
+ const add=document.createElement('button');
+ add.type='button';add.className='mobile-playlist-import';add.textContent='Tambah Playlist';
+ const heading=document.createElement('div');
+ heading.className='mobile-playlist-heading';heading.textContent='Playlist';
+ const list=document.createElement('div');list.className='mobile-playlist-list';
+ const picker=document.createElement('input');picker.type='file';picker.accept='.mp4,video/mp4,video/*';picker.multiple=true;picker.hidden=true;
+ panel.append(add,heading,list,picker);layout.appendChild(panel);
+ add.addEventListener('click',()=>picker.click());
+ const playlist=[];let current=-1;const videoPicker=document.getElementById('videoFile');
+ function render(){
+  list.replaceChildren();
+  playlist.forEach((entry,index)=>{
+   const row=document.createElement('button');row.type='button';row.className='mobile-playlist-item';
+   const ico=document.createElement('span');ico.className='mobile-playlist-icon';ico.textContent='♫';
+   const copy=document.createElement('span');copy.className='mobile-playlist-copy';
+   const name=document.createElement('strong');name.textContent=entry.file.name;
+   const size=document.createElement('small');size.textContent=(entry.file.size/1048576).toFixed(2)+' MB · File Siap Diputar';
+   copy.append(name,size);row.append(ico,copy);row.addEventListener('click',()=>load(index));list.appendChild(row);
+   if(index===current)row.classList.add('active');
   });
-  window.__miconPlaylistAdvance=()=>{
-    const next=currentIndex+1;
-    if(next<playlist.length)loadItem(next);
-    else window.__miconPlaylistHasNext=false;
-  };
-  render();
+ }
+ function load(index){
+  if(index<0||index>=playlist.length||!videoPicker)return;
+  current=index;render();
+  try{const dt=new DataTransfer();dt.items.add(playlist[index].file);videoPicker.files=dt.files;videoPicker.dispatchEvent(new Event('change',{bubbles:true}));}
+  catch(e){window.alert('Browser tidak dapat memuat video dari playlist: '+(e.message||e));}
+ }
+ picker.addEventListener('change',()=>{
+  Array.from(picker.files||[]).forEach(file=>{
+   if(/\.mp4$/i.test(file.name)||file.type==='video/mp4'||file.type==='application/mp4'){
+    if(!playlist.some(x=>x.file.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified))playlist.push({file});
+   }
+  });
+  picker.value='';render();if(current===-1&&playlist.length)load(0);
+ });
+ window.__miconPlaylistAdvance=()=>{if(current+1<playlist.length)load(current+1);};
 })();
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </body>
 </html>
