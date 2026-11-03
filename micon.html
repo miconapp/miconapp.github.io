@@ -608,15 +608,6 @@
   .mobile-tip>span{font-size:17px!important;line-height:1.2!important;color:#2563eb!important}
   .mobile-tip b{display:block!important;margin-bottom:3px!important;font-size:11px!important;font-weight:800!important}
   .mobile-tip p{display:block!important;margin:0!important;color:#526784!important;font-size:10px!important;line-height:1.5!important}
-  .mobile-ad-banner{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    box-sizing:border-box!important;width:100%!important;height:60px!important;min-height:60px!important;
-    margin:12px 0 0!important;padding:0!important;border:1px solid #cbd5e1!important;
-    border-radius:15px!important;background:#fff!important;color:#94a3b8!important;
-    text-align:center!important;font-size:10px!important;overflow:hidden!important;
-  }
-  .mobile-ad-banner:not(.is-configured){display:none!important}
-  .mobile-ad-banner.is-configured{overflow:hidden!important;padding:0!important;border-style:solid!important;background:#fff!important;color:transparent!important}
   .home-scroll-column .foot,#mainContent>.foot,.foot{
     display:grid!important;grid-template-columns:1fr!important;gap:12px!important;
     width:100%!important;margin:12px 0 0!important;padding:14px!important;
@@ -810,7 +801,7 @@
   .mobile-playlist-copy strong{font-size:10px!important;color:#111827!important}
   .mobile-playlist-copy small{font-size:8px!important;color:#16a34a!important}
   .mobile-playlist-empty{padding:17px 10px!important;font-size:10px!important}
-  .mobile-ad-banner,.home-scroll-column .foot,#mainContent>.foot,.foot{display:none!important}
+  .home-scroll-column .foot,#mainContent>.foot,.foot{display:none!important}
   .home-scroll-column>.grid{gap:0!important}
   .mobile-profile-page{z-index:3000!important}
 }
@@ -821,6 +812,51 @@
 </style>
 
 
+
+
+<style id="micon-playlist-banner-single-rule">
+/* Satu aturan tunggal ukuran banner playlist: rasio 461 x 60. */
+@media screen and (max-width:760px){
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner,
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured{
+    display:block!important;
+    position:relative!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:461 / 60!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:0!important;
+    border-radius:12px!important;
+    background:#f8fbff!important;
+  }
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner>a,
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner img,
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner video{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    object-fit:fill!important;
+    object-position:center!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:inherit!important;
+  }
+}
+</style>
 
 </head>
 <body><main class="wrap">
@@ -2620,29 +2656,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     margin-top:0!important;margin-bottom:0!important;padding:8px 10px!important;border:1px dashed #b8cbea!important;
     border-radius:14px!important;background:#f8fbff!important;color:#111827!important;
     text-align:left!important;box-shadow:none!important;
-  }
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner{
-    order:initial!important;display:flex!important;align-items:center!important;justify-content:center!important;
-    position:relative!important;isolation:isolate!important;
-    box-sizing:border-box!important;align-self:stretch!important;width:100%!important;min-width:0!important;max-width:100%!important;
-    height:auto!important;min-height:0!important;aspect-ratio:461 / 44!important;margin:0!important;padding:0!important;
-    overflow:hidden!important;border:1px dashed #b8cbea!important;border-radius:12px!important;
-    background:#f8fbff!important;color:#64748b!important;text-align:center!important;
-    font-size:10px!important;font-weight:700!important;box-shadow:none!important;
-  }
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured{
-    display:block!important;width:100%!important;height:auto!important;min-height:0!important;
-    aspect-ratio:461 / 44!important;padding:0!important;border:0!important;background:transparent!important;
-  }
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured>a{
-    position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;
-    overflow:hidden!important;border-radius:inherit!important;
-  }
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured img,
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured video{
-    position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;
-    min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;
-    object-fit:contain!important;object-position:center center!important;border:0!important;border-radius:inherit!important;
   }
   .micon-reference-stack .mobile-playlist-icon{
     display:grid!important;place-items:center!important;flex:0 0 33px!important;
