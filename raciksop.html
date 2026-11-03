@@ -54,9 +54,19 @@ function renderVideoPlaylist(){
  box.querySelectorAll("[data-remove-video]").forEach(b=>b.onclick=async()=>{
   const index=Number(b.dataset.removeVideo),item=videoPlaylist[index];
   if(!item)return;
-  if(!confirm("Hapus video \""+(item.name||item.fileName||"Iklan video")+"\" dari playlist dan hapus file-nya dari Supabase Storage?"))return;
+  if(!confirm("Hapus video \""+(item.name||item.fileName||"Iklan video")+"\" dari playlist dan Supabase Storage?"))return;
   b.disabled=true;b.textContent="Menghapus…";
   try{
+   let storagePath="";
+   try{
+    const u=new URL(item.url);
+    const marker="/storage/v1/object/public/"+SUPABASE_BUCKET+"/";
+    const pos=u.pathname.indexOf(marker);
+    if(pos>=0)storagePath=decodeURIComponent(u.pathname.slice(pos+marker.length));
+   }catch(_){}
+   if(!storagePath)throw new Error("Path file Supabase tidak dapat dikenali dari URL video. File tidak dihapus agar data playlist tetap aman.");
+   const {error:storageError}=await supabase.storage.from(SUPABASE_BUCKET).remove([storagePath]);
+   if(storageError)throw new Error("Supabase menolak penghapusan file: "+storageError.message);
    const nextPlaylist=videoPlaylist.filter((_,i)=>i!==index);
    const first=nextPlaylist[0]||{};
    await updateDoc(adRef,{
@@ -71,20 +81,7 @@ function renderVideoPlaylist(){
    });
    videoPlaylist=nextPlaylist;
    renderVideoPlaylist();renderVideoPreview();
-   let storagePath="";
-   try{
-    const u=new URL(item.url);
-    const marker="/storage/v1/object/public/"+SUPABASE_BUCKET+"/";
-    const pos=u.pathname.indexOf(marker);
-    if(pos>=0)storagePath=decodeURIComponent(u.pathname.slice(pos+marker.length));
-   }catch(_){}
-   if(storagePath){
-    const {error}=await supabase.storage.from(SUPABASE_BUCKET).remove([storagePath]);
-    if(error)throw new Error("Video sudah dihapus dari playlist, tetapi file Supabase gagal dihapus: "+error.message);
-    toast("Video dihapus dari playlist dan Supabase Storage.");
-   }else{
-    toast("Video dihapus dari playlist. File bukan URL bucket Supabase yang dikenali, jadi file fisik tidak dihapus.");
-   }
+   toast("Video berhasil dihapus dari playlist dan Supabase Storage.");
   }catch(e){
    toast("Gagal menghapus video: "+errText(e));
    renderVideoPlaylist();
@@ -93,7 +90,18 @@ function renderVideoPlaylist(){
 }
 function renderVideoPreview(){
  const box=$("videoPreview");
- if(!videoPlaylist.length){box.textContent=pendingVideoFiles.length?pendingVideoFiles.length+" video baru siap ditambahkan":"Belum ada video";$("videoInfo").textContent=pendingVideoFiles.map(f=>f.name).join(", ");return}
+ if(!videoPlaylist.length){
+  if(pendingVideoFiles.length){
+   if(videoBlob)URL.revokeObjectURL(videoBlob);
+   videoBlob=URL.createObjectURL(pendingVideoFiles[0]);
+   box.innerHTML=`<video src="${videoBlob}" controls playsinline></video>`;
+   $("videoInfo").textContent=pendingVideoFiles[0].name+(pendingVideoFiles.length>1?" • "+(pendingVideoFiles.length-1)+" video lainnya siap ditambahkan":"");
+  }else{
+   box.textContent="Belum ada video";
+   $("videoInfo").textContent="";
+  }
+  return;
+ }
  const first=videoPlaylist[0];box.innerHTML=`<video src="${esc(first.url)}" controls playsinline></video>`;
  $("videoInfo").textContent=videoPlaylist.length+" video dalam playlist"+(pendingVideoFiles.length?" • "+pendingVideoFiles.length+" video baru menunggu disimpan":"");
 }
