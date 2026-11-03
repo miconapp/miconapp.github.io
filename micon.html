@@ -2131,6 +2131,12 @@ try {
 #micon-video-ad-error{display:none;position:absolute;z-index:3;left:12px;right:12px;top:50px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.75);color:#fecaca;font-size:12px}
 @media(max-width:600px){#micon-video-ad-head{left:8px;bottom:48px;max-width:calc(100% - 16px)}#micon-video-ad-label{top:10px;right:8px}#micon-video-ad-controls{left:0;right:0;bottom:0;padding:25px 8px 8px;align-items:flex-end;justify-content:flex-end}#micon-video-ad-actions{margin-left:auto;justify-content:flex-end}#micon-video-ad-actions{gap:5px}#micon-video-ad-skip,#micon-video-ad-sound{padding:8px 9px;font-size:11px}}
 </style>
+<style id="micon-video-ad-desktop-caption-alignment">
+/* Desktop saja: turunkan seluruh keterangan iklan agar tepi bawahnya sejajar dengan tombol Lewati. */
+@media (min-width:761px){
+  #micon-video-ad-head{bottom:11px!important;}
+}
+</style>
 <div id="micon-video-ad-overlay" role="dialog" aria-modal="true" aria-label="Iklan MicOn">
   <div id="micon-video-ad-card">
     <div id="micon-video-ad-head"><span id="micon-video-ad-sponsor">Bersponsor</span><div id="micon-video-ad-meta"><strong id="micon-video-ad-name">Nama pengiklan</strong><span aria-hidden="true">|</span><a id="micon-video-ad-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><span id="micon-video-ad-count">Iklan selesai Otomatis dalam 15 Detik, Video akan diputar Otomatis</span></div>
