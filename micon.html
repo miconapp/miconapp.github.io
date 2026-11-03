@@ -2672,6 +2672,24 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 @media(min-width:761px){#micon-sticky-shell,#micon-floating-dock{display:none!important}}
 </style>
 
+
+
+<style id="micon-download-mobile-viewport-fix">
+/* Mobile: tampilkan seluruh viewport situs downloader tanpa menggeser atau memotong isi iframe. */
+@media (max-width:760px){
+  #youtubeSection.active{
+    top:62px!important;left:0!important;right:0!important;bottom:0!important;
+    width:100vw!important;height:calc(100dvh - 62px)!important;
+    min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;
+  }
+  #youtubeSection.active .yt-frame{
+    position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:0!important;border:0!important;
+  }
+}
+</style>
+
 </body>
 </html>
 
