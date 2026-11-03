@@ -2367,6 +2367,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   }
   function render(){
     list.replaceChildren();
+    /* Banner iklan selalu menjadi elemen pertama di dalam playlist. */
+    if(playlistAdBanner)list.appendChild(playlistAdBanner);
     if(!playlist.length){
       const empty=document.createElement('div');
       empty.className='mobile-playlist-empty';
@@ -2384,10 +2386,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       copy.append(name,size);row.append(icon,copy);
       row.addEventListener('click',()=>loadItem(index));
       list.appendChild(row);
-      /* Banner berada pada slot playlist ke-3; jika baru ada 1 item,
-         banner langsung tampil setelah item pertama. */
-      if(index===1&&playlistAdBanner)list.appendChild(playlistAdBanner);
-      else if(index===0&&playlist.length===1&&playlistAdBanner)list.appendChild(playlistAdBanner);
     });
     markActive();
   }
