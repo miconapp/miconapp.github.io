@@ -610,10 +610,10 @@
   .mobile-tip p{display:block!important;margin:0!important;color:#526784!important;font-size:10px!important;line-height:1.5!important}
   .mobile-ad-banner{
     display:flex!important;align-items:center!important;justify-content:center!important;
-    box-sizing:border-box!important;width:100%!important;min-height:76px!important;margin:12px 0 0!important;
-    padding:12px!important;border:1px dashed #cbd5e1!important;border-radius:15px!important;
-    background:#fff!important;color:#94a3b8!important;text-align:center!important;
-    font-size:10px!important;
+    box-sizing:border-box!important;width:100%!important;height:60px!important;min-height:60px!important;
+    margin:12px 0 0!important;padding:0!important;border:1px solid #cbd5e1!important;
+    border-radius:15px!important;background:#fff!important;color:#94a3b8!important;
+    text-align:center!important;font-size:10px!important;overflow:hidden!important;
   }
   .mobile-ad-banner:not(.is-configured){display:none!important}
   .mobile-ad-banner.is-configured{overflow:hidden!important;padding:0!important;border-style:solid!important;background:#fff!important;color:transparent!important}
@@ -2223,7 +2223,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       image.alt=String(config.name||"Banner iklan MicOn");
       image.loading="lazy";
       image.decoding="async";
-      image.style.cssText="display:block;width:100%;height:100%;min-height:0;object-fit:cover;border:0;border-radius:inherit";
+      image.style.cssText="display:block;width:100%;height:60px;min-height:60px;object-fit:fill;border:0;border-radius:inherit";
       const destination=String(config.clickUrl||"").trim();
       if(destination){
         const link=document.createElement('a');
