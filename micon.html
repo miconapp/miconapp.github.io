@@ -982,8 +982,10 @@ function updatePitch(){
          agar volume audio asli tidak ikut teredam oleh pemrosesan pitch. */
       if(source&&outputGain){
         source.disconnect();
+        /* Nada asli melewati jalur gain unity. Saat transpose aktif, sinyal
+           tetap melalui DSP lalu diberi kompensasi agar level tidak turun. */
         source.connect(n===0?outputGain:effect);
-        outputGain.gain.setTargetAtTime(n===0?1:1.35,ctx.currentTime,0.08);
+        outputGain.gain.setTargetAtTime(n===0?1:1.5,ctx.currentTime,0.08);
       }
     }catch(e){msg('Efek transpose gagal diperbarui: '+(e.message||e),true);}
   }
@@ -1020,18 +1022,20 @@ async function setupHighQualityAudio(){
     newOutputGain=newCtx.createGain();
     newOutputGain.gain.setValueAtTime(Number($('pitchRange').value)===0?1:1.35,newCtx.currentTime);
     newOutputCompressor=newCtx.createDynamicsCompressor();
-    newOutputCompressor.threshold.setValueAtTime(-6,newCtx.currentTime);
-    newOutputCompressor.knee.setValueAtTime(6,newCtx.currentTime);
-    newOutputCompressor.ratio.setValueAtTime(8,newCtx.currentTime);
+    /* Jangan memakai kompresi berat yang menekan volume musik. Compressor
+       hanya bertindak sebagai pengaman puncak saat kompensasi gain aktif. */
+    newOutputCompressor.threshold.setValueAtTime(-1,newCtx.currentTime);
+    newOutputCompressor.knee.setValueAtTime(0,newCtx.currentTime);
+    newOutputCompressor.ratio.setValueAtTime(20,newCtx.currentTime);
     newOutputCompressor.attack.setValueAtTime(0.003,newCtx.currentTime);
-    newOutputCompressor.release.setValueAtTime(0.22,newCtx.currentTime);
+    newOutputCompressor.release.setValueAtTime(0.18,newCtx.currentTime);
     node.connect(newOutputGain);
     newOutputGain.connect(newOutputCompressor);
     newOutputCompressor.connect(newCtx.destination);
     mediaSource=newCtx.createMediaElementSource(video);
     /* Simpan source segera setelah dibuat: elemen video tidak boleh memiliki source kedua. */
     ctx=newCtx;source=mediaSource;effect=node;outputGain=newOutputGain;outputCompressor=newOutputCompressor;ownsContext=true;engine=mobilePlayback?'mobile':'hq';
-    try{mediaSource.connect(node);if(!mobilePlayback)node.connect(newCtx.destination);}
+    try{mediaSource.connect(node);}
     catch(connectError){
       try{mediaSource.disconnect()}catch(_){}
       try{node.disconnect()}catch(_){}
