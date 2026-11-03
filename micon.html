@@ -1163,7 +1163,14 @@ async function setupAudio(){
   const alreadyConnected=/already connected|previously connected|different MediaElementSourceNode/i.test(highQualityError?.message||'');
   if(alreadyConnected&&!source&&url){
     try{
-      if(video){try{video.pause()}catch(_){}}
+      /* Jika browser mengharuskan elemen video baru untuk MediaElementSource,
+         pindahkan posisi dan status play ke elemen pengganti. Jangan mulai dari 00:00. */
+      const previousVideo=video;
+      const resumeAt=previousVideo&&Number.isFinite(previousVideo.currentTime)?previousVideo.currentTime:0;
+      const wasPlaying=!!(previousVideo&&!previousVideo.paused&&!previousVideo.ended);
+      const previousVolume=previousVideo?previousVideo.volume:1;
+      const previousMuted=previousVideo?previousVideo.muted:false;
+      if(previousVideo){try{previousVideo.pause()}catch(_){}}
       setupVideo();
       const replacement=video;
       await new Promise((resolve,reject)=>{
@@ -1172,8 +1179,21 @@ async function setupAudio(){
         replacement.addEventListener('error',()=>reject(new Error('Video gagal dimuat ulang setelah memperbaiki jalur audio.')),{once:true});
         replacement.load();
       });
+      if(Number.isFinite(replacement.duration)&&replacement.duration>0){
+        replacement.currentTime=Math.min(resumeAt,Math.max(0,replacement.duration-0.05));
+      }
+      replacement.volume=previousVolume;
+      replacement.muted=previousMuted;
       await setupHighQualityAudio();
-      if(engine==='hq'||engine==='mobile'){updatePitch();return;}
+      if(engine==='hq'||engine==='mobile'){
+        updatePitch();
+        if(wasPlaying){
+          window.__miconAdAuthorized=true;
+          try{await replacement.play();}
+          finally{window.__miconAdAuthorized=false;}
+        }
+        return;
+      }
       throw new Error('Mesin transpose tidak aktif setelah video dimuat ulang.');
     }catch(retryError){
       highQualityError=retryError;
