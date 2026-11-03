@@ -527,21 +527,31 @@ function renderVideoPlaylist(){
  });
 }
 function renderVideoPreview(){
- const box=$("videoPreview");
- if(!videoPlaylist.length){
+  const box=$("videoPreview");
+  /* Prioritaskan video yang baru dipilih untuk diimpor.
+     Setelah disimpan, tampilkan video terbaru (item terakhir), bukan item playlist paling lama. */
   if(pendingVideoFiles.length){
+   const latestPending=pendingVideoFiles[pendingVideoFiles.length-1];
    if(videoBlob)URL.revokeObjectURL(videoBlob);
-   videoBlob=URL.createObjectURL(pendingVideoFiles[0]);
-   box.innerHTML=`<video src="${videoBlob}" controls playsinline></video>`;
-   $("videoInfo").textContent=pendingVideoFiles[0].name+(pendingVideoFiles.length>1?" • "+(pendingVideoFiles.length-1)+" video lainnya siap ditambahkan":"");
-  }else{
+   videoBlob=URL.createObjectURL(latestPending);
+   box.innerHTML=`<video src="${videoBlob}" controls playsinline preload="metadata"></video>`;
+   $("videoInfo").textContent="Pratinjau video terbaru: "+latestPending.name+
+    (pendingVideoFiles.length>1?" • "+pendingVideoFiles.length+" video siap ditambahkan":"");
+   return;
+  }
+  if(videoBlob){
+   URL.revokeObjectURL(videoBlob);
+   videoBlob="";
+  }
+  if(!videoPlaylist.length){
    box.textContent="Belum ada video";
    $("videoInfo").textContent="";
+   return;
   }
-  return;
- }
- const first=videoPlaylist[0];box.innerHTML=`<video src="${esc(first.url)}" controls playsinline></video>`;
- $("videoInfo").textContent=videoPlaylist.length+" video dalam playlist"+(pendingVideoFiles.length?" • "+pendingVideoFiles.length+" video baru menunggu disimpan":"");
+  const latest=videoPlaylist[videoPlaylist.length-1];
+  box.innerHTML=`<video src="${esc(latest.url)}" controls playsinline preload="metadata"></video>`;
+  $("videoInfo").textContent="Pratinjau video terbaru: "+(latest.name||latest.fileName||"Iklan video")+
+   " • "+videoPlaylist.length+" video dalam playlist";
 }
 $("videoFile").onchange=()=>{
  const files=Array.from($("videoFile").files||[]);
