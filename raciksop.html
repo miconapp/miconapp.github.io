@@ -5,7 +5,7 @@
 @media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.content{padding:18px}.side{width:190px}.main{margin-left:190px}}
 @media(max-width:600px){.side{inset:auto 0 0;width:auto;height:68px;padding:5px;background:#111c31;z-index:5}.side .brand,.side small{display:none}.side nav{display:flex;justify-content:space-around;gap:3px}.side nav button{flex:1;min-height:56px;text-align:center;padding:5px 2px;font-size:10px;gap:2px;box-shadow:none;border:0;background:transparent}.side nav button .nav-icon{width:auto;height:auto;background:transparent;font-size:18px;border-radius:0}.side nav button .nav-label{font-size:9px;white-space:nowrap}.side nav button.active{background:#eaf1ff;box-shadow:none}.side nav button.active .nav-icon{background:transparent}.main{margin:0 0 70px}.top{height:60px;padding:0 13px}.top h1{font-size:15px}.content{padding:15px 11px}.head h2{font-size:20px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:23px}.panel{padding:14px}.row{grid-template-columns:1fr}.head{gap:8px;align-items:flex-start;flex-direction:column}}
 
-/* LAYOUT TUNGGAL MENU IKLAN VIDEO SKIP */
+/* LAYOUT FINAL — HANYA MENU IKLAN VIDEO SKIP */
 @media (min-width: 851px){
  #page-video.active{
   height:calc(100vh - 70px - 52px);
@@ -14,12 +14,12 @@
   flex-direction:column;
   overflow:hidden;
  }
- #page-video>.head{
+ #page-video.active>.head{
   flex:0 0 auto;
   margin-bottom:14px;
  }
- #page-video>.video-layout{
-  flex:1 1 auto;
+ #page-video.active>.video-layout{
+  flex:1 1 0;
   min-height:0;
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(0,1fr);
@@ -27,22 +27,27 @@
   gap:16px;
   overflow:hidden;
  }
- #page-video>.video-layout>.panel{
+ #page-video.active>.video-layout>.video-settings-panel{
   min-width:0;
   min-height:0;
+  height:100%;
   margin:0;
- }
- #page-video>.video-layout>.panel:first-child{
   overflow-y:auto;
   overscroll-behavior:contain;
   scrollbar-width:thin;
  }
- #page-video>.video-layout>.video-side-panel{
-  height:100%;
-  max-height:100%;
-  overflow:hidden;
+ #page-video.active>.video-layout>.video-side-panel{
+  position:sticky;
+  top:0;
+  align-self:stretch;
   display:flex;
   flex-direction:column;
+  min-width:0;
+  min-height:0;
+  height:100%;
+  max-height:100%;
+  margin:0;
+  overflow:hidden;
  }
  #page-video .video-side-panel>h3,
  #page-video .video-side-panel>p,
@@ -56,22 +61,24 @@
  }
  #page-video .video-side-panel>.preview video{
   width:100%;
+  max-width:100%;
   max-height:240px;
   object-fit:contain;
  }
  #page-video .video-side-panel>.field{
-  flex:1 1 auto;
-  min-height:0;
   display:flex;
+  flex:1 1 0;
   flex-direction:column;
+  min-height:0;
   margin-bottom:0;
  }
  #page-video .video-playlist-scroll{
-  flex:1 1 auto;
-  min-height:60px;
+  display:grid;
+  flex:1 1 0;
+  min-height:0;
   max-height:none;
-  overflow-y:auto;
   overflow-x:hidden;
+  overflow-y:auto;
   overscroll-behavior:contain;
   scrollbar-width:thin;
  }
@@ -86,21 +93,20 @@
   display:block;
   overflow:visible;
  }
- #page-video>.video-layout{
+ #page-video.active>.video-layout{
   display:grid;
   grid-template-columns:minmax(0,1fr);
   gap:14px;
   overflow:visible;
  }
- #page-video>.video-layout>.panel,
- #page-video>.video-layout>.panel:first-child{
-  min-height:0;
-  overflow:visible;
-  margin-bottom:0;
- }
- #page-video>.video-layout>.video-side-panel{
+ #page-video.active>.video-layout>.video-settings-panel,
+ #page-video.active>.video-layout>.video-side-panel{
+  position:static;
+  width:100%;
   height:auto;
   max-height:none;
+  min-height:0;
+  margin:0 0 14px;
   overflow:visible;
  }
  #page-video .video-side-panel>.preview{
@@ -108,8 +114,10 @@
   min-height:150px;
  }
  #page-video .video-playlist-scroll{
+  display:grid;
   flex:none;
   max-height:260px;
+  min-height:80px;
   overflow-y:auto;
  }
 }
@@ -120,7 +128,7 @@
 <section class="page active" id="page-dashboard"><div class="head"><div><h2>Ringkasan MicOn</h2><p>Pantau pengguna dan iklan frontend.</p></div><button class="btn" id="refresh">↻ Perbarui</button></div><div class="stats"><div class="stat">Total pengguna<strong id="totalUsers">—</strong><small>Dokumen Pengguna</small></div><div class="stat">Super Admin<strong id="totalAdmins">—</strong><small>Role Superadmin</small></div><div class="stat">Banner gambar<strong id="bannerMetric">—</strong><small>Status iklan</small></div><div class="stat">Iklan video<strong id="videoMetric">—</strong><small>Status iklan</small></div></div><div class="panel"><h3>Status koneksi</h3><p id="connection">Memeriksa Firebase…</p><div class="note">Konfigurasi iklan disimpan pada Firestore <b>PengaturanIklan/MicOn</b>. Agar iklan tampil di halaman utama, micon.html juga perlu dipasangi kode pembaca konfigurasi iklan.</div></div></section>
 <section class="page" id="page-users"><div class="head"><div><h2>Manajemen Pengguna</h2><p>Data langsung dari collection Pengguna.</p></div><button class="btn" id="reloadUsers">Muat ulang</button></div><div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px"><h3>Daftar akun</h3><input class="search" id="search" placeholder="Cari nama, nomor HP, UID…"></div><div class="tablewrap"><table><thead><tr><th>Nama</th><th>Nomor HP</th><th>UID</th><th>Role</th><th>Ubah role</th></tr></thead><tbody id="usersBody"><tr><td colspan="5">Memuat…</td></tr></tbody></table></div><div class="note">Role disimpan pada field <b>role</b>. Menonaktifkan akun Firebase Authentication memerlukan backend tepercaya Firebase Admin SDK dan tidak dilakukan langsung dari browser.</div></div></section>
 <section class="page" id="page-banner"><div class="head"><div><h2>Banner Iklan Frontend</h2><p>Unggah JPG, PNG, GIF, atau WebP.</p></div><span class="pill" id="bannerStatus">Belum diatur</span></div><div class="grid"><div class="panel"><h3>Pengaturan banner</h3><p>File disimpan di Supabase Storage bucket micon-iklan.</p><div class="field"><label>File banner</label><input class="file" id="bannerFile" type="file" accept="image/jpeg,image/png,image/webp"></div><div id="bannerUploadProgress" class="muted" style="font-size:11px;margin:-7px 0 12px" hidden></div><div class="field"><label>URL tujuan saat diklik</label><input id="bannerLink" type="url" placeholder="https://contoh.com"></div><div class="row"><div class="field"><label>Posisi</label><select id="bannerPlacement"><option value="home">Beranda</option><option value="home-bottom">Bawah beranda</option><option value="all">Semua halaman</option></select></div><div class="field"><label>Status</label><select id="bannerEnabled"><option value="true">Aktif</option><option value="false">Nonaktif</option></select></div></div><div class="field"><label>Nama iklan</label><input id="bannerName" placeholder="Promo MicOn"></div><button class="btn" id="saveBanner">Simpan banner</button></div><div class="panel"><h3>Pratinjau</h3><p>Gambar terpilih atau gambar tersimpan.</p><div class="preview" id="bannerPreview">Belum ada banner</div><p id="bannerInfo" class="muted" style="font-size:11px"></p></div></div></section>
-<section class="page" id="page-video"><div class="head"><div><h2>Iklan Video Skip</h2><p>Atur video iklan sebelum pengguna masuk ke MicOn.</p></div><span class="pill" id="videoStatus">Belum diatur</span></div><div class="grid"><div class="panel"><h3>Pengaturan video</h3><p>Unggah video MP4 atau WebM.</p><div class="field"><label>File video</label><input class="file" id="videoFile" type="file" accept="video/mp4,video/webm" multiple></div><div id="videoUploadProgress" class="muted" style="font-size:11px;margin:-7px 0 12px" hidden></div><div class="field"><label>URL tujuan iklan</label><input id="videoLink" type="url" placeholder="https://contoh.com"></div><div class="row"><div class="field"><label>Skip muncul (detik)</label><input id="skipAfter" type="number" min="0" max="120" value="5"></div><div class="field"><label>Durasi maksimal (detik)</label><input id="videoDuration" type="number" min="1" max="600" value="30"></div></div><div class="row"><div class="field"><label>Frekuensi</label><select id="videoFrequency"><option value="every-session">Setiap sesi</option><option value="once-per-day">Sekali sehari</option><option value="once-per-visit">Sekali per kunjungan</option></select></div><div class="field"><label>Status</label><select id="videoEnabled"><option value="true">Aktif</option><option value="false">Nonaktif</option></select></div></div><div class="field"><label>Nama iklan</label><input id="videoName" placeholder="Iklan pembuka"></div><button class="btn" id="saveVideo">Simpan video iklan</button></div><div class="panel"><h3>Pratinjau</h3><p>Video terpilih atau tersimpan.</p><div class="preview" id="videoPreview">Belum ada video</div><p id="videoInfo" class="muted" style="font-size:11px"></p><div class="field"><label>Playlist iklan video aktif</label><div id="videoPlaylistList" style="display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8faff"><span class="muted" style="font-size:11px">Belum ada video dalam playlist.</span></div><small class="muted">Pilih beberapa file video sekaligus untuk menambahkan iklan ke playlist. Video yang tersimpan dapat dihapus dari daftar sebelum menekan Simpan.</small></div></div></div></section>
+<section class="page" id="page-video"><div class="head"><div><h2>Iklan Video Skip</h2><p>Atur video iklan sebelum pengguna masuk ke MicOn.</p></div><span class="pill" id="videoStatus">Belum diatur</span></div><div class="grid video-layout"><div class="panel video-settings-panel"><h3>Pengaturan video</h3><p>Unggah video MP4 atau WebM.</p><div class="field"><label>File video</label><input class="file" id="videoFile" type="file" accept="video/mp4,video/webm" multiple></div><div id="videoUploadProgress" class="muted" style="font-size:11px;margin:-7px 0 12px" hidden></div><div class="field"><label>URL tujuan iklan</label><input id="videoLink" type="url" placeholder="https://contoh.com"></div><div class="row"><div class="field"><label>Skip muncul (detik)</label><input id="skipAfter" type="number" min="0" max="120" value="5"></div><div class="field"><label>Durasi maksimal (detik)</label><input id="videoDuration" type="number" min="1" max="600" value="30"></div></div><div class="row"><div class="field"><label>Frekuensi</label><select id="videoFrequency"><option value="every-session">Setiap sesi</option><option value="once-per-day">Sekali sehari</option><option value="once-per-visit">Sekali per kunjungan</option></select></div><div class="field"><label>Status</label><select id="videoEnabled"><option value="true">Aktif</option><option value="false">Nonaktif</option></select></div></div><div class="field"><label>Nama iklan</label><input id="videoName" placeholder="Iklan pembuka"></div><button class="btn" id="saveVideo">Simpan video iklan</button></div><div class="panel video-side-panel"><h3>Pratinjau</h3><p>Video terpilih atau tersimpan.</p><div class="preview" id="videoPreview">Belum ada video</div><p id="videoInfo" class="muted" style="font-size:11px"></p><div class="field"><label>Playlist iklan video aktif</label><div id="videoPlaylistList" class="video-playlist-scroll" style="display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8faff"><span class="muted" style="font-size:11px">Belum ada video dalam playlist.</span></div><small class="muted">Pilih beberapa file video sekaligus untuk menambahkan iklan ke playlist. Video yang tersimpan dapat dihapus dari daftar sebelum menekan Simpan.</small></div></div></div></section>
 </div></main></div><div class="toast" id="toast"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
