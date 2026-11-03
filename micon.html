@@ -2488,7 +2488,11 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
           if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
           else{const input=document.getElementById('videoFile');if(input)input.click();}
         }else if(action==='download'){
-          main.classList.add('hidden');if(youtube)youtube.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});
+          /* Tetap tampilkan yt-mp4.net di iframe aplikasi. Popup yang dibuat situs
+             (mis. saat tombol unduh ditekan) dibiarkan menjadi jendela/tab baru browser. */
+          main.classList.add('hidden');
+          if(youtube){youtube.classList.add('active');youtube.style.setProperty('display','block','important');}
+          window.scrollTo({top:0,behavior:'smooth'});
         }else if(action==='profile'){
           const trigger=document.getElementById('micon-profile-trigger');if(trigger)trigger.click();
         }
