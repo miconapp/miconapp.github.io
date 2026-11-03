@@ -2092,17 +2092,22 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     const data=snap.exists()?snap.data():{};
     return data.videoAd||{};
   }
+  let lastSelectedVideoAdKey="";
   function selectAccountAd(config,uid){
     const list=Array.isArray(config.videoAds)?config.videoAds.filter(item=>item&&String(item.url||"").trim()&&item.enabled!==false):[];
     if(!list.length){
       const legacy=String(config.url||"").trim();
       return legacy?{...config,url:legacy}:null;
     }
-    /* Pilihan acak konsisten per akun per hari agar akun berbeda dapat menerima iklan berbeda. */
-    const seed=String(uid||"anonymous")+"|"+new Date().toISOString().slice(0,10);
-    let hash=2166136261;
-    for(let i=0;i<seed.length;i++){hash^=seed.charCodeAt(i);hash=Math.imul(hash,16777619);}
-    return list[(hash>>>0)%list.length];
+    /* Acak ulang setiap kali satu file playlist mulai diputar; hindari iklan yang sama berturut-turut bila pilihan lebih dari satu. */
+    let candidates=list;
+    if(list.length>1&&lastSelectedVideoAdKey){
+      const withoutPrevious=list.filter(item=>String(item.url||"").trim()!==lastSelectedVideoAdKey);
+      if(withoutPrevious.length)candidates=withoutPrevious;
+    }
+    const selected=candidates[Math.floor(Math.random()*candidates.length)];
+    lastSelectedVideoAdKey=String(selected.url||"").trim();
+    return selected;
   }
   async function showAd(config,uid,phase){
     if(showing)return false;
