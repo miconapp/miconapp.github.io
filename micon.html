@@ -2363,11 +2363,11 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     /* Satu kali susun kontrol di kolom scroll; video dikeluarkan dari area scroll. */
     let stack=main.querySelector(':scope > .micon-reference-stack');
     if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
-    stack.append(file,drop,pitch,clear,panel);
+    stack.append(file,drop,clear,panel);
     /* Satu wadah sticky sebagai saudara mainContent, bukan anak elemen yang ikut scroll. */
     let shell=document.getElementById('micon-sticky-shell');
     if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
-    shell.append(header,video);
+    shell.append(header,video,pitch);
     /* Dock dibuat tepat satu kali. */
     let dock=document.getElementById('micon-floating-dock');
     if(!dock){
@@ -2398,10 +2398,12 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 @media screen and (max-width:760px){
   /* Susunan mobile mengikuti foto: video, kontrol nada, hapus, tambah, playlist, dock. */
   #micon-sticky-shell{
-    display:contents!important;
-    position:static!important;
-    width:100%!important;
-    background:transparent!important;
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    position:-webkit-sticky!important;position:sticky!important;top:0!important;z-index:5000!important;
+    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0 0 10px!important;
+    overflow:visible!important;background:#fff!important;
+    border-bottom:1px solid #e5eaf2!important;
+    box-shadow:0 3px 10px rgba(15,23,42,.06)!important;isolation:isolate!important;
   }
   #micon-sticky-shell>.top{display:none!important}
   #micon-sticky-shell>#videoStage{
@@ -2420,6 +2422,32 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     aspect-ratio:16/9!important;object-fit:contain!important;margin:0!important;padding:0!important;
     border:0!important;border-radius:0!important;background:#080b12!important;
   }
+  #micon-sticky-shell>.pitch-compact-row{
+    display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
+    grid-template-rows:46px!important;gap:7px!important;align-items:stretch!important;
+    box-sizing:border-box!important;width:calc(100% - 24px)!important;height:46px!important;
+    margin:10px 12px 0!important;padding:0!important;
+  }
+  #micon-sticky-shell>.pitch-compact-row>*{
+    display:flex!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
+    width:100%!important;height:46px!important;min-height:46px!important;margin:0!important;padding:3px!important;
+    align-items:center!important;justify-content:center!important;border:1px solid #e5e7eb!important;
+    border-radius:12px!important;background:#fff!important;color:#111827!important;
+    box-shadow:0 2px 8px rgba(15,23,42,.045)!important;
+  }
+  #micon-sticky-shell>.pitch-compact-row>.noteBox{
+    grid-column:1!important;flex-direction:column!important;gap:2px!important;
+    background:#eff6ff!important;border-color:#dbeafe!important;
+  }
+  #micon-sticky-shell>.pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
+  #micon-sticky-shell>.pitch-compact-row>.semitone{
+    grid-column:2!important;flex-direction:column!important;gap:2px!important;font-size:16px!important;font-weight:850!important;
+  }
+  #micon-sticky-shell>.pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
+  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-column:3!important;color:#dc3545!important;font-size:22px!important}
+  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-column:4!important;color:#dc3545!important;font-size:22px!important}
   .micon-reference-stack{
     display:flex!important;flex-direction:column!important;align-items:stretch!important;
     width:100%!important;margin:0!important;padding:0 12px 75px!important;gap:0!important;
@@ -2539,6 +2567,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   #transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
   .mobile-bottom-nav,.mobile-dock{display:none!important}
 }
+@media(max-width:360px){#micon-sticky-shell>.pitch-compact-row{gap:5px!important}}
 @media(min-width:761px){#micon-sticky-shell,#micon-floating-dock{display:none!important}}
 </style>
 
