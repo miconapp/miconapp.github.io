@@ -815,7 +815,7 @@
 
 
 <style id="micon-playlist-banner-single-rule">
-/* Banner playlist memenuhi lebar kotak playlist dengan tinggi tetap 80px. */
+/* Banner playlist memenuhi lebar kotak playlist dengan tinggi tetap 65px. */
 @media screen and (max-width:760px){
   .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner,
   .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured{
@@ -825,9 +825,9 @@
     width:100%!important;
     min-width:0!important;
     max-width:100%!important;
-    height:80px!important;
-    min-height:80px!important;
-    max-height:80px!important;
+    height:65px!important;
+    min-height:65px!important;
+    max-height:65px!important;
     aspect-ratio:auto!important;
     margin:0!important;
     padding:0!important;
@@ -2260,7 +2260,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       image.alt=String(config.name||"Banner iklan MicOn");
       image.loading="lazy";
       image.decoding="async";
-      image.style.cssText="display:block;width:100%;height:80px;min-height:80px;max-height:80px;object-fit:fill;border:0;border-radius:inherit";
+      image.style.cssText="display:block;width:100%;height:65px;min-height:65px;max-height:65px;object-fit:fill;border:0;border-radius:inherit";
       const destination=String(config.clickUrl||"").trim();
       if(destination){
         const link=document.createElement('a');
