@@ -976,7 +976,7 @@
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,outputCompressor=null,playing=false,ownsContext=false,engine='none';
+let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,playing=false,ownsContext=false,engine='none';
 let hqConstructorPromise=null,mobileConstructorPromise=null;
 const HQ_MODULE='https://esm.sh/@soundtouchjs/formant-correction-worklet@2.1.1?bundle';
 const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correction-worklet@2.1.1/.dist/formant-correction-processor.js';
@@ -1017,25 +1017,27 @@ function updatePitch(){
       effect.pitchSemitones.value=n;
       effect.playbackRate.value=1;
       if(engine==='hq')setFormantForPitch(n);
-      /* Pada ponsel, nada 0 melewati DSP dan langsung memakai gain unity
-         agar volume audio asli tidak ikut teredam oleh pemrosesan pitch. */
-      if(source&&outputGain){
+      /* Level keluaran selalu unity (1.0); tanpa boost atau kompresi saat transpose. */
+      if(outputGain)outputGain.gain.setTargetAtTime(1,ctx.currentTime,0.04);
+      if(source){
         source.disconnect();
-        /* Nada asli melewati jalur gain unity. Saat transpose aktif, sinyal
-           tetap melalui DSP lalu diberi kompensasi agar level tidak turun. */
         source.connect(n===0?outputGain:effect);
-        outputGain.gain.setTargetAtTime(n===0?1:1.5,ctx.currentTime,0.08);
       }
     }catch(e){msg('Efek transpose gagal diperbarui: '+(e.message||e),true);}
   }
-  if(video){if(window.matchMedia('(max-width:760px)').matches){video.volume=1;video.muted=false;}video.defaultPlaybackRate=1;if(video.playbackRate!==1)video.playbackRate=1;}
+  if(video){
+    video.volume=1;
+    video.muted=false;
+    video.defaultPlaybackRate=1;
+    if(video.playbackRate!==1)video.playbackRate=1;
+  }
 }
 async function setupHighQualityAudio(){
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
   if(!AudioCtx)throw new Error('Browser tidak mendukung Web Audio API.');
   const mobilePlayback=window.matchMedia('(max-width:760px)').matches;
   let newCtx=null,AudioPitchNode=null,resumePromise=null;
-  let mediaSource=null,node=null,newOutputGain=null,newOutputCompressor=null;
+  let mediaSource=null,node=null,newOutputGain=null;
   try{
     if(mobilePlayback){
       newCtx=new AudioCtx({latencyHint:'playback'});
@@ -1059,21 +1061,12 @@ async function setupHighQualityAudio(){
     node.pitch.value=1;node.pitchSemitones.value=Number($('pitchRange').value);node.playbackRate.value=1;
     if(node.formantStrength)node.formantStrength.value=0;
     newOutputGain=newCtx.createGain();
-    newOutputGain.gain.setValueAtTime(Number($('pitchRange').value)===0?1:1.35,newCtx.currentTime);
-    newOutputCompressor=newCtx.createDynamicsCompressor();
-    /* Jangan memakai kompresi berat yang menekan volume musik. Compressor
-       hanya bertindak sebagai pengaman puncak saat kompensasi gain aktif. */
-    newOutputCompressor.threshold.setValueAtTime(-1,newCtx.currentTime);
-    newOutputCompressor.knee.setValueAtTime(0,newCtx.currentTime);
-    newOutputCompressor.ratio.setValueAtTime(20,newCtx.currentTime);
-    newOutputCompressor.attack.setValueAtTime(0.003,newCtx.currentTime);
-    newOutputCompressor.release.setValueAtTime(0.18,newCtx.currentTime);
+    newOutputGain.gain.setValueAtTime(1,newCtx.currentTime);
     node.connect(newOutputGain);
-    newOutputGain.connect(newOutputCompressor);
-    newOutputCompressor.connect(newCtx.destination);
+    newOutputGain.connect(newCtx.destination);
     mediaSource=newCtx.createMediaElementSource(video);
     /* Simpan source segera setelah dibuat: elemen video tidak boleh memiliki source kedua. */
-    ctx=newCtx;source=mediaSource;effect=node;outputGain=newOutputGain;outputCompressor=newOutputCompressor;ownsContext=true;engine=mobilePlayback?'mobile':'hq';
+    ctx=newCtx;source=mediaSource;effect=node;outputGain=newOutputGain;ownsContext=true;engine=mobilePlayback?'mobile':'hq';
     try{mediaSource.connect(node);}
     catch(connectError){
       try{mediaSource.disconnect()}catch(_){}
@@ -1088,7 +1081,7 @@ async function setupHighQualityAudio(){
     if(mobilePlayback){video.volume=1;video.muted=false;}video.preservesPitch=false;video.defaultPlaybackRate=1;video.playbackRate=1;
     if(!mobilePlayback)setFormantForPitch(Number($('pitchRange').value));
   }catch(e){
-    if(!mediaSource){try{node?.disconnect()}catch(_){};try{newOutputGain?.disconnect()}catch(_){};try{newOutputCompressor?.disconnect()}catch(_){};try{if(newCtx&&newCtx.state!=='closed')await newCtx.close()}catch(_){} }
+    if(!mediaSource){try{node?.disconnect()}catch(_){};try{newOutputGain?.disconnect()}catch(_){};try{if(newCtx&&newCtx.state!=='closed')await newCtx.close()}catch(_){} }
     throw e;
   }
 }
@@ -1147,7 +1140,7 @@ async function setupAudio(){
   }
   throw new Error('Efek perubahan nada tidak berhasil dimuat. Jalur audio sudah dicoba diperbarui tanpa membuat MediaElementSource ganda. Detail: '+(highQualityError?.message||'Kesalahan audio tidak diketahui.'));
 }
-async function clearAudioGraph(){if(video){try{video.pause()}catch(_){}}if(source){try{source.disconnect()}catch(_){}source=null;}if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}if(outputCompressor){try{outputCompressor.disconnect()}catch(_){}outputCompressor=null;}const oldCtx=ctx;ctx=null;if(ownsContext&&oldCtx&&oldCtx.state!=='closed'){try{await oldCtx.close()}catch(_){}}ownsContext=false;engine='none';}
+async function clearAudioGraph(){if(video){try{video.pause()}catch(_){}}if(source){try{source.disconnect()}catch(_){}source=null;}if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}const oldCtx=ctx;ctx=null;if(ownsContext&&oldCtx&&oldCtx.state!=='closed'){try{await oldCtx.close()}catch(_){}}ownsContext=false;engine='none';}
 async function clearVideo(){await clearAudioGraph();if(video){video.removeAttribute('src');video.load();video.remove();video=null;}if(url){URL.revokeObjectURL(url);url=null;}file=null;playing=false;$('videoFile').value='';$('fileName').textContent='Belum ada video dipilih';$('fileSize').textContent='Pilih file MP4 dari perangkat';$('fileStatus').textContent='Menunggu video';$('clearBtn').disabled=true;$('playBtn').disabled=true;$('playBtn').textContent='▶ Putar video';$('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;$('pitchRange').value=0;if($('keySelect'))$('keySelect').value='';$('duration').textContent='00:00';$('currentTime').textContent='00:00';$('progressBar').style.width='0%';$('alert').className='alert';updatePitch();}
 // Satu jalur pemilih file: tombol Upload membuka input file secara langsung.
 const uploadDockButton=document.querySelector('.upload-dock[data-upload-video]');
