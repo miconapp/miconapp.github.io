@@ -2690,6 +2690,16 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 </style>
 
+
+<style id="micon-download-hide-app-header-only">
+/* Menu Download di dock: sembunyikan header MicOn dan gunakan seluruh tinggi layar untuk iframe. */
+@media(max-width:760px){
+  body:has(#youtubeSection.active) #micon-sticky-shell{display:none!important}
+  #youtubeSection.active{top:0!important;height:100dvh!important;min-height:100dvh!important}
+  #youtubeSection.active .yt-frame{top:0!important;height:100%!important}
+}
+</style>
+
 </body>
 </html>
 
