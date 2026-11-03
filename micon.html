@@ -1889,7 +1889,9 @@ try {
       copy.append(name,size);row.append(icon,copy);
       row.addEventListener('click',()=>loadPlaylistItem(index));
       list.appendChild(row);
+      if(index===1&&playlistAdBanner)list.appendChild(playlistAdBanner);
     });
+    if(playlistAdBanner&&playlist.length===1)list.appendChild(playlistAdBanner);
     markActive();
   }
   document.getElementById('videoFile')?.addEventListener('change',()=>{loadingIndex=-1;},{capture:true});
@@ -2232,6 +2234,12 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   heading.className='mobile-playlist-heading';heading.textContent='Playlist';
   const list=document.createElement('div');
   list.className='mobile-playlist-list';
+  const playlistAdBanner=document.querySelector('.mobile-ad-banner');
+  if(playlistAdBanner){
+    playlistAdBanner.classList.add('mobile-playlist-ad-banner');
+    playlistAdBanner.textContent='Banner Iklan';
+    playlistAdBanner.setAttribute('aria-label','Banner iklan');
+  }
   const picker=document.createElement('input');
   picker.type='file';picker.accept='.mp4,video/mp4,video/*';picker.multiple=true;
   picker.className='mobile-playlist-picker';picker.setAttribute('aria-label','Pilih video untuk playlist');
@@ -2544,6 +2552,14 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     margin-top:0!important;margin-bottom:0!important;padding:8px 10px!important;border:1px dashed #b8cbea!important;
     border-radius:14px!important;background:#f8fbff!important;color:#111827!important;
     text-align:left!important;box-shadow:none!important;
+  }
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner{
+    order:initial!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    box-sizing:border-box!important;align-self:stretch!important;width:100%!important;min-width:0!important;max-width:100%!important;
+    height:56px!important;min-height:56px!important;margin:0!important;padding:8px 10px!important;
+    overflow:hidden!important;border:1px dashed #b8cbea!important;border-radius:14px!important;
+    background:#f8fbff!important;color:#64748b!important;text-align:center!important;
+    font-size:10px!important;font-weight:700!important;box-shadow:none!important;
   }
   .micon-reference-stack .mobile-playlist-icon{
     display:grid!important;place-items:center!important;flex:0 0 33px!important;
