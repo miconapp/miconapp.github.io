@@ -2483,17 +2483,23 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       dock.addEventListener('click',function(event){
         const button=event.target.closest('[data-action]');if(!button)return;
         const action=button.dataset.action;const youtube=document.getElementById('youtubeSection');
+        const stickyShell=document.getElementById('micon-sticky-shell');
         if(action==='transpose'||action==='upload'){
-          if(youtube)youtube.classList.remove('active');main.classList.remove('hidden');
+          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
+          if(stickyShell)stickyShell.style.removeProperty('display');
+          main.classList.remove('hidden');main.style.removeProperty('display');
           if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
           else{const input=document.getElementById('videoFile');if(input)input.click();}
         }else if(action==='download'){
-          /* Tetap tampilkan yt-mp4.net di iframe aplikasi. Popup yang dibuat situs
-             (mis. saat tombol unduh ditekan) dibiarkan menjadi jendela/tab baru browser. */
-          main.classList.add('hidden');
+          /* Iframe downloader hanya aktif pada menu Download; preview karaoke disembunyikan. */
+          main.classList.add('hidden');main.style.setProperty('display','none','important');
+          if(stickyShell)stickyShell.style.setProperty('display','none','important');
           if(youtube){youtube.classList.add('active');youtube.style.setProperty('display','block','important');}
           window.scrollTo({top:0,behavior:'smooth'});
         }else if(action==='profile'){
+          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
+          if(stickyShell)stickyShell.style.removeProperty('display');
+          main.classList.remove('hidden');main.style.removeProperty('display');
           const trigger=document.getElementById('micon-profile-trigger');if(trigger)trigger.click();
         }
         dock.querySelectorAll('.micon-dock-action').forEach(el=>el.classList.toggle('active',el===button));
@@ -2668,3 +2674,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 </body>
 </html>
+
+<style id="micon-download-only-hide-preview">
+@media(max-width:760px){
+  body:has(#youtubeSection.active) #micon-sticky-shell{display:none!important}
+  body:has(#youtubeSection.active) #mainContent{display:none!important}
+}
+</style>
