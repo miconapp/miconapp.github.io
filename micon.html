@@ -1052,11 +1052,9 @@ function updatePitch(){
       effect.pitchSemitones.value=n;
       effect.playbackRate.value=1;
       if(engine==='hq')setFormantForPitch(n);
-      if(source){
-        source.disconnect();
-        source.connect(n===0?outputGain:effect);
-        if(inputAnalyser)source.connect(inputAnalyser);
-      }
+      /* Pertahankan jalur audio tetap tersambung. Memutus lalu menyambung
+         MediaElementSource pada setiap klik pitch menyebabkan audio terjeda.
+         Nilai pitch diubah langsung pada node yang sedang memproses audio. */
       if(outputGain&&ctx){
         if(n===0){
           stopVolumeMatch();
