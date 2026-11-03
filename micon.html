@@ -2088,12 +2088,27 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     const data=snap.exists()?snap.data():{};
     return data.videoAd||{};
   }
+  function selectAccountAd(config,uid){
+    const list=Array.isArray(config.videoAds)?config.videoAds.filter(item=>item&&String(item.url||"").trim()&&item.enabled!==false):[];
+    if(!list.length){
+      const legacy=String(config.url||"").trim();
+      return legacy?{...config,url:legacy}:null;
+    }
+    /* Pilihan acak konsisten per akun per hari agar akun berbeda dapat menerima iklan berbeda. */
+    const seed=String(uid||"anonymous")+"|"+new Date().toISOString().slice(0,10);
+    let hash=2166136261;
+    for(let i=0;i<seed.length;i++){hash^=seed.charCodeAt(i);hash=Math.imul(hash,16777619);}
+    return list[(hash>>>0)%list.length];
+  }
   async function showAd(config,uid,phase){
     if(showing)return false;
-    const source=String(config.url||"").trim();
-    if(!config.enabled||!source)return true;
+    if(!config.enabled)return true;
+    const selectedAd=selectAccountAd(config,uid);
+    if(!selectedAd)return true;
+    const source=String(selectedAd.url||"").trim();
+    if(!source)return true;
 
-    activeDuration=Math.max(1,Math.min(600,Number(config.durationSeconds)||30));
+    activeDuration=Math.max(1,Math.min(600,Number(selectedAd.durationSeconds)||Number(config.durationSeconds)||30));
     activeSkipAfter=Math.max(0,Math.min(120,Number(config.skipAfterSeconds)||0));
     elapsed=0;
     activeAdPhase=phase==="ending"?"ending":"opening";
@@ -2107,8 +2122,8 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     skip.textContent=activeSkipAfter>0?"Lewati dalam "+activeSkipAfter:"Lewati iklan";
     if(activeSkipAfter===0)skip.disabled=false;
     count.textContent="Iklan selesai otomatis dalam "+activeDuration+" detik";
-    adName.textContent=String(config.name||"Iklan").trim()||"Iklan";
-    const destination=String(config.clickUrl||"").trim();
+    adName.textContent=String(selectedAd.name||config.name||"Iklan").trim()||"Iklan";
+    const destination=String(selectedAd.clickUrl||config.clickUrl||"").trim();
     if(destination){
       try{
         const normalized=/^https?:\/\//i.test(destination)?destination:(/^\/\//.test(destination)?"https:"+destination:"https://"+destination.replace(/^\/+/,""));
