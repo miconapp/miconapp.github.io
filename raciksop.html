@@ -51,7 +51,45 @@ function renderVideoPlaylist(){
  const box=$("videoPlaylistList");
  if(!videoPlaylist.length){box.innerHTML='<span class="muted" style="font-size:11px">Belum ada video dalam playlist.</span>';return}
  box.innerHTML=videoPlaylist.map((v,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:8px;background:#fff;border:1px solid #e7edf5;border-radius:8px"><span style="font-weight:800;color:#2864e8;min-width:22px">${i+1}.</span><span style="min-width:0;flex:1;overflow-wrap:anywhere;font-size:11px"><b>${esc(v.name||v.fileName||"Iklan video")}</b><br><span class="muted">${esc(v.fileName||"Video tersimpan")}</span></span><button type="button" class="btn" data-remove-video="${i}" style="padding:6px 9px;background:#fff0f1;color:#b42338">Hapus</button></div>`).join("");
- box.querySelectorAll("[data-remove-video]").forEach(b=>b.onclick=()=>{videoPlaylist.splice(Number(b.dataset.removeVideo),1);renderVideoPlaylist();renderVideoPreview()});
+ box.querySelectorAll("[data-remove-video]").forEach(b=>b.onclick=async()=>{
+  const index=Number(b.dataset.removeVideo),item=videoPlaylist[index];
+  if(!item)return;
+  if(!confirm("Hapus video \""+(item.name||item.fileName||"Iklan video")+"\" dari playlist dan hapus file-nya dari Supabase Storage?"))return;
+  b.disabled=true;b.textContent="Menghapus…";
+  try{
+   const nextPlaylist=videoPlaylist.filter((_,i)=>i!==index);
+   const first=nextPlaylist[0]||{};
+   await updateDoc(adRef,{
+    "videoAd.videoAds":nextPlaylist,
+    "videoAd.url":first.url||"",
+    "videoAd.clickUrl":first.clickUrl||$("videoLink").value.trim(),
+    "videoAd.name":first.name||"",
+    "videoAd.fileName":first.fileName||"",
+    "videoAd.enabled":nextPlaylist.length?($("videoEnabled").value==="true"):false,
+    "videoAd.updatedAt":new Date().toISOString(),
+    "videoAd.updatedBy":admin.uid
+   });
+   videoPlaylist=nextPlaylist;
+   renderVideoPlaylist();renderVideoPreview();
+   let storagePath="";
+   try{
+    const u=new URL(item.url);
+    const marker="/storage/v1/object/public/"+SUPABASE_BUCKET+"/";
+    const pos=u.pathname.indexOf(marker);
+    if(pos>=0)storagePath=decodeURIComponent(u.pathname.slice(pos+marker.length));
+   }catch(_){}
+   if(storagePath){
+    const {error}=await supabase.storage.from(SUPABASE_BUCKET).remove([storagePath]);
+    if(error)throw new Error("Video sudah dihapus dari playlist, tetapi file Supabase gagal dihapus: "+error.message);
+    toast("Video dihapus dari playlist dan Supabase Storage.");
+   }else{
+    toast("Video dihapus dari playlist. File bukan URL bucket Supabase yang dikenali, jadi file fisik tidak dihapus.");
+   }
+  }catch(e){
+   toast("Gagal menghapus video: "+errText(e));
+   renderVideoPlaylist();
+  }
+ });
 }
 function renderVideoPreview(){
  const box=$("videoPreview");
