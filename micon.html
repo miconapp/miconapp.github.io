@@ -615,6 +615,8 @@
     background:#fff!important;color:#94a3b8!important;text-align:center!important;
     font-size:10px!important;
   }
+  .mobile-ad-banner:not(.is-configured){display:none!important}
+  .mobile-ad-banner.is-configured{overflow:hidden!important;padding:0!important;border-style:solid!important;background:#fff!important;color:transparent!important}
   .home-scroll-column .foot,#mainContent>.foot,.foot{
     display:grid!important;grid-template-columns:1fr!important;gap:12px!important;
     width:100%!important;margin:12px 0 0!important;padding:14px!important;
@@ -2043,7 +2045,7 @@ try {
 </div>
 <script type="module" id="micon-dashboard-video-ad">
 import { getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 (() => {
   const $ = id => document.getElementById(id);
@@ -2194,6 +2196,43 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     errorBox.textContent="Video iklan gagal dimuat. Iklan akan dilewati otomatis setelah waktu yang ditentukan.";
     errorBox.style.display="block";
   });
+
+  /* Banner playlist membaca konfigurasi yang sama dengan halaman Superadmin: PengaturanIklan/MicOn -> banner. */
+  function connectPlaylistBanner(){
+    const banner=document.querySelector('.mobile-ad-banner');
+    if(!banner)return;
+    banner.classList.remove('is-configured');
+    banner.replaceChildren();
+    if(!db)db=getFirestore(getApp());
+    onSnapshot(doc(db,"PengaturanIklan","MicOn"),snapshot=>{
+      const root=snapshot.exists()?snapshot.data():{};
+      const config=root.banner||{};
+      const url=String(config.url||"").trim();
+      const active=config.enabled===true&&!!url;
+      const allowedPlacement=["home","home-bottom","all"].includes(String(config.placement||"home"));
+      banner.classList.toggle('is-configured',active&&allowedPlacement);
+      banner.replaceChildren();
+      if(!active||!allowedPlacement)return;
+      const image=document.createElement('img');
+      image.src=url;
+      image.alt=String(config.name||"Banner iklan MicOn");
+      image.loading="lazy";
+      image.decoding="async";
+      image.style.cssText="display:block;width:100%;height:100%;min-height:0;object-fit:cover;border:0;border-radius:inherit";
+      const destination=String(config.clickUrl||"").trim();
+      if(destination){
+        const link=document.createElement('a');
+        link.href=destination;
+        link.target="_blank";
+        link.rel="noopener noreferrer";
+        link.style.cssText="display:block;width:100%;height:100%;overflow:hidden;border-radius:inherit";
+        link.appendChild(image);
+        banner.appendChild(link);
+      }else banner.appendChild(image);
+      banner.title=String(config.name||"Banner iklan");
+    },error=>console.warn("MicOn playlist banner config could not be loaded:",error));
+  }
+  try{connectPlaylistBanner();}catch(error){console.warn("MicOn playlist banner could not be initialized:",error);}
 
   window.miconAdGate=async(phase="opening")=>{
     try{
@@ -2575,6 +2614,8 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
     background:#f8fbff!important;color:#64748b!important;text-align:center!important;
     font-size:10px!important;font-weight:700!important;box-shadow:none!important;
   }
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured{padding:0!important;border-style:solid!important;background:#fff!important}
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner.is-configured img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important}
   .micon-reference-stack .mobile-playlist-icon{
     display:grid!important;place-items:center!important;flex:0 0 33px!important;
     width:33px!important;height:33px!important;border-radius:10px!important;
