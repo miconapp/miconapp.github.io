@@ -2468,7 +2468,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   .micon-reference-stack>#clearBtn:disabled{opacity:1!important;background:#9bb7f5!important;color:#fff!important}
   .micon-reference-stack>.mobile-playlist-panel{
     order:3!important;display:flex!important;flex-direction:column!important;gap:0!important;
-    width:calc(100% + 24px)!important;margin:0!important;padding:0 12px!important;
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;
     border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
   }
   .micon-reference-stack .mobile-playlist-import{
@@ -2480,15 +2480,15 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
   }
   .micon-reference-stack .mobile-playlist-heading{
     order:1!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;
-    width:calc(100% + 24px)!important;height:29px!important;min-height:29px!important;
-    margin:0 -12px 4px!important;padding:0 12px!important;border:0!important;
+    box-sizing:border-box!important;width:100%!important;height:29px!important;min-height:29px!important;
+    margin:0 0 4px!important;padding:0!important;border:0!important;
     border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;
     background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:800!important;
     letter-spacing:0!important;
   }
   .micon-reference-stack .mobile-playlist-list{
     order:2!important;display:flex!important;flex-direction:column!important;gap:8px!important;
-    width:100%!important;margin:0!important;padding:0!important;background:#fff!important;
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important;
   }
   .micon-reference-stack .mobile-playlist-item{
     display:flex!important;box-sizing:border-box!important;align-items:center!important;gap:9px!important;
