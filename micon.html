@@ -1015,19 +1015,23 @@ function stopVolumeMatch(){
 function startVolumeMatch(){
   if(!ctx||!inputAnalyser||!processedAnalyser||!outputGain||!volumeMatchInputData||!volumeMatchOutputData)return;
   stopVolumeMatch();
+  let lastTarget=outputGain.gain.value||1;
   const tick=()=>{
     if(!ctx||ctx.state==='closed'||!inputAnalyser||!processedAnalyser||!outputGain)return;
     inputAnalyser.getFloatTimeDomainData(volumeMatchInputData);
     processedAnalyser.getFloatTimeDomainData(volumeMatchOutputData);
     const before=rmsLevel(volumeMatchInputData);
     const after=rmsLevel(volumeMatchOutputData);
-    if(before>0.0005&&after>0.00025){
-      /* Samakan rata-rata level hasil transpose dengan sumber asli.
-         Batas gain mencegah penguatan berlebihan; limiter menangani puncak. */
-      const wanted=Math.max(0.75,Math.min(2.4,before/after));
-      const current=outputGain.gain.value;
-      const smoothed=current+(wanted-current)*0.12;
-      outputGain.gain.setTargetAtTime(smoothed,ctx.currentTime,0.08);
+    /* Abaikan bagian hening dan buffer awal prosesor. */
+    if(before>0.001&&after>0.00035){
+      const ratio=before/after;
+      /* Kompensasi level keluaran transpose, dibatasi agar tidak menambah
+         volume secara berlebihan. Target tidak dijadwalkan ulang setiap frame. */
+      const wanted=Math.max(0.85,Math.min(3.0,ratio));
+      if(Math.abs(wanted-lastTarget)>0.035){
+        outputGain.gain.setTargetAtTime(wanted,ctx.currentTime,0.22);
+        lastTarget=wanted;
+      }
     }
     volumeMatchFrame=requestAnimationFrame(tick);
   };
@@ -1048,14 +1052,18 @@ function updatePitch(){
       effect.pitchSemitones.value=n;
       effect.playbackRate.value=1;
       if(engine==='hq')setFormantForPitch(n);
-      if(outputGain&&ctx){
-        if(n===0)outputGain.gain.setTargetAtTime(1,ctx.currentTime,0.12);
-        else startVolumeMatch();
-      }
       if(source){
         source.disconnect();
         source.connect(n===0?outputGain:effect);
         if(inputAnalyser)source.connect(inputAnalyser);
+      }
+      if(outputGain&&ctx){
+        if(n===0){
+          stopVolumeMatch();
+          outputGain.gain.setTargetAtTime(1,ctx.currentTime,0.18);
+        }else{
+          startVolumeMatch();
+        }
       }
     }catch(e){msg('Efek transpose gagal diperbarui: '+(e.message||e),true);}
   }
@@ -1099,11 +1107,11 @@ async function setupHighQualityAudio(){
     const processedLevel=newCtx.createAnalyser();
     processedLevel.fftSize=2048;
     const limiter=newCtx.createDynamicsCompressor();
-    limiter.threshold.setValueAtTime(-2,newCtx.currentTime);
-    limiter.knee.setValueAtTime(0,newCtx.currentTime);
-    limiter.ratio.setValueAtTime(20,newCtx.currentTime);
-    limiter.attack.setValueAtTime(0.003,newCtx.currentTime);
-    limiter.release.setValueAtTime(0.12,newCtx.currentTime);
+    limiter.threshold.setValueAtTime(-1,newCtx.currentTime);
+    limiter.knee.setValueAtTime(8,newCtx.currentTime);
+    limiter.ratio.setValueAtTime(4,newCtx.currentTime);
+    limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
+    limiter.release.setValueAtTime(0.18,newCtx.currentTime);
     newOutputGain=newCtx.createGain();
     newOutputGain.gain.setValueAtTime(1,newCtx.currentTime);
     node.connect(processedLevel);
