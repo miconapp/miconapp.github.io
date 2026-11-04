@@ -983,7 +983,7 @@ const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correctio
 const MOBILE_MODULE='https://esm.sh/@soundtouchjs/audio-worklet@2.1.1?bundle';
 const MOBILE_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
 /* Penguatan keluaran tetap +2 dB (linear gain ≈ 1.2589). */
-const OUTPUT_BOOST_DB=2;
+const OUTPUT_BOOST_DB=3;
 const OUTPUT_BOOST=Math.pow(10,OUTPUT_BOOST_DB/20);
 const fmt=t=>{t=Number.isFinite(t)&&t>0?t:0;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0')};
 function msg(t,err=false){const a=$('alert');if(a){a.textContent=t;a.className='alert show '+(err?'err':'ok')}}
