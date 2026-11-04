@@ -2178,6 +2178,30 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
   let activeAdPhase="opening";
+  /* Samakan level iklan dengan jalur video impor: +2 dB dan limiter yang sama. */
+  const AD_OUTPUT_BOOST=Math.pow(10,2/20);
+  let adAudioContext=null,adMediaSource=null,adOutputGain=null,adOutputLimiter=null;
+  async function ensureAdAudioGraph(){
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx)throw new Error('Web Audio API tidak tersedia.');
+    if(!adAudioContext||adAudioContext.state==='closed'){
+      adAudioContext=new AudioCtx({latencyHint:'playback'});
+      adMediaSource=adAudioContext.createMediaElementSource(adVideo);
+      adOutputGain=adAudioContext.createGain();
+      adOutputGain.gain.setValueAtTime(AD_OUTPUT_BOOST,adAudioContext.currentTime);
+      adOutputLimiter=adAudioContext.createDynamicsCompressor();
+      adOutputLimiter.threshold.setValueAtTime(-1,adAudioContext.currentTime);
+      adOutputLimiter.knee.setValueAtTime(8,adAudioContext.currentTime);
+      adOutputLimiter.ratio.setValueAtTime(4,adAudioContext.currentTime);
+      adOutputLimiter.attack.setValueAtTime(0.004,adAudioContext.currentTime);
+      adOutputLimiter.release.setValueAtTime(0.18,adAudioContext.currentTime);
+      adMediaSource.connect(adOutputGain);
+      adOutputGain.connect(adOutputLimiter);
+      adOutputLimiter.connect(adAudioContext.destination);
+    }
+    if(adAudioContext.state!=='running')await adAudioContext.resume();
+    return adAudioContext.state==='running';
+  }
 
   function finishAd(){
     if(!showing)return;
@@ -2272,7 +2296,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       resolveGate=resolve;
       updateClock();
       timer=setInterval(updateClock,1000);
-      adVideo.play().catch(()=>{
+      Promise.resolve(ensureAdAudioGraph()).catch(()=>false).then(()=>adVideo.play()).catch(()=>{
         adVideo.muted=true;
         sound.textContent="Aktifkan suara";
         start.textContent="Putar iklan dengan suara";
@@ -2299,6 +2323,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   });
   sound.addEventListener("click",()=>{
     adVideo.muted=!adVideo.muted;
+    if(!adVideo.muted)ensureAdAudioGraph().catch(()=>{});
     sound.textContent=adVideo.muted?"Aktifkan suara":"Matikan suara";
   });
   skip.addEventListener("click",()=>{if(!skip.disabled)finishAd();});
@@ -2308,7 +2333,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     adVideo.muted=false;
     adVideo.volume=1;
     sound.textContent="Matikan suara";
-    adVideo.play().catch(()=>{
+    ensureAdAudioGraph().catch(()=>{}).then(()=>adVideo.play()).catch(()=>{
       errorBox.textContent="Video iklan tidak dapat diputar pada perangkat ini.";
       errorBox.style.display="block";
     });
