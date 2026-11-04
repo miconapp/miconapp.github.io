@@ -2178,20 +2178,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
   let activeAdPhase="opening";
-  /* Audio iklan memakai output native browser agar jalur suara tidak terputus.
-     Level iklan dibuat sedikit lebih rendah daripada video impor (+2 dB).
-     Tidak membuat MediaElementSource/AudioContext terpisah untuk iklan karena
-     kebijakan autoplay dan graph terpisah dapat menyebabkan iklan senyap. */
-  const AD_PLAYBACK_VOLUME=0.82;
-  async function ensureAdAudioGraph(){return true;}
-
-  function showAdSoundRecovery(message){
-    adVideo.pause();adVideo.muted=false;
-    sound.textContent='Aktifkan suara';
-    start.textContent='Putar iklan dengan suara';start.style.display='inline-block';
-    errorBox.textContent=message||'Browser menahan audio otomatis. Tekan tombol Putar iklan dengan suara.';
-    errorBox.style.display='block';
-  }
 
   function finishAd(){
     if(!showing)return;
@@ -2277,7 +2263,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       }catch(_){adLink.removeAttribute("href");adLink.hidden=true;}
     }else{adLink.removeAttribute("href");adLink.hidden=true;}
     adVideo.muted=false;
-    adVideo.volume=AD_PLAYBACK_VOLUME;
+    adVideo.volume=1;
     sound.textContent="Matikan suara";
     adVideo.src=source;
 
@@ -2286,10 +2272,14 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       resolveGate=resolve;
       updateClock();
       timer=setInterval(updateClock,1000);
-      ensureAdAudioGraph().then(ready=>{
-        if(!ready)throw new Error('Audio iklan belum siap.');
-        return adVideo.play();
-      }).catch(()=>showAdSoundRecovery('Browser membatasi pemutaran audio otomatis. Tekan Putar iklan dengan suara agar iklan terdengar.'));
+      adVideo.play().catch(()=>{
+        adVideo.muted=true;
+        sound.textContent="Aktifkan suara";
+        start.textContent="Putar iklan dengan suara";
+        start.style.display="inline-block";
+        errorBox.textContent="Browser membatasi suara otomatis. Tekan Putar iklan dengan suara untuk memulai iklan bersuara.";
+        errorBox.style.display="block";
+      });
     });
   }
 
@@ -2307,23 +2297,21 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       window.open(target.href,"_blank","noopener,noreferrer");
     }catch(_){}
   });
-  sound.addEventListener("click",async()=>{
-    if(adVideo.muted){
-      try{const ready=await ensureAdAudioGraph();if(!ready)throw new Error('Audio belum aktif');adVideo.muted=false;adVideo.volume=AD_PLAYBACK_VOLUME;await adVideo.play();sound.textContent='Matikan suara';errorBox.style.display='none';}
-      catch(_){showAdSoundRecovery('Audio belum diizinkan browser. Tekan Putar iklan dengan suara.');}
-    }else{adVideo.muted=true;sound.textContent='Aktifkan suara';}
+  sound.addEventListener("click",()=>{
+    adVideo.muted=!adVideo.muted;
+    sound.textContent=adVideo.muted?"Aktifkan suara":"Matikan suara";
   });
   skip.addEventListener("click",()=>{if(!skip.disabled)finishAd();});
-  start.addEventListener("click",async()=>{
-    adVideo.muted=false;adVideo.volume=AD_PLAYBACK_VOLUME;
-    try{
-      const ready=await ensureAdAudioGraph();
-      if(!ready)throw new Error('AudioContext belum berjalan');
-      await adVideo.play();
-      start.style.display='none';errorBox.style.display='none';sound.textContent='Matikan suara';
-    }catch(error){
-      showAdSoundRecovery('Audio iklan belum dapat diaktifkan: '+(error.message||error)+'. Coba tekan tombol ini sekali lagi.');
-    }
+  start.addEventListener("click",()=>{
+    start.style.display="none";
+    errorBox.style.display="none";
+    adVideo.muted=false;
+    adVideo.volume=1;
+    sound.textContent="Matikan suara";
+    adVideo.play().catch(()=>{
+      errorBox.textContent="Video iklan tidak dapat diputar pada perangkat ini.";
+      errorBox.style.display="block";
+    });
   });
   adVideo.addEventListener("ended",finishAd);
   adVideo.addEventListener("error",()=>{
