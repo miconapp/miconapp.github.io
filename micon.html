@@ -982,6 +982,9 @@ const HQ_MODULE='https://esm.sh/@soundtouchjs/formant-correction-worklet@2.1.1?b
 const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correction-worklet@2.1.1/.dist/formant-correction-processor.js';
 const MOBILE_MODULE='https://esm.sh/@soundtouchjs/audio-worklet@2.1.1?bundle';
 const MOBILE_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
+/* Penguatan keluaran tetap +2 dB (linear gain ≈ 1.2589). */
+const OUTPUT_BOOST_DB=2;
+const OUTPUT_BOOST=Math.pow(10,OUTPUT_BOOST_DB/20);
 const fmt=t=>{t=Number.isFinite(t)&&t>0?t:0;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0')};
 function msg(t,err=false){const a=$('alert');if(a){a.textContent=t;a.className='alert show '+(err?'err':'ok')}}
 function noteValue(n){return n>0?'+'+n:String(n)}
@@ -1014,8 +1017,8 @@ function stopVolumeMatch(){
 }
 function startVolumeMatch(){
   if(!ctx||!inputAnalyser||!processedAnalyser||!outputGain||!volumeMatchInputData||!volumeMatchOutputData)return;
-  stopVolumeMatch();
-  let lastTarget=outputGain.gain.value||1;
+  if(volumeMatchFrame)return;
+  let lastTarget=outputGain.gain.value||OUTPUT_BOOST;
   const tick=()=>{
     if(!ctx||ctx.state==='closed'||!inputAnalyser||!processedAnalyser||!outputGain)return;
     inputAnalyser.getFloatTimeDomainData(volumeMatchInputData);
@@ -1027,7 +1030,7 @@ function startVolumeMatch(){
       const ratio=before/after;
       /* Kompensasi level keluaran transpose, dibatasi agar tidak menambah
          volume secara berlebihan. Target tidak dijadwalkan ulang setiap frame. */
-      const wanted=Math.max(0.85,Math.min(3.0,ratio));
+      const wanted=Math.max(0.85*OUTPUT_BOOST,Math.min(3.0*OUTPUT_BOOST,ratio*OUTPUT_BOOST));
       if(Math.abs(wanted-lastTarget)>0.035){
         outputGain.gain.setTargetAtTime(wanted,ctx.currentTime,0.22);
         lastTarget=wanted;
@@ -1058,7 +1061,7 @@ function updatePitch(){
       if(outputGain&&ctx){
         if(n===0){
           stopVolumeMatch();
-          outputGain.gain.setTargetAtTime(1,ctx.currentTime,0.18);
+          outputGain.gain.setTargetAtTime(OUTPUT_BOOST,ctx.currentTime,0.18);
         }else{
           startVolumeMatch();
         }
@@ -1111,7 +1114,7 @@ async function setupHighQualityAudio(){
     limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
     limiter.release.setValueAtTime(0.18,newCtx.currentTime);
     newOutputGain=newCtx.createGain();
-    newOutputGain.gain.setValueAtTime(1,newCtx.currentTime);
+    newOutputGain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
     node.connect(processedLevel);
     node.connect(newOutputGain);
     newOutputGain.connect(limiter);
@@ -1248,9 +1251,21 @@ $('videoFile').addEventListener('change',async e=>{
     setupVideo();
     updatePitch();
     const loadedVideo=video;
-    loadedVideo.addEventListener('loadedmetadata',()=>{
+    loadedVideo.addEventListener('loadedmetadata',async()=>{
       if(loadedVideo!==video) return;
-      $('fileStatus').textContent='Video berhasil diimpor · menyiapkan iklan';
+      $('fileStatus').textContent='Video berhasil diimpor · menyambungkan audio';
+      /* Buat dan sambungkan AudioWorklet segera setelah import, sebelum iklan
+         pembuka dan pemutaran video. Simpan promise agar tombol Play tidak
+         membuat jalur MediaElementSource kedua saat inisialisasi berlangsung. */
+      if(!audioSetupPromise&&!source){
+        audioSetupPromise=setupAudio().then(()=>{
+          if(loadedVideo===video){updatePitch();$('fileStatus').textContent='Audio tersambung · menyiapkan iklan';}
+        }).catch(error=>{
+          msg('AudioWorklet belum berhasil disambungkan: '+(error.message||error),true);
+        }).finally(()=>{audioSetupPromise=null;});
+      }
+      if(audioSetupPromise)await audioSetupPromise;
+      if(loadedVideo!==video||!loadedVideo.isConnected)return;
       /* Satu import sukses = satu iklan pembuka. Setelah iklan dilewati/selesai, video langsung play. */
       if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
         window.__miconOpeningAdRunning=true;
@@ -1267,8 +1282,6 @@ $('videoFile').addEventListener('change',async e=>{
           try{
             await loadedVideo.play();
           }catch(playError){
-            /* Jika autoplay bersuara ditolak setelah iklan, mulai dalam mode
-               senyap agar video tetap otomatis berjalan, lalu pulihkan suara asli. */
             if(playError&&playError.name==='NotAllowedError'){
               loadedVideo.muted=true;
               try{
@@ -1296,7 +1309,6 @@ $('videoFile').addEventListener('change',async e=>{
         }).catch(error=>msg('Gagal memulai video setelah iklan: '+(error.message||error),true))
           .finally(()=>{window.__miconOpeningAdRunning=false;});
       }
-      /* Mesin transpose tetap tidak dibuat saat import agar pemuatan video ringan. */
       updatePitch();
     },{once:true});
     loadedVideo.addEventListener('error',()=>{
@@ -1322,7 +1334,7 @@ $('playBtn').addEventListener('click',async()=>{
   if(!mobilePlayback){
     /* Jalur pemutaran desktop tetap mengikuti urutan versi sebelumnya. */
     try{
-      if(Number($('pitchRange').value)!==0||source)await setupAudio();
+      await setupAudio();
       window.__miconAdAuthorized=true;
       await targetVideo.play();
     }catch(error){
@@ -1342,8 +1354,7 @@ $('playBtn').addEventListener('click',async()=>{
     return;
   }
   let audioTask=null;
-  if(Number($('pitchRange').value)!==0){
-    audioTask=(audioSetupPromise||setupAudio()).then(()=>updatePitch()).catch(error=>{
+  audioTask=(audioSetupPromise||setupAudio()).then(()=>updatePitch()).catch(error=>{
       /* Kegagalan efek transpose tidak boleh menggagalkan video. Audio asli
          tetap dipertahankan pada jalur native/unity gain. */
       try{
@@ -1355,7 +1366,6 @@ $('playBtn').addEventListener('click',async()=>{
       }catch(_){}
       msg('Video tetap diputar dengan audio asli. Efek transpose belum aktif: '+(error.message||error),true);
     });
-  }
   try{await playRequest;}
   catch(e){
     window.__miconAdAuthorized=false;
