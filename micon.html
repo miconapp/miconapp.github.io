@@ -2178,29 +2178,48 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
   let activeAdPhase="opening";
-  /* Samakan level iklan dengan jalur video impor: +2 dB dan limiter yang sama. */
+  /* Audio iklan memakai level +2 dB dan limiter seperti video impor.
+     Jika browser menahan autoplay AudioContext, tunggu interaksi tombol suara;
+     jangan memutar iklan diam-diam melalui graph yang masih suspended. */
   const AD_OUTPUT_BOOST=Math.pow(10,2/20);
-  let adAudioContext=null,adMediaSource=null,adOutputGain=null,adOutputLimiter=null;
+  let adAudioContext=null,adMediaSource=null,adOutputGain=null,adOutputLimiter=null,adGraphReady=false,adGraphBypass=false;
   async function ensureAdAudioGraph(){
     const AudioCtx=window.AudioContext||window.webkitAudioContext;
-    if(!AudioCtx)throw new Error('Web Audio API tidak tersedia.');
-    if(!adAudioContext||adAudioContext.state==='closed'){
-      adAudioContext=new AudioCtx({latencyHint:'playback'});
-      adMediaSource=adAudioContext.createMediaElementSource(adVideo);
-      adOutputGain=adAudioContext.createGain();
-      adOutputGain.gain.setValueAtTime(AD_OUTPUT_BOOST,adAudioContext.currentTime);
-      adOutputLimiter=adAudioContext.createDynamicsCompressor();
-      adOutputLimiter.threshold.setValueAtTime(-1,adAudioContext.currentTime);
-      adOutputLimiter.knee.setValueAtTime(8,adAudioContext.currentTime);
-      adOutputLimiter.ratio.setValueAtTime(4,adAudioContext.currentTime);
-      adOutputLimiter.attack.setValueAtTime(0.004,adAudioContext.currentTime);
-      adOutputLimiter.release.setValueAtTime(0.18,adAudioContext.currentTime);
-      adMediaSource.connect(adOutputGain);
-      adOutputGain.connect(adOutputLimiter);
-      adOutputLimiter.connect(adAudioContext.destination);
+    if(!AudioCtx){adGraphBypass=true;return true;}
+    if(!adMediaSource){
+      try{adAudioContext=new AudioCtx({latencyHint:'playback'});adMediaSource=adAudioContext.createMediaElementSource(adVideo);}
+      catch(error){adGraphBypass=true;throw error;}
+      try{
+        adOutputGain=adAudioContext.createGain();
+        adOutputGain.gain.setValueAtTime(AD_OUTPUT_BOOST,adAudioContext.currentTime);
+        adOutputLimiter=adAudioContext.createDynamicsCompressor();
+        adOutputLimiter.threshold.setValueAtTime(-1,adAudioContext.currentTime);
+        adOutputLimiter.knee.setValueAtTime(8,adAudioContext.currentTime);
+        adOutputLimiter.ratio.setValueAtTime(4,adAudioContext.currentTime);
+        adOutputLimiter.attack.setValueAtTime(0.004,adAudioContext.currentTime);
+        adOutputLimiter.release.setValueAtTime(0.18,adAudioContext.currentTime);
+        adMediaSource.connect(adOutputGain);
+        adOutputGain.connect(adOutputLimiter);
+        adOutputLimiter.connect(adAudioContext.destination);
+        adGraphReady=true;
+      }catch(error){
+        /* SourceNode hanya boleh dibuat sekali per elemen. Sambungkan langsung
+           ke output sebagai fallback supaya kegagalan pemrosesan tidak membuat sunyi. */
+        try{adMediaSource.disconnect()}catch(_){}
+        try{adMediaSource.connect(adAudioContext.destination);adGraphBypass=true;adGraphReady=true;}
+        catch(connectError){throw connectError;}
+      }
     }
-    if(adAudioContext.state!=='running')await adAudioContext.resume();
-    return adAudioContext.state==='running';
+    if(adGraphBypass)return true;
+    if(adAudioContext&&adAudioContext.state!=='running')await adAudioContext.resume();
+    return !!(adGraphReady&&(!adAudioContext||adAudioContext.state==='running'));
+  }
+  function showAdSoundRecovery(message){
+    adVideo.pause();adVideo.muted=false;
+    sound.textContent='Aktifkan suara';
+    start.textContent='Putar iklan dengan suara';start.style.display='inline-block';
+    errorBox.textContent=message||'Browser menahan audio otomatis. Tekan tombol Putar iklan dengan suara.';
+    errorBox.style.display='block';
   }
 
   function finishAd(){
@@ -2296,14 +2315,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       resolveGate=resolve;
       updateClock();
       timer=setInterval(updateClock,1000);
-      Promise.resolve(ensureAdAudioGraph()).catch(()=>false).then(()=>adVideo.play()).catch(()=>{
-        adVideo.muted=true;
-        sound.textContent="Aktifkan suara";
-        start.textContent="Putar iklan dengan suara";
-        start.style.display="inline-block";
-        errorBox.textContent="Browser membatasi suara otomatis. Tekan Putar iklan dengan suara untuk memulai iklan bersuara.";
-        errorBox.style.display="block";
-      });
+      ensureAdAudioGraph().then(ready=>{
+        if(!ready)throw new Error('Audio iklan belum siap.');
+        return adVideo.play();
+      }).catch(()=>showAdSoundRecovery('Browser membatasi pemutaran audio otomatis. Tekan Putar iklan dengan suara agar iklan terdengar.'));
     });
   }
 
@@ -2321,22 +2336,23 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       window.open(target.href,"_blank","noopener,noreferrer");
     }catch(_){}
   });
-  sound.addEventListener("click",()=>{
-    adVideo.muted=!adVideo.muted;
-    if(!adVideo.muted)ensureAdAudioGraph().catch(()=>{});
-    sound.textContent=adVideo.muted?"Aktifkan suara":"Matikan suara";
+  sound.addEventListener("click",async()=>{
+    if(adVideo.muted){
+      try{const ready=await ensureAdAudioGraph();if(!ready)throw new Error('Audio belum aktif');adVideo.muted=false;await adVideo.play();sound.textContent='Matikan suara';errorBox.style.display='none';}
+      catch(_){showAdSoundRecovery('Audio belum diizinkan browser. Tekan Putar iklan dengan suara.');}
+    }else{adVideo.muted=true;sound.textContent='Aktifkan suara';}
   });
   skip.addEventListener("click",()=>{if(!skip.disabled)finishAd();});
-  start.addEventListener("click",()=>{
-    start.style.display="none";
-    errorBox.style.display="none";
-    adVideo.muted=false;
-    adVideo.volume=1;
-    sound.textContent="Matikan suara";
-    ensureAdAudioGraph().catch(()=>{}).then(()=>adVideo.play()).catch(()=>{
-      errorBox.textContent="Video iklan tidak dapat diputar pada perangkat ini.";
-      errorBox.style.display="block";
-    });
+  start.addEventListener("click",async()=>{
+    adVideo.muted=false;adVideo.volume=1;
+    try{
+      const ready=await ensureAdAudioGraph();
+      if(!ready)throw new Error('AudioContext belum berjalan');
+      await adVideo.play();
+      start.style.display='none';errorBox.style.display='none';sound.textContent='Matikan suara';
+    }catch(error){
+      showAdSoundRecovery('Audio iklan belum dapat diaktifkan: '+(error.message||error)+'. Coba tekan tombol ini sekali lagi.');
+    }
   });
   adVideo.addEventListener("ended",finishAd);
   adVideo.addEventListener("error",()=>{
