@@ -977,6 +977,42 @@ function setupVideo(){if(video)video.remove();video=document.createElement('vide
   }).catch(error=>msg('Iklan belum dapat diputar: '+(error.message||error),true))
     .finally(()=>{window.__miconNativeAdPending=false;});
 });video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconPlaylistHasNext&&typeof window.__miconPlaylistAdvance==='function'){window.__miconPlaylistAdvance();return;}if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
+async function replaceVideoElementForAudio(){
+  const oldVideo=video;
+  if(!oldVideo||!oldVideo.isConnected)throw new Error('Video tidak tersedia untuk membangun ulang jalur audio.');
+  const resumePlayback=!oldVideo.paused&&!oldVideo.ended;
+  const savedTime=Number.isFinite(oldVideo.currentTime)?oldVideo.currentTime:0;
+  const savedVolume=oldVideo.volume;
+  const savedMuted=oldVideo.muted;
+  try{oldVideo.pause();}catch(_){}
+  /* Elemen yang mungkin sudah terikat ke MediaElementSourceNode dibuang.
+     Elemen baru memiliki identitas HTMLMediaElement yang benar-benar baru. */
+  try{oldVideo.removeAttribute('src');oldVideo.load();}catch(_){}
+  oldVideo.remove();
+  video=null;
+  setupVideo();
+  const freshVideo=video;
+  freshVideo.volume=savedVolume;
+  freshVideo.muted=savedMuted;
+  await new Promise((resolve,reject)=>{
+    if(freshVideo.readyState>=1){resolve();return;}
+    const onReady=()=>{cleanup();resolve();};
+    const onError=()=>{cleanup();reject(new Error('Video gagal dimuat ulang saat memperbaiki koneksi audio.'));};
+    const cleanup=()=>{freshVideo.removeEventListener('loadedmetadata',onReady);freshVideo.removeEventListener('error',onError);};
+    freshVideo.addEventListener('loadedmetadata',onReady,{once:true});
+    freshVideo.addEventListener('error',onError,{once:true});
+    freshVideo.load();
+  });
+  if(Number.isFinite(savedTime)&&savedTime>0){
+    try{freshVideo.currentTime=Math.min(savedTime,Number.isFinite(freshVideo.duration)?freshVideo.duration:savedTime);}catch(_){}
+  }
+  if(resumePlayback){
+    window.__miconAdAuthorized=true;
+    try{await freshVideo.play();}catch(_){$('playBtn').disabled=false;$('fileStatus').textContent='Video siap diputar · tekan Putar video';}
+  }
+  return freshVideo;
+}
+
 async function getFormantNodeClass(){
   if(!hqConstructorPromise){
     hqConstructorPromise=import(HQ_MODULE).then(mod=>{
@@ -1010,55 +1046,68 @@ function updatePitch(){
 /* Jalur dasar dibuat ringan: audio asli tidak melewati AudioWorklet. */
 async function setupHighQualityAudio(){
   if(source&&outputGain&&ctx&&ctx.state!=='closed')return;
-  /* Registry pada elemen video mencegah pembuatan source kedua bila handler
-     audio terinisialisasi ulang atau ada pemanggilan paralel dari UI. */
-  const savedGraph=video&&video.__miconAudioGraph;
-  if(savedGraph&&savedGraph.ctx&&savedGraph.ctx.state!=='closed'){
-    ctx=savedGraph.ctx;source=savedGraph.source;outputGain=savedGraph.gain;outputLimiter=savedGraph.limiter;ownsContext=true;engine='direct';return;
-  }
   if(audioGraphSetupPromise)return audioGraphSetupPromise;
   audioGraphSetupPromise=(async()=>{
     const AudioCtx=window.AudioContext||window.webkitAudioContext;
     if(!AudioCtx)throw new Error('Browser tidak mendukung Web Audio API.');
     if(!video||!video.isConnected)throw new Error('Video belum siap dihubungkan ke audio.');
-    /* Semua permintaan setup untuk elemen video yang sama diserialkan.
-       createMediaElementSource hanya boleh dipanggil satu kali per elemen video. */
-    const newCtx=new AudioCtx({latencyHint:'interactive'});
-    let mediaSource=null,gain=null,limiter=null;
-    try{
-      gain=newCtx.createGain();
-      gain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
-      limiter=newCtx.createDynamicsCompressor();
-      limiter.threshold.setValueAtTime(-1,newCtx.currentTime);
-      limiter.knee.setValueAtTime(8,newCtx.currentTime);
-      limiter.ratio.setValueAtTime(4,newCtx.currentTime);
-      limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
-      limiter.release.setValueAtTime(0.18,newCtx.currentTime);
-      gain.connect(limiter);
-      limiter.connect(newCtx.destination);
-      mediaSource=newCtx.createMediaElementSource(video);
-      /* Simpan node segera setelah dibuat. Jangan pernah membuat node kedua
-         untuk HTMLMediaElement ini, termasuk bila koneksi berikutnya gagal. */
-      ctx=newCtx;source=mediaSource;outputGain=gain;outputLimiter=limiter;
-      video.__miconAudioGraph={ctx:newCtx,source:mediaSource,gain,limiter};
-      ownsContext=true;engine='direct';
-      mediaSource.connect(gain);
-      try{const resume=newCtx.resume();if(resume&&resume.catch)resume.catch(()=>{});}catch(_){}
-      video.volume=1;video.muted=false;video.preservesPitch=false;video.defaultPlaybackRate=1;video.playbackRate=1;
-    }catch(error){
-      if(mediaSource){
-        /* Node telah terikat permanen pada elemen video: pertahankan context
-           dan referensinya agar percobaan berikutnya memakai node yang sama. */
-        try{mediaSource.connect(gain)}catch(_){}
+    const buildGraphForCurrentVideo=async()=>{
+      const graphVideo=video;
+      const newCtx=new AudioCtx({latencyHint:'interactive'});
+      let mediaSource=null,gain=null,limiter=null;
+      try{
+        gain=newCtx.createGain();
+        gain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
+        limiter=newCtx.createDynamicsCompressor();
+        limiter.threshold.setValueAtTime(-1,newCtx.currentTime);
+        limiter.knee.setValueAtTime(8,newCtx.currentTime);
+        limiter.ratio.setValueAtTime(4,newCtx.currentTime);
+        limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
+        limiter.release.setValueAtTime(0.18,newCtx.currentTime);
+        gain.connect(limiter);
+        limiter.connect(newCtx.destination);
+        /* Tepat satu pemanggilan untuk satu elemen video. Jika browser
+           menyatakan elemen sudah terikat, elemen diganti lalu dicoba sekali. */
+        mediaSource=newCtx.createMediaElementSource(graphVideo);
         ctx=newCtx;source=mediaSource;outputGain=gain;outputLimiter=limiter;
-        video.__miconAudioGraph={ctx:newCtx,source:mediaSource,gain,limiter};
+        graphVideo.__miconAudioGraph={ctx:newCtx,source:mediaSource,gain,limiter};
         ownsContext=true;engine='direct';
-      }else{
-        try{gain?.disconnect()}catch(_){}
-        try{limiter?.disconnect()}catch(_){}
-        try{if(newCtx.state!=='closed')await newCtx.close()}catch(_){}
+        mediaSource.connect(gain);
+        try{const resume=newCtx.resume();if(resume&&resume.catch)resume.catch(()=>{});}catch(_){}
+        graphVideo.volume=1;graphVideo.muted=false;graphVideo.preservesPitch=false;
+        graphVideo.defaultPlaybackRate=1;graphVideo.playbackRate=1;
+        return;
+      }catch(error){
+        if(mediaSource){
+          /* Node sudah terikat; simpan graph dan jangan pernah membuat node
+             kedua untuk elemen yang sama. */
+          ctx=newCtx;source=mediaSource;outputGain=gain;outputLimiter=limiter;
+          graphVideo.__miconAudioGraph={ctx:newCtx,source:mediaSource,gain,limiter};
+          ownsContext=true;engine='direct';
+          try{mediaSource.connect(gain);}catch(_){}
+          throw error;
+        }
+        try{gain?.disconnect();}catch(_){}
+        try{limiter?.disconnect();}catch(_){}
+        try{if(newCtx.state!=='closed')await newCtx.close();}catch(_){}
+        throw error;
       }
-      throw error;
+    };
+    try{
+      await buildGraphForCurrentVideo();
+    }catch(error){
+      const alreadyBound=/already connected|different MediaElementSourceNode|createMediaElementSource/i.test(String(error&&error.message||error));
+      if(!alreadyBound)throw error;
+      /* Pemulihan deterministik: elemen lama dibuang, satu elemen baru dibuat,
+         lalu satu-satunya graph dibuat ulang pada elemen baru. */
+      if(source&&ctx){try{source.disconnect();}catch(_){}source=null;}
+      if(outputGain){try{outputGain.disconnect();}catch(_){}outputGain=null;}
+      if(outputLimiter){try{outputLimiter.disconnect();}catch(_){}outputLimiter=null;}
+      const failedCtx=ctx;ctx=null;
+      if(failedCtx&&failedCtx.state!=='closed'){try{await failedCtx.close();}catch(_){}}
+      ownsContext=false;engine='none';
+      await replaceVideoElementForAudio();
+      await buildGraphForCurrentVideo();
     }
   })();
   try{return await audioGraphSetupPromise;}
