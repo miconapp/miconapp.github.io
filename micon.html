@@ -1106,7 +1106,7 @@ async function connectMobileVideoToSoundTouch(target){
   await smartphoneWorkletModulePromise;
   if(target!==video||!target.isConnected)return false;
   if(target.__miconMobileAudioGraph)return true;
-  let source=target.__miconMobileMediaSource||null,worklet=null,gainNode=null,limiter=null;
+  let source=target.__miconMobileMediaSource||null,worklet=null,gainNode=null;
   try{
    worklet=new AudioWorkletNode(smartphoneAudioContext,'soundtouch-processor',{
     numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
@@ -1121,23 +1121,16 @@ async function connectMobileVideoToSoundTouch(target){
     source=smartphoneAudioContext.createMediaElementSource(target);
     target.__miconMobileMediaSource=source;
    }
-   /* Kompensasi level khusus jalur SoundTouch smartphone. Limiter menjaga
-      puncak agar kenaikan gain tidak membuat audio pecah/clip. */
+   /* Satu level volume untuk semua kondisi: unity gain (100%).
+      Tidak ada boost 2x atau compressor yang mengubah level audio. */
    gainNode=smartphoneAudioContext.createGain();
-   gainNode.gain.value=2.0;
-   limiter=smartphoneAudioContext.createDynamicsCompressor();
-   limiter.threshold.value=-1.5;
-   limiter.knee.value=0;
-   limiter.ratio.value=20;
-   limiter.attack.value=0.003;
-   limiter.release.value=0.15;
-   gainNode.connect(limiter);
-   limiter.connect(smartphoneAudioContext.destination);
+   gainNode.gain.value=1.0;
+   gainNode.connect(smartphoneAudioContext.destination);
    try{source.disconnect();}catch(_){}
    source.connect(worklet);
    worklet.connect(gainNode);
    target.__miconMobileNativeFallback=false;
-   target.__miconMobileAudioGraph={source,worklet,gainNode,limiter};
+   target.__miconMobileAudioGraph={source,worklet,gainNode};
    target.__miconAudioPipeline='smartphone-soundtouch';
    target.volume=1;target.muted=false;target.defaultPlaybackRate=1;target.playbackRate=1;
    updateMobilePitchDisplay();
@@ -1145,7 +1138,6 @@ async function connectMobileVideoToSoundTouch(target){
   }catch(error){
    try{if(worklet){worklet.disconnect();worklet.port.close();}}catch(_){}
    try{if(gainNode)gainNode.disconnect();}catch(_){}
-   try{if(limiter)limiter.disconnect();}catch(_){}
    /* Kalau source sudah tercipta, pulihkan suara native supaya video tetap terdengar. */
    if(source){
     try{source.disconnect();source.connect(smartphoneAudioContext.destination);target.__miconMobileNativeFallback=true;}catch(_){}
@@ -1163,6 +1155,8 @@ function applyMobilePitch(value){
  const next=Math.max(min,Math.min(max,Math.round(Number(value)||0)));
  smartphonePitch=next;
  const target=video;
+ /* Jaga level elemen media tetap 100% setiap kali nada berubah. */
+ if(target){target.volume=1;target.muted=false;}
  const graph=target&&target.__miconMobileAudioGraph;
  const worklet=graph&&graph.worklet;
  const source=graph&&graph.source;
