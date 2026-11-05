@@ -1072,6 +1072,8 @@ function disconnectMobileVideoAudio(target){
  if(graph){
   try{graph.source.disconnect();}catch(_){}
   try{graph.worklet.disconnect();}catch(_){}
+  try{graph.gainNode&&graph.gainNode.disconnect();}catch(_){}
+  try{graph.limiter&&graph.limiter.disconnect();}catch(_){}
   try{graph.worklet.port.close();}catch(_){}
   try{delete target.__miconMobileAudioGraph;}catch(_){target.__miconMobileAudioGraph=null;}
  }
@@ -1104,7 +1106,7 @@ async function connectMobileVideoToSoundTouch(target){
   await smartphoneWorkletModulePromise;
   if(target!==video||!target.isConnected)return false;
   if(target.__miconMobileAudioGraph)return true;
-  let source=target.__miconMobileMediaSource||null,worklet=null;
+  let source=target.__miconMobileMediaSource||null,worklet=null,gainNode=null,limiter=null;
   try{
    worklet=new AudioWorkletNode(smartphoneAudioContext,'soundtouch-processor',{
     numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
@@ -1119,17 +1121,31 @@ async function connectMobileVideoToSoundTouch(target){
     source=smartphoneAudioContext.createMediaElementSource(target);
     target.__miconMobileMediaSource=source;
    }
+   /* Kompensasi level khusus jalur SoundTouch smartphone. Limiter menjaga
+      puncak agar kenaikan gain tidak membuat audio pecah/clip. */
+   gainNode=smartphoneAudioContext.createGain();
+   gainNode.gain.value=2.0;
+   limiter=smartphoneAudioContext.createDynamicsCompressor();
+   limiter.threshold.value=-1.5;
+   limiter.knee.value=0;
+   limiter.ratio.value=20;
+   limiter.attack.value=0.003;
+   limiter.release.value=0.15;
+   gainNode.connect(limiter);
+   limiter.connect(smartphoneAudioContext.destination);
    try{source.disconnect();}catch(_){}
    source.connect(worklet);
-   worklet.connect(smartphoneAudioContext.destination);
+   worklet.connect(gainNode);
    target.__miconMobileNativeFallback=false;
-   target.__miconMobileAudioGraph={source,worklet};
+   target.__miconMobileAudioGraph={source,worklet,gainNode,limiter};
    target.__miconAudioPipeline='smartphone-soundtouch';
    target.volume=1;target.muted=false;target.defaultPlaybackRate=1;target.playbackRate=1;
    updateMobilePitchDisplay();
    return true;
   }catch(error){
    try{if(worklet){worklet.disconnect();worklet.port.close();}}catch(_){}
+   try{if(gainNode)gainNode.disconnect();}catch(_){}
+   try{if(limiter)limiter.disconnect();}catch(_){}
    /* Kalau source sudah tercipta, pulihkan suara native supaya video tetap terdengar. */
    if(source){
     try{source.disconnect();source.connect(smartphoneAudioContext.destination);target.__miconMobileNativeFallback=true;}catch(_){}
@@ -1176,7 +1192,7 @@ function applyMobilePitch(value){
    if(smartphoneAudioContext.state==='suspended')smartphoneAudioContext.resume().catch(()=>{});
    if(target.__miconMobileAudioBypassed){
     source.disconnect();
-    worklet.connect(smartphoneAudioContext.destination);
+    worklet.connect(graph.gainNode||smartphoneAudioContext.destination);
     source.connect(worklet);
     target.__miconMobileAudioBypassed=false;
    }
