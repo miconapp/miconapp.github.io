@@ -1121,10 +1121,10 @@ async function connectMobileVideoToSoundTouch(target){
     source=smartphoneAudioContext.createMediaElementSource(target);
     target.__miconMobileMediaSource=source;
    }
-   /* Satu level volume untuk semua kondisi: unity gain (100%).
-      Tidak ada boost 2x atau compressor yang mengubah level audio. */
+   /* Gain +5 dB dipakai konsisten pada Original 0 dan transpose +/-.
+      Audio smartphone selalu melewati SoundTouch AudioWorklet sejak impor. */
    gainNode=smartphoneAudioContext.createGain();
-   gainNode.gain.value=1.0;
+   gainNode.gain.value=Math.pow(10,5/20);
    gainNode.connect(smartphoneAudioContext.destination);
    try{source.disconnect();}catch(_){}
    source.connect(worklet);
@@ -1155,56 +1155,24 @@ function applyMobilePitch(value){
  const next=Math.max(min,Math.min(max,Math.round(Number(value)||0)));
  smartphonePitch=next;
  const target=video;
- /* Jaga level elemen media tetap 100% setiap kali nada berubah. */
- if(target){target.volume=1;target.muted=false;}
+ if(target){target.volume=1;target.muted=false;target.defaultPlaybackRate=1;if(target.playbackRate!==1)target.playbackRate=1;}
  const graph=target&&target.__miconMobileAudioGraph;
  const worklet=graph&&graph.worklet;
- const source=graph&&graph.source;
  const param=worklet&&worklet.parameters.get('pitchSemitones');
-
- /* Nada original tidak memerlukan SoundTouch. Lewatkan audio langsung agar
-    pemutaran awal smartphone tidak menunggu buffer/pemrosesan AudioWorklet. */
- if(next===0){
-  if(graph&&source&&smartphoneAudioContext){
-   try{
-    source.disconnect();
-    source.connect(smartphoneAudioContext.destination);
-    worklet.disconnect();
-    target.__miconMobileAudioBypassed=true;
-   }catch(error){
-    msg('Gagal mengembalikan audio original: '+(error.message||error),true);
-   }
-  }
-  if(target){target.defaultPlaybackRate=1;if(target.playbackRate!==1)target.playbackRate=1;}
-  smartphoneAudioReadyPromise=Promise.resolve(true);
-  updateMobilePitchDisplay();
-  return;
- }
-
- if(param&&source&&smartphoneAudioContext){
+ /* Semua nada, termasuk Original 0, tetap melalui SoundTouch AudioWorklet.
+    Tidak ada bypass ke audio native saat kembali ke 0. */
+ if(param&&smartphoneAudioContext){
   try{
    if(smartphoneAudioContext.state==='suspended')smartphoneAudioContext.resume().catch(()=>{});
-   if(target.__miconMobileAudioBypassed){
-    source.disconnect();
-    worklet.connect(graph.gainNode||smartphoneAudioContext.destination);
-    source.connect(worklet);
-    target.__miconMobileAudioBypassed=false;
-   }
    param.setTargetAtTime(next,smartphoneAudioContext.currentTime,0.025);
    const playbackParam=worklet.parameters.get('playbackRate');
    if(playbackParam)playbackParam.value=1;
-   if(target){target.defaultPlaybackRate=1;if(target.playbackRate!==1)target.playbackRate=1;}
    smartphoneAudioReadyPromise=Promise.resolve(true);
   }catch(error){
    msg('Audio transpose smartphone belum aktif: '+(error.message||error),true);
    smartphoneAudioReadyPromise=Promise.resolve(false);
   }
-  updateMobilePitchDisplay();
-  return;
- }
-
- updateMobilePitchDisplay();
- if(target){
+ }else if(target){
   smartphoneAudioReadyPromise=connectMobileVideoToSoundTouch(target).then(ready=>{
    if(ready&&target===video){
     const activeGraph=target.__miconMobileAudioGraph;
@@ -1213,20 +1181,13 @@ function applyMobilePitch(value){
      try{activeParam.setTargetAtTime(next,smartphoneAudioContext.currentTime,0.025);}catch(_){activeParam.value=next;}
      const playbackParam=activeGraph.worklet.parameters.get('playbackRate');
      if(playbackParam)playbackParam.value=1;
-     target.defaultPlaybackRate=1;
-     if(target.playbackRate!==1)target.playbackRate=1;
     }
    }
    updateMobilePitchDisplay();
    return ready;
-  }).catch(error=>{
-   updateMobilePitchDisplay();
-   msg('Audio transpose smartphone belum aktif: '+(error.message||error),true);
-   return false;
-  });
- }else{
-  smartphoneAudioReadyPromise=Promise.resolve(false);
- }
+  }).catch(error=>{msg('Audio transpose smartphone belum aktif: '+(error.message||error),true);return false;});
+ }else smartphoneAudioReadyPromise=Promise.resolve(false);
+ updateMobilePitchDisplay();
 }
 
 function disconnectVideoAudio(target){
@@ -1321,13 +1282,21 @@ function setupVideo(){
    return false;
   });
  }else{
-  /* Saat nada 0, jangan buat AudioContext/AudioWorklet pada saat impor.
-     Audio native langsung siap; SoundTouch dibuat hanya saat transpose digunakan. */
-  smartphoneAudioReadyPromise=Promise.resolve(true);
-  if(targetVideo===video){
-   updateMobilePitchDisplay();
-   configureMobilePitchControls(true);
-  }
+  /* Pasang SoundTouch langsung setelah video diimpor, termasuk saat nada 0.
+     Jalur native tidak digunakan pada smartphone. */
+  smartphoneAudioReadyPromise=connectMobileVideoToSoundTouch(targetVideo).then(ready=>{
+   if(targetVideo===video){
+    updateMobilePitchDisplay();
+    configureMobilePitchControls(!!ready);
+   }
+   return ready;
+  }).catch(error=>{
+   if(targetVideo===video){
+    configureMobilePitchControls(false);
+    msg('SoundTouch AudioWorklet tidak dapat diaktifkan: '+(error.message||error),true);
+   }
+   return false;
+  });
  }
  video.addEventListener('loadedmetadata',()=>{
   $('duration').textContent=fmt(video.duration);
@@ -1474,9 +1443,8 @@ $('playBtn').addEventListener('click',async()=>{
    await desktopAudioReadyPromise;
    if(desktopAudioContext&&desktopAudioContext.state==='suspended')await desktopAudioContext.resume();
   }else{
-   /* Nada 0 diputar langsung melalui elemen video. Worklet hanya ditunggu
-      jika pengguna sudah memilih transpose selain nada original. */
-   if(smartphonePitch!==0)await smartphoneAudioReadyPromise;
+   /* Semua pemutaran smartphone menunggu jalur SoundTouch, termasuk Original 0. */
+   await smartphoneAudioReadyPromise;
    if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
     try{await smartphoneAudioContext.resume();}catch(_){}
    }
