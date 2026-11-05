@@ -925,6 +925,11 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const isMobilePhone=window.matchMedia('(max-width:760px)').matches;
+if(isMobilePhone){
+ const mobilePitchSelectors=['#transposeSection > h3','#transposeSection > .sub','#transposeSection .keySelectWrap','#transposeSection .noteBox','#transposeSection .stepper','#transposeSection .rangeLabels','#transposeSection .semitone','#transposeSection .hint'];
+ mobilePitchSelectors.forEach(selector=>document.querySelectorAll(selector).forEach(node=>node.remove()));
+}
+
 
 let file=null,url=null,video=null,playing=false;
 /* Satu mesin AudioWorklet dan satu kontrol transpose dipakai bersama pada desktop dan smartphone. */
@@ -2275,35 +2280,11 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
  .micon-reference-stack .mobile-playlist-copy strong{font-size:10px!important;color:#111827!important}.micon-reference-stack .mobile-playlist-copy small{font-size:8px!important;color:#16a34a!important}
  .micon-reference-stack .mobile-playlist-empty{display:none!important}
  .micon-reference-stack .mobile-playlist-picker{display:none!important}
- #importSection{display:contents!important}
- #transposeSection{
-   order:3!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;
-   box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;
-   height:auto!important;min-height:0!important;max-height:none!important;margin:14px 0!important;padding:14px!important;
-   gap:10px!important;border:1px solid #e5eaf2!important;border-radius:17px!important;
-   background:#fff!important;color:#172033!important;box-shadow:0 3px 12px rgba(15,23,42,.055)!important;
-   overflow:visible!important;
- }
+ #importSection,#transposeSection{display:contents!important}
  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
+ #transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,
+ #transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
  .mobile-fill,.mobile-tip,.mobile-ad-banner,.foot,.mobile-dock,.mobile-bottom-nav{display:none!important}
- #transposeSection .keySelectWrap{display:block!important;width:100%!important;margin:0!important}
- #transposeSection .keySelect{display:block!important;width:100%!important;height:43px!important;border:1px solid #e2e8f0!important;border-radius:12px!important;background:#fff!important;color:#172033!important;font-size:12px!important}
- #transposeSection .noteBox{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;width:100%!important;height:90px!important;min-height:90px!important;margin:0!important;padding:10px!important;border:1px solid #dbeafe!important;border-radius:14px!important;background:#eff6ff!important}
- #transposeSection .noteBox small{display:block!important;color:#64748b!important;font-size:9px!important}
- #transposeSection .note{display:block!important;color:#1d4ed8!important;font-size:24px!important;line-height:1.1!important;font-weight:850!important}
- #transposeSection #noteDesc{display:block!important;color:#64748b!important;font-size:9px!important}
- #transposeSection .stepper{display:grid!important;grid-template-columns:42px minmax(0,1fr) 42px!important;align-items:center!important;gap:9px!important;width:100%!important;height:42px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
- #transposeSection .stepper .step{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border:1px solid #dbeafe!important;border-radius:12px!important;background:#eff6ff!important;color:#1d4ed8!important;font-size:24px!important;line-height:1!important}
- #transposeSection .stepper .range{display:block!important;width:100%!important;height:24px!important;margin:0!important;accent-color:#2563eb!important}
- #transposeSection .rangeLabels{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:0 2px!important;color:#94a3b8!important;font-size:9px!important}
- #transposeSection .row:empty{display:none!important}
- #transposeSection .alert{display:none!important;min-height:0!important;margin:0!important;padding:9px 11px!important;font-size:10px!important}
- #transposeSection .alert.show{display:block!important}
- #transposeSection .playrow{display:block!important;width:100%!important;margin:0!important;padding:0!important}
- #transposeSection .playbtn,#transposeSection #playBtn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:45px!important;margin:0!important;border:0!important;border-radius:12px!important;background:#2563eb!important;color:#fff!important;font-size:12px!important;font-weight:800!important}
- #transposeSection .progress{display:block!important;width:100%!important;height:5px!important;margin:10px 0 6px!important;background:#e5e7eb!important}
- #transposeSection .playrow .row{display:flex!important;justify-content:space-between!important;margin:0!important;color:#64748b!important;font-size:9px!important}
- #transposeSection .hint{display:block!important;margin:0!important;padding:9px 10px!important;border-radius:10px!important;background:#f8fafc!important;color:#64748b!important;font-size:9px!important;line-height:1.5!important}
 }
 
 </style>
@@ -2340,7 +2321,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     /* Satu kali susun kontrol di kolom scroll; video dikeluarkan dari area scroll. */
     let stack=main.querySelector(':scope > .micon-reference-stack');
     if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
-    stack.append(file,drop,transpose,panel);
+    stack.append(file,drop,clear,panel);
     /* Satu wadah sticky sebagai saudara mainContent, bukan anak elemen yang ikut scroll. */
     let shell=document.getElementById('micon-sticky-shell');
     if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
@@ -2499,6 +2480,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   #micon-floating-dock .micon-dock-icon svg{display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
   #mainContent{padding:0!important;margin:0!important;background:#fff!important}
   #homeSection,#importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
+  #transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,
+  #transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
   .mobile-bottom-nav,.mobile-dock{display:none!important}
 }
 @media(min-width:761px){#micon-sticky-shell,#micon-floating-dock{display:none!important}}
