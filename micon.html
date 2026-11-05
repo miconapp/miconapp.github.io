@@ -333,7 +333,6 @@
   .mobile-playlist-panel{padding:13px!important;border-radius:17px!important;box-shadow:0 2px 8px rgba(20,35,60,.045)!important}
   .mobile-playlist-import{height:44px!important;border-radius:12px!important}
   .mobile-playlist-item{height:58px!important;min-height:58px!important;border-radius:12px!important}
-  #transposeSection .pitch-compact-row{grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
   #transposeSection .playbtn,#transposeSection #playBtn{height:48px!important;border-radius:14px!important}
   .mobile-ad-banner,.mobile-fill,.home-scroll-column .foot{margin-top:10px!important}
   .home-scroll-column{
@@ -413,53 +412,6 @@
     border-radius:12px!important;background:#fff!important;color:var(--micon-ink)!important;
     font-size:12px!important;font-weight:650!important;box-shadow:none!important;
   }
-  #transposeSection .pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:clamp(42px,12vw,48px)!important;grid-auto-flow:row!important;
-    gap:8px!important;align-items:stretch!important;justify-content:stretch!important;
-    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0!important;
-    overflow:visible!important;
-  }
-  #transposeSection .pitch-compact-row>*{
-    display:flex!important;position:relative!important;float:none!important;grid-row:1!important;
-    min-width:0!important;max-width:100%!important;width:100%!important;height:100%!important;
-    min-height:0!important;max-height:none!important;margin:0!important;padding:3px!important;
-    box-sizing:border-box!important;align-items:center!important;justify-content:center!important;
-    border:1px solid var(--micon-line)!important;border-radius:13px!important;
-    background:#fff!important;color:var(--micon-ink)!important;
-    box-shadow:0 2px 7px rgba(22,39,67,.045)!important;overflow:hidden!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox{
-    grid-column:1!important;flex-direction:column!important;gap:3px!important;
-    background:var(--micon-blue-soft)!important;border-color:#dbeafe!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox small{
-    display:block!important;color:#64748b!important;font-size:8px!important;line-height:1!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox .note{
-    display:block!important;color:#1d4ed8!important;font-size:clamp(12px,3.7vw,16px)!important;
-    line-height:1.1!important;font-weight:850!important;text-transform:uppercase!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
-    display:block!important;color:#64748b!important;font-size:7px!important;line-height:1!important;
-    white-space:nowrap!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone{
-    grid-column:2!important;flex-direction:column!important;gap:2px!important;
-    font-size:clamp(13px,4vw,16px)!important;font-weight:850!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone small{
-    display:block!important;color:var(--micon-muted)!important;font-size:8px!important;font-weight:600!important;
-  }
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
-  #transposeSection .pitch-compact-row>#downBtn,
-  #transposeSection .pitch-compact-row>#upBtn{
-    font-size:25px!important;line-height:1!important;font-weight:500!important;
-    color:var(--micon-blue)!important;background:#fff!important;
-  }
-  #transposeSection .pitch-compact-row>#downBtn:disabled,
-  #transposeSection .pitch-compact-row>#upBtn:disabled{color:#aab6c7!important;background:#f8fafc!important}
   #transposeSection .stepper{
     display:flex!important;box-sizing:border-box!important;width:100%!important;height:34px!important;
     align-items:center!important;gap:8px!important;margin:0!important;padding:0 3px!important;
@@ -477,7 +429,6 @@
   #transposeSection .row{display:flex!important;align-items:center!important;gap:8px!important;margin:0!important}
   #transposeSection .row .btn{display:inline-flex!important;align-items:center!important;justify-content:center!important}
   #transposeSection .alert{display:block!important;min-height:0!important;margin:0!important}
-  #transposeSection .semitone:not(.pitch-compact-row .semitone){display:none!important}
   #transposeSection .playrow{
     display:block!important;width:100%!important;margin:0!important;padding:0!important;
     border:0!important;background:transparent!important;
@@ -609,13 +560,13 @@
   .mobile-profile-page #micon-profile-detail small{font-size:13px!important;color:var(--micon-muted)!important}
   .mobile-profile-page #micon-profile-logout{display:block!important;width:100%!important;padding:15px!important;border-radius:13px!important}
   /* Semua efek interaksi tetap di dalam batas komponen. */
-  #importSection .filemeta:hover,#transposeSection .pitch-compact-row>*:hover,
+  #importSection .filemeta:hover,
   .mobile-clear-video:hover,.mobile-playlist-import:hover,.mobile-playlist-item:hover,
   #transposeSection .drop:hover,#transposeSection .keySelect:hover{
     transform:none!important;outline:none!important;
     box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 2px 7px rgba(22,39,67,.05)!important;
   }
-  #importSection .filemeta,#transposeSection .pitch-compact-row>*,
+  #importSection .filemeta,
   .mobile-clear-video,.mobile-playlist-import,.mobile-playlist-item,#transposeSection .drop{
     transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease!important;
   }
@@ -623,9 +574,6 @@
 @media screen and (max-width:360px){
   .home-scroll-column{padding-left:10px!important;padding-right:10px!important}
   #importSection,#transposeSection,.mobile-playlist-panel{padding:12px!important}
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:11px!important}
-  #transposeSection .pitch-compact-row>#downBtn,#transposeSection .pitch-compact-row>#upBtn{font-size:22px!important}
 }
 @media screen and (max-width:760px){
   body:has(.home-layout) .top .desktop-nav{display:none!important}
@@ -716,25 +664,6 @@
   #transposeSection .drop .uploadIcon{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;flex-basis:30px!important;margin:0!important;border-radius:10px!important;background:#eaf2ff!important;color:#2563eb!important;font-size:17px!important}
   #transposeSection .drop strong{font-size:11px!important;color:#1d4ed8!important}
   #transposeSection .drop small{display:inline!important;margin:0 0 0 2px!important;font-size:9px!important;color:#718096!important}
-  #transposeSection .pitch-compact-row{
-    order:3!important;display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:49px!important;gap:8px!important;width:100%!important;height:49px!important;
-    margin:0 0 15px!important;padding:0!important;
-  }
-  #transposeSection .pitch-compact-row>*{
-    display:flex!important;min-width:0!important;width:100%!important;height:49px!important;min-height:49px!important;
-    margin:0!important;padding:3px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;
-    border:1px solid #e1e8f2!important;border-radius:13px!important;background:#fff!important;
-    box-shadow:0 2px 7px rgba(15,23,42,.04)!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:#eff6ff!important;border-color:#dbeafe!important}
-  #transposeSection .pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:1px!important;font-size:16px!important;font-weight:850!important}
-  #transposeSection .pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:3!important;color:#ef233c!important;font-size:22px!important}
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:4!important;color:#ef233c!important;font-size:22px!important}
   #transposeSection .row{display:contents!important}
   #transposeSection #clearBtn,.mobile-playlist-panel>.mobile-clear-video{
     order:4!important;display:flex!important;align-items:center!important;justify-content:center!important;
@@ -778,8 +707,6 @@
   .mobile-profile-page{z-index:3000!important}
 }
 @media screen and (max-width:360px){
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:12px!important}
 }
 </style>
 <style id="micon-playlist-banner-single-rule">
@@ -998,213 +925,49 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const isMobilePhone=window.matchMedia('(max-width:760px)').matches;
-const activeAudioVersion=isMobilePhone?'smartphone-soundtouch':'desktop-audioworklet';
 
 let file=null,url=null,video=null,playing=false;
-/* Dua mesin audio terpisah. Hanya mesin yang sesuai perangkat yang dijalankan. */
-const DESKTOP_AUDIO_WORKLET_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
-const SMARTPHONE_SOUNDTOUCH_WORKLET_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
-let desktopAudioContext=null,desktopWorkletModulePromise=null,desktopAudioReadyPromise=Promise.resolve(false),desktopPitch=0;
-let smartphoneAudioContext=null,smartphoneWorkletModulePromise=null,smartphoneAudioReadyPromise=Promise.resolve(false),smartphonePitch=0;
+/* Satu mesin AudioWorklet dan satu kontrol transpose dipakai bersama pada desktop dan smartphone. */
+const AUDIO_WORKLET_MODULE_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
+let audioContext=null,workletModulePromise=null,audioReadyPromise=Promise.resolve(false),currentPitchSemitones=0;
 
 function updatePitchDisplay(){
  const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
- if(range)range.value=String(desktopPitch);
- if(value)value.textContent=String(desktopPitch);
- if(name)name.textContent=desktopPitch===0?'Original':(desktopPitch>0?'+':'')+desktopPitch;
- if(desc)desc.textContent=desktopPitch===0?'0 semitone · nada asli':Math.abs(desktopPitch)+' semitone · '+(desktopPitch>0?'nada dinaikkan':'nada diturunkan');
+ if(range)range.value=String(currentPitchSemitones);
+ if(value)value.textContent=String(currentPitchSemitones);
+ if(name)name.textContent=currentPitchSemitones===0?'Original':(currentPitchSemitones>0?'+':'')+currentPitchSemitones;
+ if(desc)desc.textContent=currentPitchSemitones===0?'0 semitone · nada asli':Math.abs(currentPitchSemitones)+' semitone · '+(currentPitchSemitones>0?'nada dinaikkan':'nada diturunkan');
  const down=$('downBtn'),up=$('upBtn');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const ready=!!(video&&video.__miconAudioGraph&&video.__miconAudioGraph.worklet);
- if(down)down.disabled=!ready||desktopPitch<=min;
- if(up)up.disabled=!ready||desktopPitch>=max;
+ if(down)down.disabled=!ready||currentPitchSemitones<=min;
+ if(up)up.disabled=!ready||currentPitchSemitones>=max;
  if(range)range.disabled=!ready;
 }
 
 function configurePitchControls(enabled){
  const down=$('downBtn'),up=$('upBtn'),range=$('pitchRange');
  if(range)range.disabled=!enabled;
- if(down)down.disabled=!enabled||desktopPitch<=Number(range?range.min:-6);
- if(up)up.disabled=!enabled||desktopPitch>=Number(range?range.max:6);
- if(range)range.value=String(desktopPitch);
+ if(down)down.disabled=!enabled||currentPitchSemitones<=Number(range?range.min:-6);
+ if(up)up.disabled=!enabled||currentPitchSemitones>=Number(range?range.max:6);
+ if(range)range.value=String(currentPitchSemitones);
 }
 
 function applyPitch(value){
  const range=$('pitchRange');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const next=Math.max(min,Math.min(max,Math.round(Number(value)||0)));
- desktopPitch=next;
+ currentPitchSemitones=next;
  const activeVideo=video;
  const worklet=activeVideo&&activeVideo.__miconAudioGraph&&activeVideo.__miconAudioGraph.worklet;
  const pitchParam=worklet&&worklet.parameters.get('pitchSemitones');
  if(pitchParam){
   try{
-   if(desktopAudioContext&&typeof pitchParam.setTargetAtTime==='function')pitchParam.setTargetAtTime(next,desktopAudioContext.currentTime,0.025);
+   if(audioContext&&typeof pitchParam.setTargetAtTime==='function')pitchParam.setTargetAtTime(next,audioContext.currentTime,0.025);
    else pitchParam.value=next;
   }catch(_){pitchParam.value=next;}
  }
  updatePitchDisplay();
-}
-
-function updateMobilePitchDisplay(){
- const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
- if(range)range.value=String(smartphonePitch);
- if(value)value.textContent=String(smartphonePitch);
- if(name)name.textContent=smartphonePitch===0?'Original':(smartphonePitch>0?'+':'')+smartphonePitch;
- if(desc)desc.textContent=smartphonePitch===0?'0 semitone · nada asli':Math.abs(smartphonePitch)+' semitone · '+(smartphonePitch>0?'nada dinaikkan':'nada diturunkan');
- const down=$('downBtn'),up=$('upBtn');
- const min=range?Number(range.min):-6,max=range?Number(range.max):6;
- const available=!!video;
- if(down)down.disabled=!available||smartphonePitch<=min;
- if(up)up.disabled=!available||smartphonePitch>=max;
- if(range)range.disabled=!available;
-}
-function configureMobilePitchControls(enabled){
- const down=$('downBtn'),up=$('upBtn'),range=$('pitchRange');
- if(range)range.disabled=!enabled;
- if(down)down.disabled=!enabled||smartphonePitch<=Number(range?range.min:-6);
- if(up)up.disabled=!enabled||smartphonePitch>=Number(range?range.max:6);
- if(range)range.value=String(smartphonePitch);
-}
-function disconnectMobileVideoAudio(target){
- if(!target)return;
- const graph=target.__miconMobileAudioGraph;
- if(graph){
-  try{graph.source.disconnect();}catch(_){}
-  try{graph.worklet.disconnect();}catch(_){}
-  try{graph.gainNode&&graph.gainNode.disconnect();}catch(_){}
-  try{graph.limiter&&graph.limiter.disconnect();}catch(_){}
-  try{graph.worklet.port.close();}catch(_){}
-  try{delete target.__miconMobileAudioGraph;}catch(_){target.__miconMobileAudioGraph=null;}
- }
- const source=target.__miconMobileMediaSource;
- if(source){try{source.disconnect();}catch(_){};try{delete target.__miconMobileMediaSource;}catch(_){target.__miconMobileMediaSource=null;}}
- try{delete target.__miconMobileNativeFallback;}catch(_){}
- try{delete target.__miconMobileConnectPromise;}catch(_){}
- if(target.__miconAudioPipeline==='smartphone-soundtouch')try{delete target.__miconAudioPipeline;}catch(_){}
-}
-async function connectMobileVideoToSoundTouch(target){
- const AudioContextClass=window.AudioContext||window.webkitAudioContext;
- if(!AudioContextClass||!window.AudioWorkletNode)throw new Error('Perangkat atau browser belum mendukung AudioWorklet.');
- if(!target||target!==video||!target.isConnected)return false;
- if(target.__miconAudioGraph||target.__miconAudioPipeline==='desktop-audioworklet')throw new Error('Audio desktop sudah terpasang pada video ini; mesin smartphone tidak boleh digabung.')
- if(target.__miconMobileAudioGraph)return true;
- if(target.__miconMobileConnectPromise)return target.__miconMobileConnectPromise;
- const task=(async()=>{
-  /* Siapkan AudioWorklet sejak impor. AudioContext boleh tetap suspended sampai
-     browser memberi izin; graph tetap harus dibuat sekarang agar video tidak mulai
-     melalui jalur native lalu berpindah ke SoundTouch saat tombol nada ditekan. */
-  if(!smartphoneAudioContext)smartphoneAudioContext=new AudioContextClass({latencyHint:'playback'});
-  if(!smartphoneAudioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
-  /* Coba aktifkan sekarang saat impor; bila browser menolak karena belum ada
-     gesture, graph tetap dibuat dan resume diulang saat pengguna menekan Putar. */
-  if(smartphoneAudioContext.state!=='running'){
-   try{smartphoneAudioContext.resume().catch(()=>{});}catch(_){}
-  }
-  if(!smartphoneWorkletModulePromise){
-   smartphoneWorkletModulePromise=smartphoneAudioContext.audioWorklet.addModule(SMARTPHONE_SOUNDTOUCH_WORKLET_URL).catch(error=>{
-    smartphoneWorkletModulePromise=null;throw error;
-   });
-  }
-  await smartphoneWorkletModulePromise;
-  if(target!==video||!target.isConnected)return false;
-  if(target.__miconMobileAudioGraph)return true;
-  let source=target.__miconMobileMediaSource||null,worklet=null,gainNode=null;
-  try{
-   worklet=new AudioWorkletNode(smartphoneAudioContext,'soundtouch-processor',{
-    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
-    processorOptions:{sampleBufferType:'circular'}
-   });
-   const pitchParam=worklet.parameters.get('pitchSemitones');
-   if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada SoundTouch AudioWorklet.');
-   pitchParam.value=smartphonePitch;
-   const pitchMultiplierParam=worklet.parameters.get('pitch');
-   if(pitchMultiplierParam)pitchMultiplierParam.value=1;
-   const playbackParam=worklet.parameters.get('playbackRate');
-   if(playbackParam)playbackParam.value=1;
-   if(!source){
-    source=smartphoneAudioContext.createMediaElementSource(target);
-    target.__miconMobileMediaSource=source;
-   }
-   /* Matikan pitch correction bawaan browser agar tidak memproses pitch dua kali. */
-   try{target.preservesPitch=false;}catch(_){}
-   try{target.webkitPreservesPitch=false;}catch(_){}
-   try{target.mozPreservesPitch=false;}catch(_){}
-   target.defaultPlaybackRate=1;target.playbackRate=1;
-   /* Gain +10 dB sama untuk Original 0 dan seluruh transpose +/-.
-      Audio smartphone selalu melewati satu jalur SoundTouch yang sama. */
-   gainNode=smartphoneAudioContext.createGain();
-   gainNode.gain.value=Math.pow(10,10/20);
-   gainNode.connect(smartphoneAudioContext.destination);
-   try{source.disconnect();}catch(_){}
-   source.connect(worklet);
-   worklet.connect(gainNode);
-   target.__miconMobileNativeFallback=false;
-   target.__miconMobileAudioGraph={source,worklet,gainNode};
-   target.__miconAudioPipeline='smartphone-soundtouch';
-   target.volume=1;target.muted=false;target.defaultPlaybackRate=1;target.playbackRate=1;
-   updateMobilePitchDisplay();
-   return true;
-  }catch(error){
-   try{if(worklet){worklet.disconnect();worklet.port.close();}}catch(_){}
-   try{if(gainNode)gainNode.disconnect();}catch(_){}
-   /* Kalau source sudah tercipta, pulihkan suara native supaya video tetap terdengar. */
-   if(source){
-    try{source.disconnect();source.connect(smartphoneAudioContext.destination);target.__miconMobileNativeFallback=true;}catch(_){}
-   }
-   throw error;
-  }
- })();
- target.__miconMobileConnectPromise=task;
- try{return await task;}
- finally{if(target.__miconMobileConnectPromise===task)try{delete target.__miconMobileConnectPromise;}catch(_){target.__miconMobileConnectPromise=null;}}
-}
-function applyMobilePitch(value){
- const range=$('pitchRange');
- const min=range?Number(range.min):-6,max=range?Number(range.max):6;
- const next=Math.max(min,Math.min(max,Math.round(Number(value)||0)));
- smartphonePitch=next;
- const target=video;
- if(target){target.volume=1;target.muted=false;target.defaultPlaybackRate=1;if(target.playbackRate!==1)target.playbackRate=1;}
- const graph=target&&target.__miconMobileAudioGraph;
- const worklet=graph&&graph.worklet;
- const param=worklet&&worklet.parameters.get('pitchSemitones');
- /* Semua nada, termasuk Original 0, tetap melalui SoundTouch AudioWorklet.
-    Nilai pitch diterapkan langsung agar perubahan berulang tidak menumpuk
-    sebagai automation target yang saling mengejar. */
- if(param&&smartphoneAudioContext){
-  try{
-   if(smartphoneAudioContext.state==='suspended')smartphoneAudioContext.resume().catch(()=>{});
-   try{param.cancelScheduledValues(smartphoneAudioContext.currentTime);}catch(_){}
-   param.value=next;
-   const pitchMultiplierParam=worklet.parameters.get('pitch');
-   if(pitchMultiplierParam)pitchMultiplierParam.value=1;
-   const playbackParam=worklet.parameters.get('playbackRate');
-   if(playbackParam)playbackParam.value=1;
-   smartphoneAudioReadyPromise=Promise.resolve(true);
-  }catch(error){
-   msg('Audio transpose smartphone belum aktif: '+(error.message||error),true);
-   smartphoneAudioReadyPromise=Promise.resolve(false);
-  }
- }else if(target){
-  smartphoneAudioReadyPromise=connectMobileVideoToSoundTouch(target).then(ready=>{
-   if(ready&&target===video){
-    const activeGraph=target.__miconMobileAudioGraph;
-    const activeParam=activeGraph&&activeGraph.worklet&&activeGraph.worklet.parameters.get('pitchSemitones');
-    if(activeParam){
-     try{activeParam.cancelScheduledValues(smartphoneAudioContext.currentTime);}catch(_){}
-     activeParam.value=smartphonePitch;
-     const pitchMultiplierParam=activeGraph.worklet.parameters.get('pitch');
-     if(pitchMultiplierParam)pitchMultiplierParam.value=1;
-     const playbackParam=activeGraph.worklet.parameters.get('playbackRate');
-     if(playbackParam)playbackParam.value=1;
-    }
-   }
-   updateMobilePitchDisplay();
-   return ready;
-  }).catch(error=>{msg('Audio transpose smartphone belum aktif: '+(error.message||error),true);return false;});
- }else smartphoneAudioReadyPromise=Promise.resolve(false);
- updateMobilePitchDisplay();
 }
 
 function disconnectVideoAudio(target){
@@ -1216,43 +979,42 @@ function disconnectVideoAudio(target){
   try{graph.worklet.port.close();}catch(_){}
   try{delete target.__miconAudioGraph;}catch(_){target.__miconAudioGraph=null;}
  }
- if(target.__miconAudioPipeline==='desktop-audioworklet')try{delete target.__miconAudioPipeline;}catch(_){}
+ if(target.__miconAudioPipeline==='shared-audioworklet')try{delete target.__miconAudioPipeline;}catch(_){}
 }
 
 async function connectVideoToAudioWorklet(target){
  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
  if(!AudioContextClass||!window.AudioWorkletNode)throw new Error('Perangkat atau browser belum mendukung AudioWorklet.');
  if(!target||target!==video||!target.isConnected)return false;
- if(target.__miconMobileAudioGraph||target.__miconAudioPipeline==='smartphone-soundtouch')throw new Error('Audio smartphone sudah terpasang pada video ini; mesin desktop tidak boleh digabung.')
  if(target.__miconAudioGraph)return true;
- if(!desktopAudioContext)desktopAudioContext=new AudioContextClass({latencyHint:'playback'});
- if(!desktopAudioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
- const resumeTask=desktopAudioContext.state==='suspended'?desktopAudioContext.resume().catch(()=>{}):Promise.resolve();
- if(!desktopWorkletModulePromise){
-  desktopWorkletModulePromise=desktopAudioContext.audioWorklet.addModule(DESKTOP_AUDIO_WORKLET_URL).catch(error=>{
-   desktopWorkletModulePromise=null;
+ if(!audioContext)audioContext=new AudioContextClass({latencyHint:'playback'});
+ if(!audioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
+ const resumeTask=audioContext.state==='suspended'?audioContext.resume().catch(()=>{}):Promise.resolve();
+ if(!workletModulePromise){
+  workletModulePromise=audioContext.audioWorklet.addModule(AUDIO_WORKLET_MODULE_URL).catch(error=>{
+   workletModulePromise=null;
    throw error;
   });
  }
- await Promise.all([desktopWorkletModulePromise,resumeTask]);
+ await Promise.all([workletModulePromise,resumeTask]);
  if(target!==video||!target.isConnected)return false;
  if(target.__miconAudioGraph)return true;
  let source=null,worklet=null;
  try{
-  worklet=new AudioWorkletNode(desktopAudioContext,'soundtouch-processor',{
+  worklet=new AudioWorkletNode(audioContext,'soundtouch-processor',{
    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
    processorOptions:{sampleBufferType:'circular'}
   });
   const pitchParam=worklet.parameters.get('pitchSemitones');
   if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada AudioWorklet.');
-  pitchParam.value=desktopPitch;
+  pitchParam.value=currentPitchSemitones;
   const playbackParam=worklet.parameters.get('playbackRate');
   if(playbackParam)playbackParam.value=1;
-  source=desktopAudioContext.createMediaElementSource(target);
+  source=audioContext.createMediaElementSource(target);
   source.connect(worklet);
-  worklet.connect(desktopAudioContext.destination);
+  worklet.connect(audioContext.destination);
   target.__miconAudioGraph={source,worklet};
-  target.__miconAudioPipeline='desktop-audioworklet';
+  target.__miconAudioPipeline='shared-audioworklet';
   return true;
  }catch(error){
   try{if(source)source.disconnect();}catch(_){}
@@ -1268,53 +1030,27 @@ function showTime(){
  $('progressBar').style.width=(video.duration?video.currentTime/video.duration*100:0)+'%';
 }
 function setupVideo(){
- if(video){video.pause();if(activeAudioVersion==='desktop-audioworklet')disconnectVideoAudio(video);else disconnectMobileVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
+ if(video){video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
  video=document.createElement('video');
  video.id='karaokeVideo';video.controls=true;video.playsInline=true;
- video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';
- if(activeAudioVersion==='smartphone-soundtouch'){video.volume=1;video.muted=false;video.defaultPlaybackRate=1;video.playbackRate=1;}
+ video.preload=isMobilePhone?'auto':'metadata';
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
  $('videoStage').appendChild(video);video.src=url;
  const targetVideo=video;
- if(activeAudioVersion==='smartphone-soundtouch'){
-  targetVideo.addEventListener('ratechange',()=>{
-   if(Math.abs(targetVideo.playbackRate-1)>0.001){
-    targetVideo.defaultPlaybackRate=1;targetVideo.playbackRate=1;
-   }
-  });
- }
- if(activeAudioVersion==='desktop-audioworklet'){
-  desktopAudioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
-   if(targetVideo===video){
-    updatePitchDisplay();
-    if(!ready)configurePitchControls(false);
-    else configurePitchControls(true);
-   }
-   return ready;
-  }).catch(error=>{
-   if(targetVideo===video){
-    configurePitchControls(false);
-    msg('AudioWorklet tidak dapat diaktifkan: '+(error.message||error),true);
-   }
-   return false;
-  });
- }else{
-  /* Pasang SoundTouch langsung setelah video diimpor, termasuk saat nada 0.
-     Jalur native tidak digunakan pada smartphone. */
-  smartphoneAudioReadyPromise=connectMobileVideoToSoundTouch(targetVideo).then(ready=>{
-   if(targetVideo===video){
-    updateMobilePitchDisplay();
-    configureMobilePitchControls(!!ready);
-   }
-   return ready;
-  }).catch(error=>{
-   if(targetVideo===video){
-    configureMobilePitchControls(false);
-    msg('SoundTouch AudioWorklet tidak dapat diaktifkan: '+(error.message||error),true);
-   }
-   return false;
-  });
- }
+ audioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
+  if(targetVideo===video){
+   updatePitchDisplay();
+   if(!ready)configurePitchControls(false);
+   else configurePitchControls(true);
+  }
+  return ready;
+ }).catch(error=>{
+  if(targetVideo===video){
+   configurePitchControls(false);
+   msg('AudioWorklet tidak dapat diaktifkan: '+(error.message||error),true);
+  }
+  return false;
+ });
  video.addEventListener('loadedmetadata',()=>{
   $('duration').textContent=fmt(video.duration);
   $('fileStatus').textContent='Video siap diputar';
@@ -1336,16 +1072,9 @@ function setupVideo(){
   window.__miconNativeAdPending=true;
   Promise.resolve(window.miconAdGate?window.miconAdGate():true).then(async ok=>{
    if(ok&&video&&video.isConnected){
-    if(activeAudioVersion==='desktop-audioworklet'){
-     await desktopAudioReadyPromise;
-     if(desktopAudioContext&&desktopAudioContext.state==='suspended'){
-      try{await desktopAudioContext.resume();}catch(_){}
-     }
-    }else{
-     await smartphoneAudioReadyPromise;
-     if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
-      try{await smartphoneAudioContext.resume();}catch(_){}
-     }
+    await audioReadyPromise;
+    if(audioContext&&audioContext.state==='suspended'){
+     try{await audioContext.resume();}catch(_){}
     }
     if(!video||!video.isConnected)return;
     window.__miconAdAuthorized=true;return video.play();
@@ -1366,14 +1095,9 @@ function setupVideo(){
  video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));
 }
 async function clearVideo(){
- if(video){try{video.pause();if(activeAudioVersion==='desktop-audioworklet')disconnectVideoAudio(video);else disconnectMobileVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}video=null;}
- if(activeAudioVersion==='desktop-audioworklet'){
-  desktopAudioReadyPromise=Promise.resolve(false);
-  desktopPitch=0;updatePitchDisplay();configurePitchControls(false);
- }else{
-  smartphoneAudioReadyPromise=Promise.resolve(false);
-  smartphonePitch=0;updateMobilePitchDisplay();configureMobilePitchControls(false);
- }
+ if(video){try{video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}video=null;}
+ audioReadyPromise=Promise.resolve(false);
+ currentPitchSemitones=0;updatePitchDisplay();configurePitchControls(false);
  if(url){URL.revokeObjectURL(url);url=null;}
  file=null;playing=false;
  $('videoFile').value='';
@@ -1405,31 +1129,16 @@ $('videoFile').addEventListener('change',async event=>{
   $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
   setupVideo();
   const loadedVideo=video;
-  loadedVideo.addEventListener(activeAudioVersion==='smartphone-soundtouch'?'canplay':'loadedmetadata',async()=>{
+  loadedVideo.addEventListener('loadedmetadata',async()=>{
    if(loadedVideo!==video)return;
-   if(activeAudioVersion==='smartphone-soundtouch'){
-    await smartphoneAudioReadyPromise;
-    if(loadedVideo!==video||!loadedVideo.isConnected)return;
-    if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
-     try{await smartphoneAudioContext.resume();}catch(_){}
-    }
-   }
    if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
     window.__miconOpeningAdRunning=true;
     Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true).then(async passed=>{
      if(!passed||loadedVideo!==video||!loadedVideo.isConnected)return;
-     if(activeAudioVersion==='desktop-audioworklet'){
-      await desktopAudioReadyPromise;
-      if(loadedVideo!==video||!loadedVideo.isConnected)return;
-      if(desktopAudioContext&&desktopAudioContext.state==='suspended'){
-       try{await desktopAudioContext.resume();}catch(_){}
-      }
-     }else{
-      await smartphoneAudioReadyPromise;
-      if(loadedVideo!==video||!loadedVideo.isConnected)return;
-      if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
-       try{await smartphoneAudioContext.resume();}catch(_){}
-      }
+     await audioReadyPromise;
+     if(loadedVideo!==video||!loadedVideo.isConnected)return;
+     if(audioContext&&audioContext.state==='suspended'){
+      try{await audioContext.resume();}catch(_){}
      }
      window.__miconAdForFileDone=true;
      $('fileStatus').textContent='Video siap diputar';
@@ -1456,19 +1165,8 @@ $('playBtn').addEventListener('click',async()=>{
  if(!video.paused){video.pause();return;}
  try{
   const targetVideo=video;if(!targetVideo)return;
-  if(activeAudioVersion==='desktop-audioworklet'){
-   await desktopAudioReadyPromise;
-   if(desktopAudioContext&&desktopAudioContext.state==='suspended')await desktopAudioContext.resume();
-  }else{
-   /* Pastikan graph SoundTouch benar-benar terpasang sebelum video mulai.
-      Pemanggilan ini juga menjadi kesempatan resume dari gesture tombol Putar. */
-   const mobileGraphReady=await connectMobileVideoToSoundTouch(targetVideo);
-   if(!mobileGraphReady||!targetVideo.__miconMobileAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
-   smartphoneAudioReadyPromise=Promise.resolve(true);
-   if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
-    try{await smartphoneAudioContext.resume();}catch(_){}
-   }
-  }
+  await audioReadyPromise;
+  if(audioContext&&audioContext.state==='suspended')await audioContext.resume();
   if(targetVideo!==video||!targetVideo.isConnected)return;
   window.__miconAdAuthorized=true;
   await targetVideo.play();
@@ -1478,21 +1176,11 @@ $('playBtn').addEventListener('click',async()=>{
  }
 });
 $('clearBtn').addEventListener('click',()=>{clearVideo();});
-if(activeAudioVersion==='desktop-audioworklet'){
- $('downBtn')?.addEventListener('click',()=>applyPitch(desktopPitch-1));
- $('upBtn')?.addEventListener('click',()=>applyPitch(desktopPitch+1));
- $('pitchRange')?.addEventListener('input',event=>applyPitch(event.currentTarget.value));
- updatePitchDisplay();
- configurePitchControls(false);
-}else{
- $('downBtn')?.addEventListener('click',()=>applyMobilePitch(smartphonePitch-1));
- $('upBtn')?.addEventListener('click',()=>applyMobilePitch(smartphonePitch+1));
- $('pitchRange')?.addEventListener('input',event=>applyMobilePitch(event.currentTarget.value));
- updateMobilePitchDisplay();
- configureMobilePitchControls(false);
- const mobileKeySelect=$('keySelect');
- if(mobileKeySelect){mobileKeySelect.setAttribute('aria-disabled','true');mobileKeySelect.tabIndex=-1;}
-}
+$('downBtn')?.addEventListener('click',()=>applyPitch(currentPitchSemitones-1));
+$('upBtn')?.addEventListener('click',()=>applyPitch(currentPitchSemitones+1));
+$('pitchRange')?.addEventListener('input',event=>applyPitch(event.currentTarget.value));
+updatePitchDisplay();
+configurePitchControls(false);
 const dock=document.getElementById('mobileDock'),moreSheet=document.getElementById('moreSheet');
 if(dock)dock.querySelectorAll('[data-target]').forEach(button=>button.addEventListener('click',()=>{
  dock.querySelectorAll('.dock-item').forEach(item=>item.classList.remove('active'));
@@ -1702,16 +1390,6 @@ html:has(#youtubeSection.active)::-webkit-scrollbar,body:has(#youtubeSection.act
 <script id="mobile-reference-layout">
 (function(){
  if(!window.matchMedia('(max-width:760px)').matches)return;
- const trans=document.getElementById('transposeSection');
- const note=trans&&trans.querySelector('.noteBox');
- const semi=trans&&trans.querySelector('.semitone');
- const stepper=trans&&trans.querySelector('.stepper');
- if(trans&&note&&semi&&stepper){
-   const compact=document.createElement('div');compact.className='pitch-compact-row';
-   trans.insertBefore(compact,trans.querySelector('.keySelectWrap'));
-   compact.append(note,semi);
-   compact.append(trans.querySelector('#upBtn'),trans.querySelector('#downBtn'));
- }
  const fileIcon=document.querySelector('#importSection .fileIcon');
  if(fileIcon){fileIcon.textContent='♫';fileIcon.setAttribute('aria-label','Ikon musik');}
  const banner=document.createElement('div');banner.className='mobile-ad-banner';banner.textContent='Banner Iklan Gif , Jpg, png (dikontrol dari superadmin)';
@@ -2454,8 +2132,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   const grid=scroll&&scroll.querySelector(':scope > .grid');
   const transpose=document.getElementById('transposeSection');
   const clear=document.getElementById('clearBtn');
-  const compact=transpose&&transpose.querySelector('.pitch-compact-row');
-  if(!scroll||!grid||!transpose||!compact)return;
+  if(!scroll||!grid||!transpose)return;
 
   /* Tombol Hapus Video dipindahkan ke baris penuh di atas Import Playlist; handler asli tetap. */
 
@@ -2598,11 +2275,35 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
  .micon-reference-stack .mobile-playlist-copy strong{font-size:10px!important;color:#111827!important}.micon-reference-stack .mobile-playlist-copy small{font-size:8px!important;color:#16a34a!important}
  .micon-reference-stack .mobile-playlist-empty{display:none!important}
  .micon-reference-stack .mobile-playlist-picker{display:none!important}
- #importSection,#transposeSection{display:contents!important}
+ #importSection{display:contents!important}
+ #transposeSection{
+   order:3!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;
+   box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:0!important;max-height:none!important;margin:14px 0!important;padding:14px!important;
+   gap:10px!important;border:1px solid #e5eaf2!important;border-radius:17px!important;
+   background:#fff!important;color:#172033!important;box-shadow:0 3px 12px rgba(15,23,42,.055)!important;
+   overflow:visible!important;
+ }
  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
- #transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,
- #transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
  .mobile-fill,.mobile-tip,.mobile-ad-banner,.foot,.mobile-dock,.mobile-bottom-nav{display:none!important}
+ #transposeSection .keySelectWrap{display:block!important;width:100%!important;margin:0!important}
+ #transposeSection .keySelect{display:block!important;width:100%!important;height:43px!important;border:1px solid #e2e8f0!important;border-radius:12px!important;background:#fff!important;color:#172033!important;font-size:12px!important}
+ #transposeSection .noteBox{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;width:100%!important;height:90px!important;min-height:90px!important;margin:0!important;padding:10px!important;border:1px solid #dbeafe!important;border-radius:14px!important;background:#eff6ff!important}
+ #transposeSection .noteBox small{display:block!important;color:#64748b!important;font-size:9px!important}
+ #transposeSection .note{display:block!important;color:#1d4ed8!important;font-size:24px!important;line-height:1.1!important;font-weight:850!important}
+ #transposeSection #noteDesc{display:block!important;color:#64748b!important;font-size:9px!important}
+ #transposeSection .stepper{display:grid!important;grid-template-columns:42px minmax(0,1fr) 42px!important;align-items:center!important;gap:9px!important;width:100%!important;height:42px!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+ #transposeSection .stepper .step{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border:1px solid #dbeafe!important;border-radius:12px!important;background:#eff6ff!important;color:#1d4ed8!important;font-size:24px!important;line-height:1!important}
+ #transposeSection .stepper .range{display:block!important;width:100%!important;height:24px!important;margin:0!important;accent-color:#2563eb!important}
+ #transposeSection .rangeLabels{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:0 2px!important;color:#94a3b8!important;font-size:9px!important}
+ #transposeSection .row:empty{display:none!important}
+ #transposeSection .alert{display:none!important;min-height:0!important;margin:0!important;padding:9px 11px!important;font-size:10px!important}
+ #transposeSection .alert.show{display:block!important}
+ #transposeSection .playrow{display:block!important;width:100%!important;margin:0!important;padding:0!important}
+ #transposeSection .playbtn,#transposeSection #playBtn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:45px!important;margin:0!important;border:0!important;border-radius:12px!important;background:#2563eb!important;color:#fff!important;font-size:12px!important;font-weight:800!important}
+ #transposeSection .progress{display:block!important;width:100%!important;height:5px!important;margin:10px 0 6px!important;background:#e5e7eb!important}
+ #transposeSection .playrow .row{display:flex!important;justify-content:space-between!important;margin:0!important;color:#64748b!important;font-size:9px!important}
+ #transposeSection .hint{display:block!important;margin:0!important;padding:9px 10px!important;border-radius:10px!important;background:#f8fafc!important;color:#64748b!important;font-size:9px!important;line-height:1.5!important}
 }
 
 </style>
@@ -2631,35 +2332,34 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     const video=document.getElementById('videoStage');
     const file=importSection&&importSection.querySelector('.filemeta');
     const drop=document.getElementById('dropZone');
-    const pitch=transpose&&transpose.querySelector('.pitch-compact-row');
     const clear=document.getElementById('clearBtn');
     const panel=scroll&&scroll.querySelector('.mobile-playlist-panel');
-    if(!wrap||!header||!main||!layout||!preview||!scroll||!grid||!importSection||!transpose||!video||!file||!drop||!pitch||!clear||!panel){
+    if(!wrap||!header||!main||!layout||!preview||!scroll||!grid||!importSection||!transpose||!video||!file||!drop||!clear||!panel){
       console.error('MicOn mobile structure: elemen wajib belum tersedia.');return;
     }
     /* Satu kali susun kontrol di kolom scroll; video dikeluarkan dari area scroll. */
     let stack=main.querySelector(':scope > .micon-reference-stack');
     if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
-    stack.append(file,drop,clear,panel);
+    stack.append(file,drop,transpose,panel);
     /* Satu wadah sticky sebagai saudara mainContent, bukan anak elemen yang ikut scroll. */
     let shell=document.getElementById('micon-sticky-shell');
     if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
-    shell.append(header,video,pitch);
+    shell.append(header,video);
     /* Dock dibuat tepat satu kali. */
     let dock=document.getElementById('micon-floating-dock');
     if(!dock){
       dock=document.createElement('nav');dock.id='micon-floating-dock';dock.setAttribute('aria-label','Menu utama');
-      dock.innerHTML='<button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
+      dock.innerHTML='<button type="button" class="micon-dock-action" data-action="video"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span><span>Video</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
       document.body.appendChild(dock);
       dock.addEventListener('click',function(event){
         const button=event.target.closest('[data-action]');if(!button)return;
         const action=button.dataset.action;const youtube=document.getElementById('youtubeSection');
         const stickyShell=document.getElementById('micon-sticky-shell');
-        if(action==='transpose'||action==='upload'){
+        if(action==='video'||action==='upload'){
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
           if(stickyShell)stickyShell.style.removeProperty('display');
           main.classList.remove('hidden');main.style.removeProperty('display');
-          if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
+          if(action==='video')drop.scrollIntoView({behavior:'smooth',block:'center'});
           else{const input=document.getElementById('videoFile');if(input)input.click();}
         }else if(action==='download'){
           /* Iframe downloader hanya aktif pada menu Download; preview karaoke disembunyikan. */
@@ -2683,8 +2383,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 <style id="micon-mobile-fixed-preview-controls-single">
 @media screen and (max-width:760px){
-  /* Susunan mobile mengikuti foto: video, kontrol nada, hapus, tambah, playlist, dock. */
-  /* Preview dan kontrol nada dikunci ke viewport; hanya konten di bawahnya yang bergulir. */
+  /* Susunan mobile: preview video, impor, hapus, playlist, dan dock. */
+  /* Preview video dikunci ke viewport; konten di bawahnya tetap dapat digulir. */
   #micon-sticky-shell{
     display:flex!important;flex-direction:column!important;align-items:stretch!important;
     position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10000!important;
@@ -2711,32 +2411,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     aspect-ratio:16/9!important;object-fit:contain!important;margin:0!important;padding:0!important;
     border:0!important;border-radius:0!important;background:#080b12!important;
   }
-  #micon-sticky-shell>.pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:46px!important;gap:7px!important;align-items:stretch!important;
-    box-sizing:border-box!important;width:calc(100% - 24px)!important;height:46px!important;
-    margin:10px 12px 0!important;padding:0!important;touch-action:pan-x!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>*{
-    display:flex!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
-    width:100%!important;height:46px!important;min-height:46px!important;margin:0!important;padding:3px!important;
-    align-items:center!important;justify-content:center!important;border:1px solid #e5e7eb!important;
-    border-radius:12px!important;background:#fff!important;color:#111827!important;
-    box-shadow:0 2px 8px rgba(15,23,42,.045)!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.noteBox{
-    grid-column:1!important;flex-direction:column!important;gap:2px!important;
-    background:#eff6ff!important;border-color:#dbeafe!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
-  #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>.semitone{
-    grid-column:2!important;flex-direction:column!important;gap:2px!important;font-size:16px!important;font-weight:850!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-column:3!important;color:#dc3545!important;font-size:22px!important}
-  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-column:4!important;color:#dc3545!important;font-size:22px!important}
   .micon-reference-stack{
     display:flex!important;flex-direction:column!important;align-items:stretch!important;
     width:100%!important;margin:0!important;padding:calc(56.25vw + 67px) 12px 75px!important;gap:0!important;
@@ -2825,11 +2499,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   #micon-floating-dock .micon-dock-icon svg{display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
   #mainContent{padding:0!important;margin:0!important;background:#fff!important}
   #homeSection,#importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,
-  #transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,
-  #transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,
   .mobile-bottom-nav,.mobile-dock{display:none!important}
 }
-@media(max-width:360px){#micon-sticky-shell>.pitch-compact-row{gap:5px!important}}
 @media(min-width:761px){#micon-sticky-shell,#micon-floating-dock{display:none!important}}
 </style>
 
@@ -2861,11 +2532,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 </style>
 
-<style id="micon-mobile-pitch-controls-inert">
-@media screen and (max-width:760px){
-  #transposeSection .keySelect{pointer-events:none!important}
-}
-</style>
 <script id="micon-app-download-store-page-js">
 (function(){
   const page=document.getElementById('appDownloadSection');
