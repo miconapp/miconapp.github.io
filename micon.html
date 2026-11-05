@@ -952,8 +952,9 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 const $=id=>document.getElementById(id);
 let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,outputLimiter=null,playing=false,ownsContext=false,engine='none';
 let hqConstructorPromise=null;
-/* Kunci satu kali pembuatan MediaElementAudioSourceNode per video.
-   Klik + / - yang berdekatan tidak boleh membuat AudioContext/source ganda. */
+/* Satu MediaElementSourceNode melekat permanen pada elemen video yang membuatnya. */
+let graphVideo=null;
+let graphReady=false;
 let graphSetupPromise=null;
 const HQ_MODULE='https://esm.sh/@soundtouchjs/formant-correction-worklet@2.1.1?bundle';
 const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correction-worklet@2.1.1/.dist/formant-correction-processor.js';
@@ -1011,38 +1012,65 @@ function updatePitch(){
 async function createHighQualityAudioGraph(){
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
   if(!AudioCtx)throw new Error('Browser tidak mendukung Web Audio API.');
-  if(source&&outputGain&&ctx)return;
-  const newCtx=new AudioCtx({latencyHint:'interactive'});
-  let mediaSource=null,gain=null,limiter=null;
+  if(!video)throw new Error('Pilih video terlebih dahulu.');
+
+  /* Jangan pernah membuat source kedua untuk elemen video yang sama. */
+  if(source&&graphVideo!==video)throw new Error('Elemen video berubah sebelum koneksi audio lama dibersihkan.');
+  if(graphReady&&source&&outputGain&&ctx)return;
+  if(ctx&&ctx.state==='closed'){
+    if(source)throw new Error('Koneksi audio video ini sudah tertutup. Impor ulang video untuk membuat koneksi baru.');
+    ctx=null;
+  }
+  if(!ctx)ctx=new AudioCtx({latencyHint:'interactive'});
+  ownsContext=true;
+
   try{
-    gain=newCtx.createGain();
-    gain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
-    limiter=newCtx.createDynamicsCompressor();
-    limiter.threshold.setValueAtTime(-1,newCtx.currentTime);
-    limiter.knee.setValueAtTime(8,newCtx.currentTime);
-    limiter.ratio.setValueAtTime(4,newCtx.currentTime);
-    limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
-    limiter.release.setValueAtTime(0.18,newCtx.currentTime);
-    gain.connect(limiter);
-    limiter.connect(newCtx.destination);
-    mediaSource=newCtx.createMediaElementSource(video);
-    mediaSource.connect(gain);
-    ctx=newCtx;source=mediaSource;outputGain=gain;outputLimiter=limiter;
-    ownsContext=true;engine='direct';
-    /* Panggil resume tanpa menahan import/metadata; tombol Play akan mencoba lagi
-       dalam konteks interaksi pengguna bila browser masih menangguhkan audio. */
-    try{const resume=newCtx.resume();if(resume&&resume.catch)resume.catch(()=>{});}catch(_){}
+    if(!outputGain){
+      outputGain=ctx.createGain();
+      outputGain.gain.setValueAtTime(OUTPUT_BOOST,ctx.currentTime);
+    }
+    if(!outputLimiter){
+      outputLimiter=ctx.createDynamicsCompressor();
+      outputLimiter.threshold.setValueAtTime(-1,ctx.currentTime);
+      outputLimiter.knee.setValueAtTime(8,ctx.currentTime);
+      outputLimiter.ratio.setValueAtTime(4,ctx.currentTime);
+      outputLimiter.attack.setValueAtTime(0.004,ctx.currentTime);
+      outputLimiter.release.setValueAtTime(0.18,ctx.currentTime);
+    }
+    /* Bangun jalur keluaran secara idempoten agar retry tidak menggandakan rute. */
+    try{outputGain.disconnect()}catch(_){}
+    try{outputLimiter.disconnect()}catch(_){}
+    outputGain.connect(outputLimiter);
+    outputLimiter.connect(ctx.destination);
+
+    if(!source){
+      source=ctx.createMediaElementSource(video);
+      graphVideo=video;
+    }
+    /* Simpan source ke state global SEGERA setelah dibuat. Jika connect gagal,
+       percobaan berikutnya menggunakan source yang sama, bukan membuat source baru. */
+    try{source.disconnect()}catch(_){}
+    source.connect(outputGain);
+    graphReady=true;
+    engine='direct';
+    try{const resume=ctx.resume();if(resume&&resume.catch)resume.catch(()=>{});}catch(_){}
     video.volume=1;video.muted=false;video.preservesPitch=false;video.defaultPlaybackRate=1;video.playbackRate=1;
   }catch(error){
-    try{mediaSource?.disconnect()}catch(_){}
-    try{gain?.disconnect()}catch(_){}
-    try{limiter?.disconnect()}catch(_){}
-    try{if(newCtx.state!=='closed')await newCtx.close()}catch(_){}
+    /* Source yang sudah tercipta tidak boleh dibuang/ditinggalkan dengan context
+       tertutup: browser tetap menganggap video sudah terhubung ke source itu. */
+    graphReady=false;
+    if(!source){
+      const failedCtx=ctx;ctx=null;
+      if(failedCtx&&failedCtx.state!=='closed'){try{await failedCtx.close()}catch(_){}}
+      ownsContext=false;
+      if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}
+      if(outputLimiter){try{outputLimiter.disconnect()}catch(_){}outputLimiter=null;}
+    }
     throw error;
   }
 }
 async function setupHighQualityAudio(){
-  if(source&&outputGain&&ctx)return;
+  if(graphReady&&source&&outputGain&&ctx&&graphVideo===video)return;
   if(graphSetupPromise)return graphSetupPromise;
   graphSetupPromise=createHighQualityAudioGraph();
   try{
@@ -1090,6 +1118,7 @@ function useDirectAudioRoute(){
     source.disconnect();
     effect.disconnect();
     source.connect(outputGain);
+    graphReady=true;
     engine='direct';
   }catch(error){msg('Gagal mengembalikan audio asli: '+(error.message||error),true);}
 }
@@ -1097,7 +1126,7 @@ async function setupAudio(){
   if(!video)throw new Error('Pilih video terlebih dahulu.');
   /* Nada asli memakai pemutar HTML5 langsung; jangan buat AudioContext/Worklet. */
   if(Number($('pitchRange').value)===0)return;
-  if(!source)await setupHighQualityAudio();
+  if(!source||!graphReady)await setupHighQualityAudio();
   if(ctx&&ctx.state==='suspended'){
     try{await ctx.resume();}catch(_){}
   }
@@ -1109,6 +1138,7 @@ async function clearAudioGraph(){
   if(graphSetupPromise){try{await graphSetupPromise}catch(_){}}
   if(video){try{video.pause()}catch(_){}}
   if(source){try{source.disconnect()}catch(_){}source=null;}
+  graphVideo=null;graphReady=false;
   if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}
   if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}
   if(outputLimiter){try{outputLimiter.disconnect()}catch(_){}outputLimiter=null;}
