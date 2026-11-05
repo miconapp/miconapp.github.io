@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%232563eb%22/%3E%3Cpath d=%22M18 15v25a8 8 0 1 0 6 7V25l22-5v15a8 8 0 1 0 6 7V10z%22 fill=%22white%22/%3E%3C/svg%3E">
 <title>MicOn - Nyamankan Suaramu</title>
 <style id="micon-auth-gate-style">html.micon-auth-check body{visibility:hidden}</style>
 <script>document.documentElement.classList.add('micon-auth-check');</script>
@@ -952,6 +952,9 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 const $=id=>document.getElementById(id);
 let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,outputLimiter=null,playing=false,ownsContext=false,engine='none';
 let hqConstructorPromise=null;
+/* Kunci satu kali pembuatan MediaElementAudioSourceNode per video.
+   Klik + / - yang berdekatan tidak boleh membuat AudioContext/source ganda. */
+let graphSetupPromise=null;
 const HQ_MODULE='https://esm.sh/@soundtouchjs/formant-correction-worklet@2.1.1?bundle';
 const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correction-worklet@2.1.1/.dist/formant-correction-processor.js';
 /* Penguatan keluaran tetap +2 dB (linear gain ≈ 1.2589). */
@@ -1005,7 +1008,7 @@ function updatePitch(){
   if(video){video.volume=1;video.muted=false;video.defaultPlaybackRate=1;if(video.playbackRate!==1)video.playbackRate=1;}
 }
 /* Jalur dasar dibuat ringan: audio asli tidak melewati AudioWorklet. */
-async function setupHighQualityAudio(){
+async function createHighQualityAudioGraph(){
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
   if(!AudioCtx)throw new Error('Browser tidak mendukung Web Audio API.');
   if(source&&outputGain&&ctx)return;
@@ -1036,6 +1039,16 @@ async function setupHighQualityAudio(){
     try{limiter?.disconnect()}catch(_){}
     try{if(newCtx.state!=='closed')await newCtx.close()}catch(_){}
     throw error;
+  }
+}
+async function setupHighQualityAudio(){
+  if(source&&outputGain&&ctx)return;
+  if(graphSetupPromise)return graphSetupPromise;
+  graphSetupPromise=createHighQualityAudioGraph();
+  try{
+    await graphSetupPromise;
+  }finally{
+    graphSetupPromise=null;
   }
 }
 async function ensureTransposeProcessor(){
@@ -1093,6 +1106,7 @@ async function setupAudio(){
   updatePitch();
 }
 async function clearAudioGraph(){
+  if(graphSetupPromise){try{await graphSetupPromise}catch(_){}}
   if(video){try{video.pause()}catch(_){}}
   if(source){try{source.disconnect()}catch(_){}source=null;}
   if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}
