@@ -1091,13 +1091,16 @@ async function connectMobileVideoToSoundTouch(target){
  if(target.__miconMobileAudioGraph)return true;
  if(target.__miconMobileConnectPromise)return target.__miconMobileConnectPromise;
  const task=(async()=>{
-  if(!smartphoneAudioContext)smartphoneAudioContext=new AudioContextClass({latencyHint:'interactive'});
+  /* Siapkan AudioWorklet sejak impor. AudioContext boleh tetap suspended sampai
+     browser memberi izin; graph tetap harus dibuat sekarang agar video tidak mulai
+     melalui jalur native lalu berpindah ke SoundTouch saat tombol nada ditekan. */
+  if(!smartphoneAudioContext)smartphoneAudioContext=new AudioContextClass({latencyHint:'playback'});
   if(!smartphoneAudioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
+  /* Coba aktifkan sekarang saat impor; bila browser menolak karena belum ada
+     gesture, graph tetap dibuat dan resume diulang saat pengguna menekan Putar. */
   if(smartphoneAudioContext.state!=='running'){
-   try{await smartphoneAudioContext.resume();}catch(_){}
+   try{smartphoneAudioContext.resume().catch(()=>{});}catch(_){}
   }
-  /* Jika konteks masih terkunci oleh browser, jangan mengambil alih jalur audio native. */
-  if(smartphoneAudioContext.state!=='running')return false;
   if(!smartphoneWorkletModulePromise){
    smartphoneWorkletModulePromise=smartphoneAudioContext.audioWorklet.addModule(SMARTPHONE_SOUNDTOUCH_WORKLET_URL).catch(error=>{
     smartphoneWorkletModulePromise=null;throw error;
@@ -1115,16 +1118,23 @@ async function connectMobileVideoToSoundTouch(target){
    const pitchParam=worklet.parameters.get('pitchSemitones');
    if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada SoundTouch AudioWorklet.');
    pitchParam.value=smartphonePitch;
+   const pitchMultiplierParam=worklet.parameters.get('pitch');
+   if(pitchMultiplierParam)pitchMultiplierParam.value=1;
    const playbackParam=worklet.parameters.get('playbackRate');
    if(playbackParam)playbackParam.value=1;
    if(!source){
     source=smartphoneAudioContext.createMediaElementSource(target);
     target.__miconMobileMediaSource=source;
    }
-   /* Gain +5 dB dipakai konsisten pada Original 0 dan transpose +/-.
-      Audio smartphone selalu melewati SoundTouch AudioWorklet sejak impor. */
+   /* Matikan pitch correction bawaan browser agar tidak memproses pitch dua kali. */
+   try{target.preservesPitch=false;}catch(_){}
+   try{target.webkitPreservesPitch=false;}catch(_){}
+   try{target.mozPreservesPitch=false;}catch(_){}
+   target.defaultPlaybackRate=1;target.playbackRate=1;
+   /* Gain +10 dB sama untuk Original 0 dan seluruh transpose +/-.
+      Audio smartphone selalu melewati satu jalur SoundTouch yang sama. */
    gainNode=smartphoneAudioContext.createGain();
-   gainNode.gain.value=Math.pow(10,5/20);
+   gainNode.gain.value=Math.pow(10,10/20);
    gainNode.connect(smartphoneAudioContext.destination);
    try{source.disconnect();}catch(_){}
    source.connect(worklet);
@@ -1160,11 +1170,15 @@ function applyMobilePitch(value){
  const worklet=graph&&graph.worklet;
  const param=worklet&&worklet.parameters.get('pitchSemitones');
  /* Semua nada, termasuk Original 0, tetap melalui SoundTouch AudioWorklet.
-    Tidak ada bypass ke audio native saat kembali ke 0. */
+    Nilai pitch diterapkan langsung agar perubahan berulang tidak menumpuk
+    sebagai automation target yang saling mengejar. */
  if(param&&smartphoneAudioContext){
   try{
    if(smartphoneAudioContext.state==='suspended')smartphoneAudioContext.resume().catch(()=>{});
-   param.setTargetAtTime(next,smartphoneAudioContext.currentTime,0.025);
+   try{param.cancelScheduledValues(smartphoneAudioContext.currentTime);}catch(_){}
+   param.value=next;
+   const pitchMultiplierParam=worklet.parameters.get('pitch');
+   if(pitchMultiplierParam)pitchMultiplierParam.value=1;
    const playbackParam=worklet.parameters.get('playbackRate');
    if(playbackParam)playbackParam.value=1;
    smartphoneAudioReadyPromise=Promise.resolve(true);
@@ -1178,7 +1192,10 @@ function applyMobilePitch(value){
     const activeGraph=target.__miconMobileAudioGraph;
     const activeParam=activeGraph&&activeGraph.worklet&&activeGraph.worklet.parameters.get('pitchSemitones');
     if(activeParam){
-     try{activeParam.setTargetAtTime(next,smartphoneAudioContext.currentTime,0.025);}catch(_){activeParam.value=next;}
+     try{activeParam.cancelScheduledValues(smartphoneAudioContext.currentTime);}catch(_){}
+     activeParam.value=smartphonePitch;
+     const pitchMultiplierParam=activeGraph.worklet.parameters.get('pitch');
+     if(pitchMultiplierParam)pitchMultiplierParam.value=1;
      const playbackParam=activeGraph.worklet.parameters.get('playbackRate');
      if(playbackParam)playbackParam.value=1;
     }
@@ -1443,8 +1460,11 @@ $('playBtn').addEventListener('click',async()=>{
    await desktopAudioReadyPromise;
    if(desktopAudioContext&&desktopAudioContext.state==='suspended')await desktopAudioContext.resume();
   }else{
-   /* Semua pemutaran smartphone menunggu jalur SoundTouch, termasuk Original 0. */
-   await smartphoneAudioReadyPromise;
+   /* Pastikan graph SoundTouch benar-benar terpasang sebelum video mulai.
+      Pemanggilan ini juga menjadi kesempatan resume dari gesture tombol Putar. */
+   const mobileGraphReady=await connectMobileVideoToSoundTouch(targetVideo);
+   if(!mobileGraphReady||!targetVideo.__miconMobileAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
+   smartphoneAudioReadyPromise=Promise.resolve(true);
    if(smartphoneAudioContext&&smartphoneAudioContext.state==='suspended'){
     try{await smartphoneAudioContext.resume();}catch(_){}
    }
