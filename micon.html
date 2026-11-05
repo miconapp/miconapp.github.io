@@ -943,7 +943,7 @@
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,inputAnalyser=null,processedAnalyser=null,outputLimiter=null,volumeMatchFrame=0,volumeMatchInputData=null,volumeMatchOutputData=null,playing=false,ownsContext=false,engine='none';
+let file=null,url=null,video=null,ctx=null,source=null,effect=null,outputGain=null,outputLimiter=null,playing=false,ownsContext=false,engine='none';
 let hqConstructorPromise=null;
 const HQ_MODULE='https://esm.sh/@soundtouchjs/formant-correction-worklet@2.1.1?bundle';
 const HQ_PROCESSOR='https://cdn.jsdelivr.net/npm/@soundtouchjs/formant-correction-worklet@2.1.1/.dist/formant-correction-processor.js';
@@ -956,7 +956,7 @@ function noteValue(n){return n>0?'+'+n:String(n)}
 const pitchScaleNames={0:'Original',1:'C♯ / D♭',2:'D',3:'D♯ / E♭',4:'E',5:'F',6:'F♯ / G♭','-1':'B','-2':'A♯ / B♭','-3':'A','-4':'G♯ / A♭','-5':'G','-6':'F♯ / G♭'};
 function pitchScaleName(n){return pitchScaleNames[n]||'Original'}
 function showTime(){if(!video)return;$('currentTime').textContent=fmt(video.currentTime);$('progressBar').style.width=(video.duration?video.currentTime/video.duration*100:0)+'%';}
-function setupVideo(){if(video)video.remove();video=document.createElement('video');video.id='karaokeVideo';video.controls=true;video.playsInline=true;video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';video.volume=1;video.muted=false;video.defaultPlaybackRate=1;video.playbackRate=1;video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';$('videoStage').appendChild(video);video.src=url;video.addEventListener('loadedmetadata',()=>{$('duration').textContent=fmt(video.duration);$('fileStatus').textContent='Video siap diputar';$('playBtn').disabled=false;$('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;});video.addEventListener('canplay',()=>{if(video&&video.isConnected){$('playBtn').disabled=false;if($('fileStatus').textContent==='Memuat video…')$('fileStatus').textContent='Video siap diputar';}});video.addEventListener('ratechange',()=>{if(video&&video.playbackRate!==1)video.playbackRate=1;});video.addEventListener('timeupdate',showTime);video.addEventListener('play',()=>{if(Number($('pitchRange').value)!==0)startVolumeMatch();
+function setupVideo(){if(video)video.remove();video=document.createElement('video');video.id='karaokeVideo';video.controls=true;video.playsInline=true;video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';video.volume=1;video.muted=false;video.defaultPlaybackRate=1;video.playbackRate=1;video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';$('videoStage').appendChild(video);video.src=url;video.addEventListener('loadedmetadata',()=>{$('duration').textContent=fmt(video.duration);$('fileStatus').textContent='Video siap diputar';$('playBtn').disabled=false;$('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;});video.addEventListener('canplay',()=>{if(video&&video.isConnected){$('playBtn').disabled=false;if($('fileStatus').textContent==='Memuat video…')$('fileStatus').textContent='Video siap diputar';}});video.addEventListener('ratechange',()=>{if(video&&video.playbackRate!==1)video.playbackRate=1;});video.addEventListener('timeupdate',showTime);video.addEventListener('play',()=>{
   if(window.__miconAdAuthorized||window.__miconAdForFileDone){window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;}
   /* Jika tombol play bawaan video dipakai, tahan video utama sampai iklan selesai/di-skip. */
   video.pause();
@@ -966,211 +966,135 @@ function setupVideo(){if(video)video.remove();video=document.createElement('vide
     if(ok&&video&&video.isConnected){window.__miconAdAuthorized=true;return video.play();}
   }).catch(error=>msg('Iklan belum dapat diputar: '+(error.message||error),true))
     .finally(()=>{window.__miconNativeAdPending=false;});
-});video.addEventListener('pause',()=>{stopVolumeMatch();playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{stopVolumeMatch();playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconPlaylistHasNext&&typeof window.__miconPlaylistAdvance==='function'){window.__miconPlaylistAdvance();return;}if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
-async function getFormantNodeClass(){if(!hqConstructorPromise){hqConstructorPromise=import(HQ_MODULE).then(mod=>{if(!mod.FormantCorrectionNode)throw new Error('Modul koreksi formant tidak ditemukan.');return mod.FormantCorrectionNode;});}return hqConstructorPromise;}
-function setFormantForPitch(n){if(!effect||engine!=='hq'||!effect.formantStrength)return;effect.formantStrength.value=1;}
-function rmsLevel(data){
-  if(!data||!data.length)return 0;
-  let sum=0;
-  for(let i=0;i<data.length;i++)sum+=data[i]*data[i];
-  return Math.sqrt(sum/data.length);
+});video.addEventListener('pause',()=>{playing=false;$('playBtn').textContent='▶ Putar video'});video.addEventListener('ended',()=>{playing=false;$('playBtn').textContent='▶ Putar video';if(window.__miconPlaylistHasNext&&typeof window.__miconPlaylistAdvance==='function'){window.__miconPlaylistAdvance();return;}if(window.__miconAdForFileDone&&!window.__miconEndAdShown){window.__miconEndAdShown=true;Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true).catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));}});video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));}
+async function getFormantNodeClass(){
+  if(!hqConstructorPromise){
+    hqConstructorPromise=import(HQ_MODULE).then(mod=>{
+      if(!mod.FormantCorrectionNode)throw new Error('Modul koreksi nada tidak ditemukan.');
+      return mod.FormantCorrectionNode;
+    }).catch(error=>{hqConstructorPromise=null;throw error;});
+  }
+  return hqConstructorPromise;
 }
-function stopVolumeMatch(){
-  if(volumeMatchFrame)cancelAnimationFrame(volumeMatchFrame);
-  volumeMatchFrame=0;
-}
-function startVolumeMatch(){
-  if(!ctx||!inputAnalyser||!processedAnalyser||!outputGain||!volumeMatchInputData||!volumeMatchOutputData)return;
-  if(volumeMatchFrame)return;
-  let lastTarget=outputGain.gain.value||OUTPUT_BOOST;
-  const tick=()=>{
-    if(!ctx||ctx.state==='closed'||!inputAnalyser||!processedAnalyser||!outputGain)return;
-    inputAnalyser.getFloatTimeDomainData(volumeMatchInputData);
-    processedAnalyser.getFloatTimeDomainData(volumeMatchOutputData);
-    const before=rmsLevel(volumeMatchInputData);
-    const after=rmsLevel(volumeMatchOutputData);
-    /* Abaikan bagian hening dan buffer awal prosesor. */
-    if(before>0.001&&after>0.00035){
-      const ratio=before/after;
-      /* Kompensasi level keluaran transpose, dibatasi agar tidak menambah
-         volume secara berlebihan. Target tidak dijadwalkan ulang setiap frame. */
-      const wanted=Math.max(0.85*OUTPUT_BOOST,Math.min(3.0*OUTPUT_BOOST,ratio*OUTPUT_BOOST));
-      if(Math.abs(wanted-lastTarget)>0.035){
-        outputGain.gain.setTargetAtTime(wanted,ctx.currentTime,0.22);
-        lastTarget=wanted;
-      }
-    }
-    volumeMatchFrame=requestAnimationFrame(tick);
-  };
-  volumeMatchFrame=requestAnimationFrame(tick);
-}
+function setFormantForPitch(){if(effect&&engine==='hq'&&effect.formantStrength)effect.formantStrength.value=1;}
 function updatePitch(){
   const n=Number($('pitchRange').value);
   $('pitchValue').textContent=noteValue(n);
   $('noteName').textContent=pitchScaleName(n);
   $('noteDesc').textContent=n===0?'Nada asli':pitchScaleName(n)+' · '+Math.abs(n)+' semitone '+(n>0?'lebih tinggi':'lebih rendah');
-  const engineFailed=engine==='bypass';
-  $('pitchRange').disabled=!file||engineFailed;
-  $('downBtn').disabled=!file||engineFailed||n<=-6;
-  $('upBtn').disabled=!file||engineFailed||n>=6;
+  const failed=engine==='bypass';
+  $('pitchRange').disabled=!file||failed;
+  $('downBtn').disabled=!file||failed||n<=-6;
+  $('upBtn').disabled=!file||failed||n>=6;
+  if(n===0&&effect&&engine==='hq')useDirectAudioRoute();
   if(effect&&engine==='hq'){
     try{
       effect.pitch.value=1;
       effect.pitchSemitones.value=n;
       effect.playbackRate.value=1;
-      if(engine==='hq')setFormantForPitch(n);
-      /* Pertahankan jalur audio tetap tersambung. Memutus lalu menyambung
-         MediaElementSource pada setiap klik pitch menyebabkan audio terjeda.
-         Nilai pitch diubah langsung pada node yang sedang memproses audio. */
-      if(outputGain&&ctx){
-        if(n===0){
-          stopVolumeMatch();
-          outputGain.gain.setTargetAtTime(OUTPUT_BOOST,ctx.currentTime,0.18);
-        }else{
-          startVolumeMatch();
-        }
-      }
-    }catch(e){msg('Efek transpose gagal diperbarui: '+(e.message||e),true);}
+      setFormantForPitch();
+    }catch(error){msg('Pengaturan nada gagal diperbarui: '+(error.message||error),true);}
   }
-  if(video){
-    video.volume=1;
-    video.muted=false;
-    video.defaultPlaybackRate=1;
-    if(video.playbackRate!==1)video.playbackRate=1;
-  }
+  if(video){video.volume=1;video.muted=false;video.defaultPlaybackRate=1;if(video.playbackRate!==1)video.playbackRate=1;}
 }
+/* Jalur dasar dibuat ringan: audio asli tidak melewati AudioWorklet. */
 async function setupHighQualityAudio(){
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
   if(!AudioCtx)throw new Error('Browser tidak mendukung Web Audio API.');
-  let newCtx=null,AudioPitchNode=null,resumePromise=null;
-  let mediaSource=null,node=null,newOutputGain=null;
+  if(source&&outputGain&&ctx)return;
+  const newCtx=new AudioCtx({latencyHint:'interactive'});
+  let mediaSource=null,gain=null,limiter=null;
   try{
-    /* Smartphone dan desktop memakai mesin FormantCorrectionNode yang sama.
-       Inisialisasi AudioContext dan AudioWorklet dibuat identik di semua layar. */
-    AudioPitchNode=await getFormantNodeClass();
-    newCtx=new AudioCtx({latencyHint:'playback'});
-    resumePromise=newCtx.resume();
-    const processorUrl=HQ_PROCESSOR;
-    await resumePromise;
-    await AudioPitchNode.register(newCtx,processorUrl);
-    node=new AudioPitchNode({context:newCtx,interpolationStrategy:'lanczos',sampleBufferType:'circular'});
-    if(typeof node.setStretchParameters==='function'){
-      node.setStretchParameters({overlapMs:12,quickSeek:false});
-    }
-    node.pitch.value=1;node.pitchSemitones.value=Number($('pitchRange').value);node.playbackRate.value=1;
-    if(node.formantStrength)node.formantStrength.value=0;
-    const inputLevel=newCtx.createAnalyser();
-    inputLevel.fftSize=2048;
-    const processedLevel=newCtx.createAnalyser();
-    processedLevel.fftSize=2048;
-    const limiter=newCtx.createDynamicsCompressor();
+    gain=newCtx.createGain();
+    gain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
+    limiter=newCtx.createDynamicsCompressor();
     limiter.threshold.setValueAtTime(-1,newCtx.currentTime);
     limiter.knee.setValueAtTime(8,newCtx.currentTime);
     limiter.ratio.setValueAtTime(4,newCtx.currentTime);
     limiter.attack.setValueAtTime(0.004,newCtx.currentTime);
     limiter.release.setValueAtTime(0.18,newCtx.currentTime);
-    newOutputGain=newCtx.createGain();
-    newOutputGain.gain.setValueAtTime(OUTPUT_BOOST,newCtx.currentTime);
-    node.connect(processedLevel);
-    node.connect(newOutputGain);
-    newOutputGain.connect(limiter);
+    gain.connect(limiter);
     limiter.connect(newCtx.destination);
     mediaSource=newCtx.createMediaElementSource(video);
-    /* Simpan source segera setelah dibuat: elemen video tidak boleh memiliki source kedua. */
-    ctx=newCtx;source=mediaSource;effect=node;outputGain=newOutputGain;inputAnalyser=inputLevel;processedAnalyser=processedLevel;outputLimiter=limiter;volumeMatchInputData=new Float32Array(inputLevel.fftSize);volumeMatchOutputData=new Float32Array(processedLevel.fftSize);ownsContext=true;engine='hq';
-    try{mediaSource.connect(node);mediaSource.connect(inputLevel);}
-    catch(connectError){
-      try{mediaSource.disconnect()}catch(_){}
-      try{node.disconnect()}catch(_){}
-      /* Jalur cadangan tetap mempertahankan audio asli melalui gain keluaran. */
-      try{mediaSource.connect(newOutputGain||newCtx.destination)}catch(_){}
-      effect=null;engine='bypass';
-      $('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;
-      msg('Video tetap dapat diputar dengan audio asli, tetapi efek transpose gagal tersambung. '+(connectError.message||connectError),true);
-      return;
-    }
+    mediaSource.connect(gain);
+    ctx=newCtx;source=mediaSource;outputGain=gain;outputLimiter=limiter;
+    ownsContext=true;engine='direct';
+    /* Panggil resume tanpa menahan import/metadata; tombol Play akan mencoba lagi
+       dalam konteks interaksi pengguna bila browser masih menangguhkan audio. */
+    try{const resume=newCtx.resume();if(resume&&resume.catch)resume.catch(()=>{});}catch(_){}
     video.volume=1;video.muted=false;video.preservesPitch=false;video.defaultPlaybackRate=1;video.playbackRate=1;
-    setFormantForPitch(Number($('pitchRange').value));
-  }catch(e){
-    if(!mediaSource){try{node?.disconnect()}catch(_){};try{newOutputGain?.disconnect()}catch(_){};try{if(newCtx&&newCtx.state!=='closed')await newCtx.close()}catch(_){} }
-    throw e;
+  }catch(error){
+    try{mediaSource?.disconnect()}catch(_){}
+    try{gain?.disconnect()}catch(_){}
+    try{limiter?.disconnect()}catch(_){}
+    try{if(newCtx.state!=='closed')await newCtx.close()}catch(_){}
+    throw error;
   }
 }
-async function setupToneFallback(){if(!window.Tone)throw new Error('Mesin audio berkualitas tinggi tidak termuat, dan mode cadangan tidak tersedia. Periksa koneksi internet lalu muat ulang.');await Tone.start();const toneCtx=Tone.getContext();ctx=toneCtx.rawContext;effect=new Tone.PitchShift({pitch:Number($('pitchRange').value),windowSize:0.1,feedback:0,wet:Number($('pitchRange').value)===0?0:1});try{source=toneCtx.createMediaElementSource(video);source.connect(effect.input.input);effect.toDestination();engine='tone';ownsContext=false;video.defaultPlaybackRate=1;video.playbackRate=1;msg('Mesin koreksi kualitas tinggi tidak dapat dimuat; memakai mode audio standar. Untuk suara lebih jernih, pastikan internet mengizinkan akses ke CDN.',true);}catch(e){try{effect.dispose()}catch(_){}effect=null;engine='none';throw e;}}
-async function setupAudio(){
+async function ensureTransposeProcessor(){
   if(!video)throw new Error('Pilih video terlebih dahulu.');
-  if(source&&effect&&engine==='hq'){
-    if(ctx&&ctx.state==='suspended')await ctx.resume();
-    updatePitch();
+  if(!source||!ctx||!outputGain)await setupHighQualityAudio();
+  if(effect){
+    try{source.disconnect();effect.connect(outputGain);source.connect(effect);engine='hq';}
+    catch(error){throw error;}
+    effect.pitch.value=1;effect.pitchSemitones.value=Number($('pitchRange').value);effect.playbackRate.value=1;
+    if(effect.formantStrength)effect.formantStrength.value=1;
     return;
   }
-  if(source&&engine==='bypass')throw new Error('Mesin transpose belum tersambung. Hapus video lalu pilih kembali agar jalur audio dibuat ulang.');
-  let highQualityError=null;
+  const AudioPitchNode=await getFormantNodeClass();
+  if(ctx.state==='closed')throw new Error('Koneksi audio sudah tertutup. Impor ulang video.');
+  try{if(ctx.state==='suspended')await ctx.resume();}catch(_){}
+  await AudioPitchNode.register(ctx,HQ_PROCESSOR);
+  const node=new AudioPitchNode({context:ctx,interpolationStrategy:'linear',sampleBufferType:'circular'});
+  if(typeof node.setStretchParameters==='function')node.setStretchParameters({overlapMs:32,quickSeek:true});
+  node.pitch.value=1;
+  node.pitchSemitones.value=Number($('pitchRange').value);
+  node.playbackRate.value=1;
+  if(node.formantStrength)node.formantStrength.value=1;
   try{
-    await setupHighQualityAudio();
-    if(engine==='hq'){updatePitch();return;}
-    throw new Error('Mesin transpose tidak aktif.');
+    source.disconnect();
+    source.connect(node);
+    node.connect(outputGain);
+    effect=node;engine='hq';
   }catch(error){
-    highQualityError=error;
-  }
-  /* Chromium hanya mengizinkan satu MediaElementSource untuk setiap elemen video.
-     Jika elemen lama pernah terhubung tetapi referensinya sudah hilang, buat elemen
-     video baru dari file yang sama sebelum mencoba membuat jalur audio lagi. */
-  const alreadyConnected=/already connected|previously connected|different MediaElementSourceNode/i.test(highQualityError?.message||'');
-  if(alreadyConnected&&!source&&url){
-    try{
-      /* Jika browser mengharuskan elemen video baru untuk MediaElementSource,
-         pindahkan posisi dan status play ke elemen pengganti. Jangan mulai dari 00:00. */
-      const previousVideo=video;
-      const resumeAt=previousVideo&&Number.isFinite(previousVideo.currentTime)?previousVideo.currentTime:0;
-      const wasPlaying=!!(previousVideo&&!previousVideo.paused&&!previousVideo.ended);
-      const previousVolume=previousVideo?previousVideo.volume:1;
-      const previousMuted=previousVideo?previousVideo.muted:false;
-      if(previousVideo){try{previousVideo.pause()}catch(_){}}
-      setupVideo();
-      const replacement=video;
-      await new Promise((resolve,reject)=>{
-        if(replacement.readyState>=1){resolve();return;}
-        replacement.addEventListener('loadedmetadata',resolve,{once:true});
-        replacement.addEventListener('error',()=>reject(new Error('Video gagal dimuat ulang setelah memperbaiki jalur audio.')),{once:true});
-        replacement.load();
-      });
-      if(Number.isFinite(replacement.duration)&&replacement.duration>0){
-        replacement.currentTime=Math.min(resumeAt,Math.max(0,replacement.duration-0.05));
-      }
-      replacement.volume=previousVolume;
-      replacement.muted=previousMuted;
-      await setupHighQualityAudio();
-      if(engine==='hq'){
-        updatePitch();
-        if(wasPlaying){
-          window.__miconAdAuthorized=true;
-          try{await replacement.play();}
-          finally{window.__miconAdAuthorized=false;}
-        }
-        return;
-      }
-      throw new Error('Mesin transpose tidak aktif setelah video dimuat ulang.');
-    }catch(retryError){
-      highQualityError=retryError;
-    }
-  }
-
-  /* Jangan lepaskan referensi MediaElementSource yang sudah tercipta: elemen video
-     tersebut tidak boleh dibuatkan source kedua, walaupun AudioContext gagal. */
-  if(source){
-    if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}
     try{source.disconnect()}catch(_){}
-    if(ctx&&ctx.state!=='closed'){try{source.connect(ctx.destination)}catch(_){}}
-    engine='bypass';
-  }else{
-    if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}
-    if(ctx&&ownsContext&&ctx.state!=='closed'){try{await ctx.close()}catch(_){}}
-    ctx=null;ownsContext=false;engine='none';
+    try{node.disconnect()}catch(_){}
+    try{source.connect(outputGain)}catch(_){}
+    effect=null;engine='direct';
+    throw error;
   }
-  throw new Error('Efek perubahan nada tidak berhasil dimuat. Jalur audio sudah dicoba diperbarui tanpa membuat MediaElementSource ganda. Detail: '+(highQualityError?.message||'Kesalahan audio tidak diketahui.'));
 }
-async function clearAudioGraph(){stopVolumeMatch();if(video){try{video.pause()}catch(_){}}if(source){try{source.disconnect()}catch(_){}source=null;}if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}if(inputAnalyser){try{inputAnalyser.disconnect()}catch(_){}inputAnalyser=null;}if(processedAnalyser){try{processedAnalyser.disconnect()}catch(_){}processedAnalyser=null;}if(outputLimiter){try{outputLimiter.disconnect()}catch(_){}outputLimiter=null;}volumeMatchInputData=null;volumeMatchOutputData=null;const oldCtx=ctx;ctx=null;if(ownsContext&&oldCtx&&oldCtx.state!=='closed'){try{await oldCtx.close()}catch(_){}}ownsContext=false;engine='none';}
+function useDirectAudioRoute(){
+  if(!source||!outputGain||!effect||engine!=='hq')return;
+  try{
+    source.disconnect();
+    effect.disconnect();
+    source.connect(outputGain);
+    engine='direct';
+  }catch(error){msg('Gagal mengembalikan audio asli: '+(error.message||error),true);}
+}
+async function setupAudio(){
+  if(!video)throw new Error('Pilih video terlebih dahulu.');
+  /* Nada asli memakai pemutar HTML5 langsung; jangan buat AudioContext/Worklet. */
+  if(Number($('pitchRange').value)===0)return;
+  if(!source)await setupHighQualityAudio();
+  if(ctx&&ctx.state==='suspended'){
+    try{await ctx.resume();}catch(_){}
+  }
+  if(Number($('pitchRange').value)===0){useDirectAudioRoute();updatePitch();return;}
+  await ensureTransposeProcessor();
+  updatePitch();
+}
+async function clearAudioGraph(){
+  if(video){try{video.pause()}catch(_){}}
+  if(source){try{source.disconnect()}catch(_){}source=null;}
+  if(effect){try{effect.disconnect()}catch(_){}try{effect.dispose?.()}catch(_){}effect=null;}
+  if(outputGain){try{outputGain.disconnect()}catch(_){}outputGain=null;}
+  if(outputLimiter){try{outputLimiter.disconnect()}catch(_){}outputLimiter=null;}
+  const oldCtx=ctx;ctx=null;
+  if(ownsContext&&oldCtx&&oldCtx.state!=='closed'){try{await oldCtx.close()}catch(_){}}
+  ownsContext=false;engine='none';
+}
 async function clearVideo(){await clearAudioGraph();if(video){video.removeAttribute('src');video.load();video.remove();video=null;}if(url){URL.revokeObjectURL(url);url=null;}file=null;playing=false;$('videoFile').value='';$('fileName').textContent='Belum ada video dipilih';$('fileSize').textContent='Pilih file MP4 dari perangkat';$('fileStatus').textContent='Menunggu video';$('clearBtn').disabled=true;$('playBtn').disabled=true;$('playBtn').textContent='▶ Putar video';$('pitchRange').disabled=true;$('downBtn').disabled=true;$('upBtn').disabled=true;$('pitchRange').value=0;if($('keySelect'))$('keySelect').value='';$('duration').textContent='00:00';$('currentTime').textContent='00:00';$('progressBar').style.width='0%';$('alert').className='alert';updatePitch();}
 // Satu jalur pemilih file: tombol Upload membuka input file secara langsung.
 const uploadDockButton=document.querySelector('.upload-dock[data-upload-video]');
@@ -1209,17 +1133,8 @@ $('videoFile').addEventListener('change',async e=>{
     loadedVideo.addEventListener('loadedmetadata',async()=>{
       if(loadedVideo!==video) return;
       $('fileStatus').textContent='Video berhasil diimpor · menyambungkan audio';
-      /* Buat dan sambungkan AudioWorklet segera setelah import, sebelum iklan
-         pembuka dan pemutaran video. Simpan promise agar tombol Play tidak
-         membuat jalur MediaElementSource kedua saat inisialisasi berlangsung. */
-      if(!audioSetupPromise&&!source){
-        audioSetupPromise=setupAudio().then(()=>{
-          if(loadedVideo===video){updatePitch();$('fileStatus').textContent='Audio tersambung · menyiapkan iklan';}
-        }).catch(error=>{
-          msg('AudioWorklet belum berhasil disambungkan: '+(error.message||error),true);
-        }).finally(()=>{audioSetupPromise=null;});
-      }
-      if(audioSetupPromise)await audioSetupPromise;
+      /* Audio nada asli dibiarkan memakai jalur native browser. Mesin transpose
+         baru dibuat saat pengguna benar-benar menekan + atau -. */
       if(loadedVideo!==video||!loadedVideo.isConnected)return;
       /* Satu import sukses = satu iklan pembuka. Setelah iklan dilewati/selesai, video langsung play. */
       if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
@@ -1283,11 +1198,13 @@ $('playBtn').addEventListener('click',async()=>{
   targetVideo.muted=false;
   targetVideo.defaultPlaybackRate=1;
   targetVideo.playbackRate=1;
-  /* Smartphone mengikuti urutan desktop: pastikan AudioWorklet aktif dahulu,
-     lalu mulai video. Tidak ada jalur playback terpisah yang dapat mengubah
-     urutan inisialisasi atau membuat audio berjalan sebelum efek siap. */
+  /* Pada nada asli, biarkan elemen video memakai decoder audio native browser.
+     AudioWorklet hanya disiapkan lebih dulu bila transpose sedang aktif. */
   try{
-    await (audioSetupPromise||setupAudio());
+    if(Number($('pitchRange').value)!==0){
+      if(ctx&&ctx.state==='suspended'){try{await ctx.resume();}catch(_){}}
+      await (audioSetupPromise||setupAudio());
+    }
     if(targetVideo!==video)return;
     updatePitch();
     window.__miconAdAuthorized=true;
@@ -1299,9 +1216,9 @@ $('playBtn').addEventListener('click',async()=>{
 });
 const keySelect=$('keySelect');
 async function activateTransposeForSelectedPitch(){
-  if(!video||Number($('pitchRange').value)===0||source||engine==='bypass')return;
+  if(!video||Number($('pitchRange').value)===0||engine==='bypass')return;
   if(audioSetupPromise)return audioSetupPromise;
-  audioSetupPromise=setupAudio()
+  audioSetupPromise=ensureTransposeProcessor()
     .then(()=>updatePitch())
     .catch(err=>msg('Transpose belum aktif: '+(err.message||err),true))
     .finally(()=>{audioSetupPromise=null;});
@@ -1316,11 +1233,13 @@ if(keySelect)keySelect.addEventListener('change',()=>{
   activateTransposeForSelectedPitch();
 });
 $('pitchRange').addEventListener('input',()=>{
+  if(Number($('pitchRange').value)===0)useDirectAudioRoute();
   updatePitch();
   activateTransposeForSelectedPitch();
 });
 $('downBtn').addEventListener('click',()=>{
   $('pitchRange').value=Math.max(-6,+$('pitchRange').value-1);
+  if(Number($('pitchRange').value)===0)useDirectAudioRoute();
   updatePitch();
   activateTransposeForSelectedPitch();
 });
