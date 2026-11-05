@@ -997,45 +997,44 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-
+const AUDIO_WORKLET_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
+let audioContext=null,workletModulePromise=null,audioReadyPromise=Promise.resolve(false),pitch=0;
 let file=null,url=null,video=null,playing=false;
-/* Satu mesin AudioWorklet global untuk desktop dan smartphone. */
-const DESKTOP_AUDIO_WORKLET_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
-let desktopAudioContext=null,desktopWorkletModulePromise=null,desktopAudioReadyPromise=Promise.resolve(false),desktopPitch=0;
 
+/* Satu mesin AudioWorklet global untuk desktop dan smartphone. */
 function updatePitchDisplay(){
  const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
- if(range)range.value=String(desktopPitch);
- if(value)value.textContent=String(desktopPitch);
- if(name)name.textContent=desktopPitch===0?'Original':(desktopPitch>0?'+':'')+desktopPitch;
- if(desc)desc.textContent=desktopPitch===0?'0 semitone · nada asli':Math.abs(desktopPitch)+' semitone · '+(desktopPitch>0?'nada dinaikkan':'nada diturunkan');
+ if(range)range.value=String(pitch);
+ if(value)value.textContent=String(pitch);
+ if(name)name.textContent=pitch===0?'Original':(pitch>0?'+':'')+pitch;
+ if(desc)desc.textContent=pitch===0?'0 semitone · nada asli':Math.abs(pitch)+' semitone · '+(pitch>0?'nada dinaikkan':'nada diturunkan');
  const down=$('downBtn'),up=$('upBtn');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const ready=!!(video&&video.__miconAudioGraph&&video.__miconAudioGraph.worklet);
- if(down)down.disabled=!ready||desktopPitch<=min;
- if(up)up.disabled=!ready||desktopPitch>=max;
+ if(down)down.disabled=!ready||pitch<=min;
+ if(up)up.disabled=!ready||pitch>=max;
  if(range)range.disabled=!ready;
 }
 
 function configurePitchControls(enabled){
  const down=$('downBtn'),up=$('upBtn'),range=$('pitchRange');
  if(range)range.disabled=!enabled;
- if(down)down.disabled=!enabled||desktopPitch<=Number(range?range.min:-6);
- if(up)up.disabled=!enabled||desktopPitch>=Number(range?range.max:6);
- if(range)range.value=String(desktopPitch);
+ if(down)down.disabled=!enabled||pitch<=Number(range?range.min:-6);
+ if(up)up.disabled=!enabled||pitch>=Number(range?range.max:6);
+ if(range)range.value=String(pitch);
 }
 
 function applyPitch(value){
  const range=$('pitchRange');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const next=Math.max(min,Math.min(max,Math.round(Number(value)||0)));
- desktopPitch=next;
+ pitch=next;
  const activeVideo=video;
  const worklet=activeVideo&&activeVideo.__miconAudioGraph&&activeVideo.__miconAudioGraph.worklet;
  const pitchParam=worklet&&worklet.parameters.get('pitchSemitones');
  if(pitchParam){
   try{
-   if(desktopAudioContext&&typeof pitchParam.setTargetAtTime==='function')pitchParam.setTargetAtTime(next,desktopAudioContext.currentTime,0.025);
+   if(audioContext&&typeof pitchParam.setTargetAtTime==='function')pitchParam.setTargetAtTime(next,audioContext.currentTime,0.025);
    else pitchParam.value=next;
   }catch(_){pitchParam.value=next;}
  }
@@ -1051,7 +1050,7 @@ function disconnectVideoAudio(target){
   try{graph.worklet.port.close();}catch(_){}
   try{delete target.__miconAudioGraph;}catch(_){target.__miconAudioGraph=null;}
  }
- if(target.__miconAudioPipeline==='desktop-audioworklet')try{delete target.__miconAudioPipeline;}catch(_){}
+ if(target.__miconAudioPipeline==='soundtouch-audioworklet')try{delete target.__miconAudioPipeline;}catch(_){}
 }
 
 async function connectVideoToAudioWorklet(target){
@@ -1059,34 +1058,36 @@ async function connectVideoToAudioWorklet(target){
  if(!AudioContextClass||!window.AudioWorkletNode)throw new Error('Perangkat atau browser belum mendukung AudioWorklet.');
  if(!target||target!==video||!target.isConnected)return false;
  if(target.__miconAudioGraph)return true;
- if(!desktopAudioContext)desktopAudioContext=new AudioContextClass({latencyHint:'playback'});
- if(!desktopAudioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
- const resumeTask=desktopAudioContext.state==='suspended'?desktopAudioContext.resume().catch(()=>{}):Promise.resolve();
- if(!desktopWorkletModulePromise){
-  desktopWorkletModulePromise=desktopAudioContext.audioWorklet.addModule(DESKTOP_AUDIO_WORKLET_URL).catch(error=>{
-   desktopWorkletModulePromise=null;
+ if(!audioContext)audioContext=new AudioContextClass({latencyHint:'playback'});
+ if(!audioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
+ const resumeTask=audioContext.state==='suspended'?audioContext.resume().catch(()=>{}):Promise.resolve();
+ if(!workletModulePromise){
+  workletModulePromise=audioContext.audioWorklet.addModule(AUDIO_WORKLET_URL).catch(error=>{
+   workletModulePromise=null;
    throw error;
   });
  }
- await Promise.all([desktopWorkletModulePromise,resumeTask]);
+ await Promise.all([workletModulePromise,resumeTask]);
  if(target!==video||!target.isConnected)return false;
  if(target.__miconAudioGraph)return true;
  let source=null,worklet=null;
  try{
-  worklet=new AudioWorkletNode(desktopAudioContext,'soundtouch-processor',{
+  worklet=new AudioWorkletNode(audioContext,'soundtouch-processor',{
    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
    processorOptions:{sampleBufferType:'circular'}
   });
   const pitchParam=worklet.parameters.get('pitchSemitones');
   if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada AudioWorklet.');
-  pitchParam.value=desktopPitch;
+  pitchParam.value=pitch;
   const playbackParam=worklet.parameters.get('playbackRate');
   if(playbackParam)playbackParam.value=1;
-  source=desktopAudioContext.createMediaElementSource(target);
+  source=audioContext.createMediaElementSource(target);
   source.connect(worklet);
-  worklet.connect(desktopAudioContext.destination);
+  worklet.connect(audioContext.destination);
   target.__miconAudioGraph={source,worklet};
-  target.__miconAudioPipeline='desktop-audioworklet';
+  target.__miconAudioPipeline='soundtouch-audioworklet';
+  target.defaultPlaybackRate=1;
+  target.playbackRate=1;
   return true;
  }catch(error){
   try{if(source)source.disconnect();}catch(_){}
@@ -1109,8 +1110,7 @@ function setupVideo(){
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
  $('videoStage').appendChild(video);video.src=url;
  const targetVideo=video;
- /* Semua perangkat memakai mesin desktop AudioWorklet yang sama. */
- desktopAudioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
+ audioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
   if(targetVideo===video){
    updatePitchDisplay();
    configurePitchControls(!!ready);
@@ -1144,9 +1144,9 @@ function setupVideo(){
   window.__miconNativeAdPending=true;
   Promise.resolve(window.miconAdGate?window.miconAdGate():true).then(async ok=>{
    if(ok&&video&&video.isConnected){
-    await desktopAudioReadyPromise;
-    if(desktopAudioContext&&desktopAudioContext.state==='suspended'){
-     try{await desktopAudioContext.resume();}catch(_){}
+    await audioReadyPromise;
+    if(audioContext&&audioContext.state==='suspended'){
+     try{await audioContext.resume();}catch(_){}
     }
     if(!video||!video.isConnected)return;
     window.__miconAdAuthorized=true;return video.play();
@@ -1166,11 +1166,10 @@ function setupVideo(){
  });
  video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));
 }
-
 async function clearVideo(){
  if(video){try{video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}video=null;}
- desktopAudioReadyPromise=Promise.resolve(false);
- desktopPitch=0;updatePitchDisplay();configurePitchControls(false);
+ audioReadyPromise=Promise.resolve(false);
+ pitch=0;updatePitchDisplay();configurePitchControls(false);
  if(url){URL.revokeObjectURL(url);url=null;}
  file=null;playing=false;
  $('videoFile').value='';
@@ -1182,7 +1181,6 @@ async function clearVideo(){
  $('duration').textContent='00:00';$('currentTime').textContent='00:00';
  $('progressBar').style.width='0%';$('alert').className='alert';
 }
-
 const uploadDockButton=document.querySelector('.upload-dock[data-upload-video]');
 if(uploadDockButton)uploadDockButton.addEventListener('click',event=>{
  event.preventDefault();$('videoFile')?.click();
@@ -1205,19 +1203,19 @@ $('videoFile').addEventListener('change',async event=>{
   const loadedVideo=video;
   loadedVideo.addEventListener('loadedmetadata',async()=>{
    if(loadedVideo!==video)return;
-   await desktopAudioReadyPromise;
+   await audioReadyPromise;
    if(loadedVideo!==video||!loadedVideo.isConnected)return;
-   if(desktopAudioContext&&desktopAudioContext.state==='suspended'){
-    try{await desktopAudioContext.resume();}catch(_){}
+   if(audioContext&&audioContext.state==='suspended'){
+    try{await audioContext.resume();}catch(_){}
    }
    if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
     window.__miconOpeningAdRunning=true;
     Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true).then(async passed=>{
      if(!passed||loadedVideo!==video||!loadedVideo.isConnected)return;
-     await desktopAudioReadyPromise;
+     await audioReadyPromise;
      if(loadedVideo!==video||!loadedVideo.isConnected)return;
-     if(desktopAudioContext&&desktopAudioContext.state==='suspended'){
-      try{await desktopAudioContext.resume();}catch(_){}
+     if(audioContext&&audioContext.state==='suspended'){
+      try{await audioContext.resume();}catch(_){}
      }
      window.__miconAdForFileDone=true;
      $('fileStatus').textContent='Video siap diputar';
@@ -1243,14 +1241,10 @@ $('playBtn').addEventListener('click',async()=>{
  if(!video)return;
  if(!video.paused){video.pause();return;}
  try{
-  const targetVideo=video;if(!targetVideo)return;
-  await desktopAudioReadyPromise;
-  if(!targetVideo.__miconAudioGraph||!targetVideo.__miconAudioGraph.worklet){
-   const ready=await connectVideoToAudioWorklet(targetVideo);
-   if(!ready)throw new Error('AudioWorklet belum siap.');
-   desktopAudioReadyPromise=Promise.resolve(true);
-  }
-  if(desktopAudioContext&&desktopAudioContext.state==='suspended')await desktopAudioContext.resume();
+  const targetVideo=video;
+  const ready=await audioReadyPromise;
+  if(!ready||!targetVideo.__miconAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
+  if(audioContext&&audioContext.state==='suspended')await audioContext.resume();
   if(targetVideo!==video||!targetVideo.isConnected)return;
   window.__miconAdAuthorized=true;
   await targetVideo.play();
@@ -1260,11 +1254,15 @@ $('playBtn').addEventListener('click',async()=>{
  }
 });
 $('clearBtn').addEventListener('click',()=>{clearVideo();});
-$('downBtn')?.addEventListener('click',()=>applyPitch(desktopPitch-1));
-$('upBtn')?.addEventListener('click',()=>applyPitch(desktopPitch+1));
+$('downBtn')?.addEventListener('click',()=>applyPitch(pitch-1));
+$('upBtn')?.addEventListener('click',()=>applyPitch(pitch+1));
 $('pitchRange')?.addEventListener('input',event=>applyPitch(event.currentTarget.value));
 updatePitchDisplay();
 configurePitchControls(false);
+if(window.matchMedia('(max-width:760px)').matches){
+ const mobileKeySelect=$('keySelect');
+ if(mobileKeySelect){mobileKeySelect.setAttribute('aria-disabled','true');mobileKeySelect.tabIndex=-1;}
+}
 const dock=document.getElementById('mobileDock'),moreSheet=document.getElementById('moreSheet');
 if(dock)dock.querySelectorAll('[data-target]').forEach(button=>button.addEventListener('click',()=>{
  dock.querySelectorAll('.dock-item').forEach(item=>item.classList.remove('active'));
@@ -1857,19 +1855,18 @@ try {
     else window.__miconPlaylistHasNext=false;
   };
   playlistPicker.addEventListener('change',()=>{
-    const selectedFiles=Array.from(playlistPicker.files||[]);
     const beforeCount=playlist.length;
-    let addedCount=0;
-    selectedFiles.forEach(selected=>{
-      const isMp4=/\.mp4$/i.test(selected.name)||selected.type==='video/mp4'||selected.type==='application/mp4';
-      if(!isMp4)return;
-      const duplicate=playlist.some(item=>item.file.name===selected.name&&item.file.size===selected.size&&item.file.lastModified===selected.lastModified);
-      if(!duplicate){playlist.push({file:selected});addedCount++;}
+    Array.from(playlistPicker.files||[]).forEach(file=>{
+      if(/\.mp4$/i.test(file.name)||file.type==='video/mp4'||file.type==='application/mp4'){
+        if(!playlist.some(item=>item.file.name===file.name&&item.file.size===file.size&&item.file.lastModified===file.lastModified)){
+          playlist.push({file});
+        }
+      }
     });
     playlistPicker.value='';
     renderPlaylist();
-    /* Seluruh file dalam satu FileList masuk antrean. Hanya batch pertama
-       yang otomatis memulai item pertama; batch berikutnya tidak memotong antrean. */
+    /* Impor batch pertama langsung memulai lagu pertama; batch tambahan tidak
+       mengganggu lagu yang sedang diputar dan masuk ke urutan antrean berikutnya. */
     if(beforeCount===0&&playlist.length>0&&currentIndex===-1)loadPlaylistItem(0);
     window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
   });
@@ -2702,8 +2699,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   .micon-play-details{grid-template-columns:1fr;gap:20px;padding-top:17px}.micon-play-details h2{font-size:18px;margin-bottom:9px}.micon-play-description>p{font-size:12px;line-height:1.7}.micon-play-feature-grid{grid-template-columns:1fr;gap:8px;margin-top:15px}.micon-play-feature-grid article{padding:11px}.micon-play-feature-grid strong{font-size:12px}.micon-play-feature-grid small{font-size:10px}.feature-symbol{width:32px;height:32px}.micon-play-about{padding:14px}.micon-play-about h2{font-size:16px}.micon-play-footnote{font-size:10px;margin-top:18px}
 }
 </style>
-</body>
-</html>
 
 <style id="micon-download-only-hide-preview">
 @media(max-width:760px){
@@ -2711,3 +2706,5 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   body:has(#youtubeSection.active) #mainContent{display:none!important}
 }
 </style>
+</body>
+</html>
