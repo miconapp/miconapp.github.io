@@ -73,9 +73,48 @@ button,input{font:inherit}
 .password-help{font-size:11px;color:#8994a4;margin-top:6px}
 @media(max-width:900px){.page{grid-template-columns:1fr}.visual{display:none}.auth-side{min-height:100vh;padding:28px 20px}.mobile-brand{display:flex;margin-bottom:34px}.auth-wrap{max-width:430px}}
 @media(max-width:480px){.auth-side{align-items:flex-start;padding:25px 20px calc(25px + env(safe-area-inset-bottom))}.auth-wrap{margin:auto 0}.mobile-brand{margin-bottom:35px}.auth-heading h2{font-size:31px}.auth-heading{margin-bottom:23px}}
+
+/* MicOn splash screen — hanya lapisan pembuka, tidak mengubah form autentikasi */
+#miconSplash{
+  position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+  overflow:hidden;background:#071827 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/cover no-repeat;
+  opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease;
+}
+#miconSplash::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,12,25,.12),rgba(3,12,25,.55))}
+#miconSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.splash-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:22px;padding:24px;text-align:center;color:#fff}
+.splash-loader{width:64px;height:64px;border:3px solid rgba(255,255,255,.25);border-top-color:#75f1df;border-right-color:#75f1df;border-radius:50%;animation:miconSpin .9s linear infinite;filter:drop-shadow(0 0 12px rgba(117,241,223,.45))}
+.splash-equalizer{height:28px;display:flex;align-items:center;gap:5px}
+.splash-equalizer i{display:block;width:4px;height:9px;border-radius:8px;background:#83f4e2;animation:miconBars .8s ease-in-out infinite alternate}
+.splash-equalizer i:nth-child(2n){animation-delay:.18s}.splash-equalizer i:nth-child(3n){animation-delay:.34s}
+.splash-caption{font:700 12px/1.5 Inter,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 2px 12px #0008}
+.splash-hint{display:none;border:1px solid #ffffff70;border-radius:30px;padding:10px 17px;background:#07182780;color:#fff;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
+#miconSplash.needs-tap .splash-hint{display:inline-flex}
+#miconSplash.needs-tap .splash-loader{animation:none;border-color:#75f1df}
+@keyframes miconSpin{to{transform:rotate(360deg)}}
+@keyframes miconBars{to{height:25px;opacity:.55}}
+@media(max-width:900px){
+  #miconSplash{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
+  .splash-loader{width:54px;height:54px}
+}
+@media(prefers-reduced-motion:reduce){.splash-loader,.splash-equalizer i{animation:none}#miconSplash{transition:none}}
+
 </style>
 </head>
 <body>
+
+<div id="miconSplash" role="status" aria-live="polite" aria-label="MicOn sedang memuat">
+  <div class="splash-content">
+    <div class="splash-loader" aria-hidden="true"></div>
+    <div class="splash-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="splash-caption">Menyiapkan pengalaman MicOn</div>
+    <button class="splash-hint" id="splashStart" type="button">Ketuk untuk memulai audio</button>
+  </div>
+</div>
+<audio id="miconSplashAudio" preload="auto" playsinline>
+  <source src="https://github.com/miconapp/miconapp.github.io/blob/main/src/audio%20Splash%20Screen%20desktop%20dan%20mobile.mp3?raw=true" type="audio/mpeg">
+</audio>
+
 <div class="page">
   <aside class="visual" aria-label="Informasi MicOn">
     <a class="brand" href="#" aria-label="MicOn">
@@ -164,6 +203,56 @@ button,input{font:inherit}
     </div>
   </main>
 </div>
+
+<script>
+(() => {
+  const screen = document.getElementById("miconSplash");
+  const audio = document.getElementById("miconSplashAudio");
+  const startButton = document.getElementById("splashStart");
+  if (!screen || !audio) return;
+  let finished = false;
+  let fallbackTimer = null;
+
+  function closeSplash() {
+    if (finished) return;
+    finished = true;
+    clearTimeout(fallbackTimer);
+    screen.classList.add("is-leaving");
+    window.setTimeout(() => screen.remove(), 700);
+    audio.pause();
+  }
+
+  function startAudio() {
+    audio.play().then(() => {
+      screen.classList.remove("needs-tap");
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = setTimeout(closeSplash, (audio.duration + 8) * 1000);
+      }
+    }).catch(() => {
+      // Browser/WebView tertentu memblokir autoplay bersuara sampai ada sentuhan pengguna.
+      screen.classList.add("needs-tap");
+    });
+  }
+
+  audio.addEventListener("ended", closeSplash, { once:true });
+  audio.addEventListener("error", () => {
+    // Jika file audio gagal dimuat, jangan menahan pengguna di splash.
+    fallbackTimer = setTimeout(closeSplash, 2500);
+  }, { once:true });
+
+  startButton.addEventListener("click", startAudio);
+  screen.addEventListener("click", event => {
+    if (screen.classList.contains("needs-tap") && event.target !== startButton) startAudio();
+  });
+
+  // Coba mulai otomatis. Jika ditolak browser, pengguna cukup mengetuk layar sekali.
+  startAudio();
+
+  // Splash normalnya berakhir tepat saat audio selesai (event ended).
+})();
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import {
