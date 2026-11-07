@@ -1081,8 +1081,8 @@ function applyPitch(value){
 /* Gain +20 dB hanya untuk audio video pada smartphone.
    Satu node gain ditempatkan setelah SoundTouch sehingga Original 0,
    transpose minus, dan transpose plus selalu memakai gain yang sama. */
-const MOBILE_AUDIO_GAIN_DB=15;
-const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/15);
+const MOBILE_AUDIO_GAIN_DB=13;
+const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/13);
 
 function disconnectVideoAudio(target){
  if(!target)return;
@@ -1158,14 +1158,15 @@ function showTime(){
  $('currentTime').textContent=fmt(video.currentTime);
  $('progressBar').style.width=(video.duration?video.currentTime/video.duration*100:0)+'%';
 }
-function setupVideo(){
+async function setupVideo(){
  if(video){video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
  video=document.createElement('video');
  video.id='karaokeVideo';video.controls=true;video.playsInline=true;
  video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
- $('videoStage').appendChild(video);video.src=url;
+ $('videoStage').appendChild(video);
  const targetVideo=video;
+ const isMobileAudioTarget=window.matchMedia('(max-width:760px)').matches;
  audioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
   if(targetVideo===video){
    updatePitchDisplay();
@@ -1292,6 +1293,23 @@ function setupVideo(){
   }
  });
  video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));
+
+ /* Smartphone: jangan mulai decode/load file sebelum jalur source -> Worklet
+    -> Gain -> speaker benar-benar terpasang. Ini mencegah audio awal lolos
+    atau memulai dengan jalur native lalu terlambat berpindah ke SoundTouch. */
+ if(isMobileAudioTarget){
+  const graphReady=await audioReadyPromise;
+  if(targetVideo!==video||!targetVideo.isConnected)return false;
+  if(!graphReady||!targetVideo.__miconAudioGraph||!targetVideo.__miconAudioGraph.worklet){
+   throw new Error('AudioWorklet + SoundTouch gagal disiapkan sebelum file video dimuat.');
+  }
+  if(audioContext&&audioContext.state==='suspended'){
+   try{await audioContext.resume();}catch(_){}
+  }
+ }
+ targetVideo.src=url;
+ targetVideo.load();
+ return true;
 }
 async function clearVideo(){
  if(video){try{video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}video=null;}
@@ -1321,24 +1339,33 @@ $('videoFile').addEventListener('change',async event=>{
  try{
   await clearVideo();file=selectedFile;
   window.__miconAdAuthorized=false;window.__miconAdForFileDone=false;
-  window.__miconEndAdShown=false;window.__miconOpeningAdRunning=false;
+  window.__miconEndAdShown=false;window.__miconOpeningAdRunning=false;window.__miconOpeningAdPromise=null;
   url=URL.createObjectURL(selectedFile);
   $('fileName').textContent=selectedFile.name;
   $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video/mp4');
   $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
-  setupVideo();
+  const isMobileImport=window.matchMedia('(max-width:760px)').matches;
+  if(isMobileImport){
+   /* Mulai iklan pada saat import dipilih, bersamaan dengan inisialisasi
+      Worklet. Audio graph harus selesai sebelum src video mulai di-decode. */
+   window.__miconOpeningAdRunning=true;
+   window.__miconOpeningAdPromise=Promise.resolve(
+    window.miconAdGate?window.miconAdGate('opening'):true
+   );
+  }
+  await setupVideo();
   const loadedVideo=video;
   loadedVideo.addEventListener('loadedmetadata',()=>{
    if(loadedVideo!==video||!loadedVideo.isConnected)return;
-   if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
-    window.__miconOpeningAdRunning=true;
+   if((window.__miconOpeningAdRunning||!isMobileImport)&&!window.__miconAdForFileDone){
 
-    /* AudioWorklet + SoundTouch sudah mulai disiapkan sejak setupVideo().
-       Jalankan iklan secara paralel, jangan menunggu Worklet selesai lebih dulu. */
+    /* AudioWorklet telah terhubung sebelum video smartphone dimuat.
+       Iklan berjalan paralel dengan persiapan graph dan buffer video. */
+    window.__miconOpeningAdRunning=true;
     const workletReadyTask=audioReadyPromise;
-    const openingAdTask=Promise.resolve(
-     window.miconAdGate?window.miconAdGate('opening'):true
-    );
+    const openingAdTask=isMobileImport
+     ?(window.__miconOpeningAdPromise||Promise.resolve(true))
+     :Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
     const mobileBufferTask=waitForMobileVideoBuffer(loadedVideo);
 
     Promise.all([workletReadyTask,openingAdTask,mobileBufferTask]).then(async([audioReady,passed,bufferReady])=>{
