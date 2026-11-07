@@ -857,7 +857,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 <div id="videoStage" class="videoStage"></div><section class="mobile-fill" aria-label="Tips karaoke"><div class="mobile-tip"><span>✦</span><div><b>Tips vokal</b><p>Atur nada sedikit demi sedikit sampai lagu terasa pas dengan jangkauan suaramu.</p></div></div></section>
 <div class="filemeta"><div class="fileIcon" aria-hidden="true">♫</div><div class="filetext"><b id="fileName">Belum ada lagu dipilih</b><small id="fileSize">File audio akan tampil di sini</small><div class="status" id="fileStatus">Menunggu file</div></div></div>
 </section>
-<section class="card transposeCard" id="transposeSection"><label class="drop" id="dropZone" for="videoFile" role="button" tabindex="0"><div><div class="uploadIcon">⬆</div><strong>Tekan untuk pilih video MP4</strong><small>MP4 · pilih video baru untuk mengganti video</small></div></label><input id="videoFile" type="file" accept=".mp4,video/mp4,video/*" hidden><h3>02 · Transpose nada video</h3><p class="sub">Ubah nada audio video saat diputar.</p>
+<section class="card transposeCard" id="transposeSection"><label class="drop" id="dropZone" for="videoFile" role="button" tabindex="0"><div><div class="uploadIcon">⬆</div><strong>Tekan untuk pilih video MP4</strong><small>MP4 · pilih video baru untuk mengganti video</small></div></label><input id="videoFile" type="file" accept="video/*,.mp4,.m4v,.webm,.mov,.3gp" hidden><h3>02 · Transpose nada video</h3><p class="sub">Ubah nada audio video saat diputar.</p>
 <label class="keySelectWrap" aria-label="Pilih Tangga Nada">
   <select id="keySelect" class="keySelect">
     <option value="">Pilih Tangga Nada</option>
@@ -1330,18 +1330,23 @@ async function setupVideo(){
  });
  video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));
 
- /* Smartphone: jangan mulai decode/load file sebelum jalur source -> Worklet
-    -> Gain -> speaker benar-benar terpasang. Ini mencegah audio awal lolos
-    atau memulai dengan jalur native lalu terlambat berpindah ke SoundTouch. */
+ /* MOBILE ONLY: muat file lokal seketika agar preview tidak menunggu
+    AudioWorklet. SoundTouch disiapkan paralel dan dipakai saat audio diputar.
+    File master tetap objek File asli; tidak dibaca ulang atau ditulis ulang. */
  if(isMobileAudioTarget){
-  const graphReady=await audioReadyPromise;
-  if(targetVideo!==video||!targetVideo.isConnected)return false;
-  if(!graphReady||!targetVideo.__miconAudioGraph||!targetVideo.__miconAudioGraph.worklet){
-   throw new Error('AudioWorklet + SoundTouch gagal disiapkan sebelum file video dimuat.');
-  }
-  if(audioContext&&audioContext.state==='suspended'){
-   try{await audioContext.resume();}catch(_){}
-  }
+  targetVideo.src=url;
+  targetVideo.load();
+  audioReadyPromise.then(async ready=>{
+   if(targetVideo!==video||!targetVideo.isConnected)return;
+   if(ready&&targetVideo.__miconAudioGraph){
+    if(audioContext&&audioContext.state==='suspended')try{await audioContext.resume();}catch(_){}
+    configurePitchControls(true);
+   }else{
+    configurePitchControls(false);
+    msg('Pemrosesan transpose belum didukung oleh WebView ini. Video lokal tetap dapat dibuka.',true);
+   }
+  });
+  return true;
  }
  targetVideo.src=url;
  targetVideo.load();
@@ -1369,6 +1374,57 @@ if(uploadDockButton)uploadDockButton.addEventListener('click',event=>{
 $('videoFile').addEventListener('change',async event=>{
  const picker=event.currentTarget,selectedFile=picker.files&&picker.files[0];
  if(!selectedFile)return;
+ /* Smartphone menggunakan alur impor lokal tunggal yang baru; desktop
+    tetap memakai handler lama tanpa perubahan. */
+ if(window.matchMedia('(max-width:760px)').matches){
+  event.stopImmediatePropagation();
+  picker.value='';
+  try{
+   await clearVideo();
+   file=selectedFile;
+   window.__miconAdAuthorized=false;window.__miconAdForFileDone=false;
+   window.__miconEndAdShown=false;window.__miconOpeningAdRunning=true;
+   window.__miconOpeningAdPromise=Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
+   url=URL.createObjectURL(selectedFile);
+   $('fileName').textContent=selectedFile.name;
+   $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video');
+   $('fileStatus').textContent='Memuat video lokal…';$('clearBtn').disabled=false;
+   await setupVideo();
+   const activeVideo=video;
+   activeVideo.addEventListener('loadedmetadata',()=>{
+    if(activeVideo!==video||!activeVideo.isConnected)return;
+    $('duration').textContent=fmt(activeVideo.duration);
+    $('playBtn').disabled=false;
+    const adTask=window.__miconOpeningAdPromise||Promise.resolve(true);
+    const bufferTask=waitForMobileVideoBuffer(activeVideo).catch(()=>false);
+    Promise.all([audioReadyPromise,adTask,bufferTask]).then(async([audioReady,adPassed,bufferReady])=>{
+     if(activeVideo!==video||!activeVideo.isConnected)return;
+     if(!adPassed||!bufferReady){$('fileStatus').textContent='Video siap · tekan Putar';return;}
+     if(audioReady&&activeVideo.__miconAudioGraph){
+      if(audioContext&&audioContext.state!=='running')try{await audioContext.resume();}catch(_){}
+      configurePitchControls(true);
+     }else{
+      configurePitchControls(false);
+      $('fileStatus').textContent='Video siap · transpose tidak tersedia di WebView ini';
+     }
+     window.__miconAdForFileDone=true;window.__miconAdAuthorized=true;
+     try{await activeVideo.play();$('fileStatus').textContent='Video sedang diputar';}
+     catch(playError){$('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';}
+    }).catch(error=>{
+     $('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';
+     msg('Video lokal berhasil dimuat; audio sedang disiapkan: '+(error.message||error),true);
+    }).finally(()=>{window.__miconOpeningAdRunning=false;});
+   },{once:true});
+   activeVideo.addEventListener('error',()=>{
+    $('fileStatus').textContent='Format video tidak didukung';
+    msg('HP tidak dapat memutar codec video ini. Coba MP4 H.264 dengan audio AAC.',true);
+   },{once:true});
+  }catch(error){
+   $('fileStatus').textContent='Gagal memuat video';
+   msg('Gagal membuka file dari penyimpanan HP: '+(error.message||error),true);
+  }
+  return;
+ }
  if(!(/\.mp4$/i.test(selectedFile.name)||selectedFile.type==='video/mp4'||selectedFile.type==='application/mp4')){
   msg('Pilih file video MP4.',true);picker.value='';return;
  }
@@ -2438,119 +2494,60 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 <script id="micon-mobile-playlist-ui">
 (function(){
-  if(!window.matchMedia('(max-width:760px)').matches)return;
-  const scroll=document.querySelector('#mainContent>.home-layout>.home-scroll-column');
-  const grid=scroll&&scroll.querySelector(':scope > .grid');
-  const transpose=document.getElementById('transposeSection');
-  const clear=document.getElementById('clearBtn');
-  const compact=transpose&&transpose.querySelector('.pitch-compact-row');
-  if(!scroll||!grid||!transpose||!compact)return;
-
-  /* Tombol Hapus Video dipindahkan ke baris penuh di atas Import Playlist; handler asli tetap. */
-
-  const panel=document.createElement('section');
-  panel.className='mobile-playlist-panel';
-  panel.setAttribute('aria-label','Playlist video');
-  const add=document.createElement('button');
-  add.type='button';add.className='mobile-playlist-import';add.textContent='Tambah Playlist';
-  const heading=document.createElement('div');
-  heading.className='mobile-playlist-heading';heading.textContent='Playlist';
-  const list=document.createElement('div');
-  list.className='mobile-playlist-list';
-  const playlistAdBanner=document.querySelector('.mobile-ad-banner');
-  if(playlistAdBanner){
-    playlistAdBanner.classList.add('mobile-playlist-ad-banner');
-    playlistAdBanner.textContent='Banner Iklan';
-    playlistAdBanner.setAttribute('aria-label','Banner iklan');
-  }
-  const picker=document.createElement('input');
-  picker.type='file';picker.accept='.mp4,video/mp4,video/*';picker.multiple=true;
-  picker.className='mobile-playlist-picker';picker.setAttribute('aria-label','Pilih video untuk playlist');
-  if(clear){
-    clear.classList.add('mobile-clear-video');
-    clear.textContent='Hapus video';
-    panel.appendChild(clear);
-  }
-  panel.append(add,heading,list,picker);
-  grid.insertAdjacentElement('afterend',panel);
-  add.addEventListener('click',()=>picker.click());
-
-  /* Upload dari dock mobile masuk ke antrean playlist, bukan mengganti video langsung. */
-  document.addEventListener('click',event=>{
-    const uploadButton=event.target&&event.target.closest&&event.target.closest('.upload-dock[data-upload-video]');
-    if(!uploadButton)return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    picker.click();
-  },true);
-
-  const playlist=[];
-  let currentIndex=-1;
-  const videoPicker=document.getElementById('videoFile');
-  function markActive(){
-    list.querySelectorAll('.mobile-playlist-item').forEach((item,index)=>{
-      item.classList.toggle('active',index===currentIndex);
-    });
-  }
-  function loadItem(index){
-    if(index<0||index>=playlist.length||!videoPicker)return;
-    currentIndex=index;
-    window.__miconPlaylistHasNext=index<playlist.length-1;
-    markActive();
-    try{
-      const transfer=new DataTransfer();
-      transfer.items.add(playlist[index].file);
-      videoPicker.files=transfer.files;
-      videoPicker.dispatchEvent(new Event('change',{bubbles:true}));
-    }catch(error){
-      window.alert('Browser tidak dapat memuat video dari playlist: '+(error.message||error));
-    }
-  }
-  function render(){
-    list.replaceChildren();
-    /* Banner iklan selalu menjadi elemen pertama di dalam playlist. */
-    if(playlistAdBanner)list.appendChild(playlistAdBanner);
-    if(!playlist.length){
-      const empty=document.createElement('div');
-      empty.className='mobile-playlist-empty';
-      empty.textContent='Playlist masih kosong';
-      list.appendChild(empty);
-      return;
-    }
-    playlist.forEach((entry,index)=>{
-      const row=document.createElement('button');
-      row.type='button';row.className='mobile-playlist-item';
-      const icon=document.createElement('span');icon.className='mobile-playlist-icon';icon.textContent='♫';
-      const copy=document.createElement('span');copy.className='mobile-playlist-copy';
-      const name=document.createElement('strong');name.textContent=entry.file.name;
-      const size=document.createElement('small');size.textContent=(entry.file.size/1048576).toFixed(2)+' MB · video/mp4';
-      copy.append(name,size);row.append(icon,copy);
-      row.addEventListener('click',()=>loadItem(index));
-      list.appendChild(row);
-    });
-    markActive();
-  }
-  picker.addEventListener('change',()=>{
-    const before=playlist.length;
-    Array.from(picker.files||[]).forEach(file=>{
-      if(/\.mp4$/i.test(file.name)||file.type==='video/mp4'||file.type==='application/mp4'){
-        if(!playlist.some(entry=>entry.file.name===file.name&&entry.file.size===file.size&&entry.file.lastModified===file.lastModified)){
-          playlist.push({file});
-        }
-      }
-    });
-    picker.value='';
-    render();
-    if(before===0&&playlist.length>0&&currentIndex===-1)loadItem(0);
-    window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
+ if(!window.matchMedia('(max-width:760px)').matches)return;
+ const scroll=document.querySelector('#mainContent>.home-layout>.home-scroll-column');
+ const grid=scroll&&scroll.querySelector(':scope > .grid');
+ const transpose=document.getElementById('transposeSection');
+ const clear=document.getElementById('clearBtn');
+ if(!scroll||!grid||!transpose)return;
+ const panel=document.createElement('section');panel.className='mobile-playlist-panel';panel.setAttribute('aria-label','Playlist video');
+ const add=document.createElement('button');add.type='button';add.className='mobile-playlist-import';add.textContent='Tambah Playlist';
+ const heading=document.createElement('div');heading.className='mobile-playlist-heading';heading.textContent='Playlist';
+ const list=document.createElement('div');list.className='mobile-playlist-list';
+ const picker=document.createElement('input');picker.type='file';picker.accept='video/*,.mp4,.m4v,.webm,.mov,.3gp';picker.multiple=true;picker.hidden=true;picker.className='mobile-playlist-picker';
+ if(clear){clear.classList.add('mobile-clear-video');clear.textContent='Hapus video';panel.appendChild(clear);}
+ panel.append(add,heading,list,picker);grid.insertAdjacentElement('afterend',panel);
+ const playlist=[];let currentIndex=-1;
+ function render(){
+  list.replaceChildren();
+  if(!playlist.length){const empty=document.createElement('div');empty.className='mobile-playlist-empty';empty.textContent='Playlist masih kosong';list.appendChild(empty);return;}
+  playlist.forEach((entry,index)=>{
+   const row=document.createElement('button');row.type='button';row.className='mobile-playlist-item'+(index===currentIndex?' active':'');
+   const icon=document.createElement('span');icon.className='mobile-playlist-icon';icon.textContent='♫';
+   const copy=document.createElement('span');copy.className='mobile-playlist-copy';
+   const name=document.createElement('strong');name.textContent=entry.file.name;
+   const size=document.createElement('small');size.textContent=(entry.file.size/1048576).toFixed(2)+' MB · file lokal';
+   copy.append(name,size);row.append(icon,copy);row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
   });
-  window.__miconPlaylistAdvance=()=>{
-    const next=currentIndex+1;
-    if(next<playlist.length)loadItem(next);
-    else window.__miconPlaylistHasNext=false;
-  };
-  render();
+ }
+ function loadItem(index){
+  if(index<0||index>=playlist.length)return;
+  currentIndex=index;window.__miconPlaylistHasNext=index<playlist.length-1;render();
+  const input=document.getElementById('videoFile');if(!input)return;
+  try{const dt=new DataTransfer();dt.items.add(playlist[index].file);input.files=dt.files;input.dispatchEvent(new Event('change',{bubbles:true}));}
+  catch(_){
+   /* Fallback Android: use a temporary object URL only for this in-memory File. */
+   const file=playlist[index].file;
+   if(typeof window.__miconLoadLocalFile==='function')window.__miconLoadLocalFile(file);
+  }
+ }
+ add.addEventListener('click',()=>picker.click());
+ picker.addEventListener('change',()=>{
+  Array.from(picker.files||[]).forEach(file=>{
+   if(file.type.startsWith('video/')||/\.(mp4|m4v|webm|mov|3gp)$/i.test(file.name)){
+    if(!playlist.some(x=>x.file.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified))playlist.push({file});
+   }
+  });
+  picker.value='';render();
+  if(currentIndex===-1&&playlist.length)loadItem(0);
+  window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
+ });
+ window.__miconPlaylistAdvance=()=>{if(currentIndex+1<playlist.length)loadItem(currentIndex+1);else window.__miconPlaylistHasNext=false;};
+ document.addEventListener('click',event=>{
+  const button=event.target&&event.target.closest&&event.target.closest('.upload-dock[data-upload-video]');
+  if(!button)return;event.preventDefault();event.stopImmediatePropagation();picker.click();
+ },true);
+ render();
 })();
 </script>
 <style id="micon-reference-exact-final">
