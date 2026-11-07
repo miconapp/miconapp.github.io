@@ -1195,10 +1195,14 @@ function showTime(){
  $('progressBar').style.width=(video.duration?video.currentTime/video.duration*100:0)+'%';
 }
 async function setupVideo(){
- if(video){video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
+ if(video){
+  try{if(video.__miconMobileLifecycleController)video.__miconMobileLifecycleController.abort();}catch(_){}
+  try{video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}
+ }
  video=document.createElement('video');
  video.id='karaokeVideo';video.controls=true;video.playsInline=true;
- video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';
+ /* Smartphone: ambil metadata dahulu; browser hanya menambah buffer saat diperlukan. */
+ video.preload=window.matchMedia('(max-width:760px)').matches?'metadata':'metadata';
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
  $('videoStage').appendChild(video);
  const targetVideo=video;
@@ -1233,6 +1237,8 @@ async function setupVideo(){
     karena buffer atau AudioContext tersuspend, lanjutkan setelah siap kembali.
     Pause yang dilakukan pengguna tetap dihormati. */
  if(window.matchMedia('(max-width:760px)').matches){
+  const mobileLifecycleController=new AbortController();
+  targetVideo.__miconMobileLifecycleController=mobileLifecycleController;
   let mobilePlaybackWanted=false;
   let mobileBufferRecovery=false;
   let mobileRecoveryBusy=false;
@@ -1286,13 +1292,13 @@ async function setupVideo(){
    if(document.visibilityState==='visible'&&mobilePlaybackWanted){
     setTimeout(()=>recoverMobilePlayback(),180);
    }
-  });
+  },{signal:mobileLifecycleController.signal});
   if(audioContext){
    audioContext.addEventListener('statechange',()=>{
     if(audioContext.state!=='running'&&mobilePlaybackWanted&&video&&!video.paused){
      setTimeout(()=>recoverMobilePlayback(),120);
     }
-   });
+   },{signal:mobileLifecycleController.signal});
   }
  }
 
@@ -1327,6 +1333,11 @@ async function setupVideo(){
    Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true)
     .catch(error=>msg('Iklan penutup gagal diputar: '+(error.message||error),true));
   }
+  /* Smartphone: lepaskan buffer/decoder yang sudah selesai dipakai.
+     URL dan File tetap dipertahankan agar video bisa diputar ulang tanpa impor ulang. */
+  if(window.matchMedia('(max-width:760px)').matches&&targetVideo===video&&targetVideo.isConnected){
+   try{targetVideo.pause();targetVideo.preload='metadata';targetVideo.load();}catch(_){}
+  }
  });
  video.addEventListener('error',()=>msg('Browser tidak dapat membaca video ini. Coba MP4 H.264 dengan audio AAC.',true));
 
@@ -1353,7 +1364,18 @@ async function setupVideo(){
  return true;
 }
 async function clearVideo(){
- if(video){try{video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}catch(_){}video=null;}
+ if(video){
+  try{if(video.__miconMobileLifecycleController)video.__miconMobileLifecycleController.abort();}catch(_){}
+  try{
+   video.pause();
+   disconnectVideoAudio(video);
+   video.removeAttribute('src');
+   try{video.srcObject=null;}catch(_){}
+   video.load();
+   video.remove();
+  }catch(_){}
+  video=null;
+ }
  audioReadyPromise=Promise.resolve(false);
  pitch=0;updatePitchDisplay();configurePitchControls(false);
  if(url){URL.revokeObjectURL(url);url=null;}
