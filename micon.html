@@ -2585,7 +2585,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
           if(stickyShell)stickyShell.style.removeProperty('display');
           main.classList.remove('hidden');main.style.removeProperty('display');
-          if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
+          if(action==='transpose'){/* Kontrol transpose sudah berada di area sticky; jangan paksa scroll agar playback video tidak terganggu. */}
           else{const input=document.getElementById('videoFile');if(input)input.click();}
         }else if(action==='download'){
           /* Iframe downloader hanya aktif pada menu Download; preview karaoke disembunyikan. */
