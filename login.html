@@ -78,7 +78,7 @@ button,input{font:inherit}
 #miconSplash{
   position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
   overflow:hidden;
-  background:#006bc8 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/contain no-repeat;
+  background:#006bc8 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center center/cover no-repeat;
   opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease;
 }
 #miconSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
@@ -94,7 +94,10 @@ button,input{font:inherit}
 @keyframes miconSpin{to{transform:rotate(360deg)}}
 @keyframes miconBars{to{height:16px;opacity:.55}}
 @media(max-width:900px){
-  #miconSplash{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
+  #miconSplash{
+    background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true");
+    background-position:center center;background-size:cover;
+  }
   .splash-loader{width:36px;height:36px}
   .splash-content{bottom:5%;gap:9px}
 }
