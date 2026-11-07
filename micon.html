@@ -1400,6 +1400,12 @@ $('videoFile').addEventListener('change',async event=>{
     tetap memakai handler lama tanpa perubahan. */
  if(window.matchMedia('(max-width:760px)').matches){
   event.stopImmediatePropagation();
+  const isMp4File=/\\.mp4$/i.test(selectedFile.name)||selectedFile.type==='video/mp4'||selectedFile.type==='application/mp4';
+  if(!isMp4File){
+   msg('Pilih file video MP4 (.mp4).',true);
+   picker.value='';
+   return;
+  }
   picker.value='';
   try{
    await clearVideo();
@@ -1413,34 +1419,51 @@ $('videoFile').addEventListener('change',async event=>{
    $('fileStatus').textContent='Memuat video lokal…';$('clearBtn').disabled=false;
    await setupVideo();
    const activeVideo=video;
-   activeVideo.addEventListener('loadedmetadata',()=>{
-    if(activeVideo!==video||!activeVideo.isConnected)return;
+   let mobileImportStarted=false;
+   const startImportedMp4=()=>{
+    if(mobileImportStarted||activeVideo!==video||!activeVideo.isConnected||
+       activeVideo.readyState<HTMLMediaElement.HAVE_METADATA)return;
+    mobileImportStarted=true;
     $('duration').textContent=fmt(activeVideo.duration);
     $('playBtn').disabled=false;
+    $('fileStatus').textContent='MP4 terbaca · menyiapkan pemutaran…';
     const adTask=window.__miconOpeningAdPromise||Promise.resolve(true);
     const bufferTask=waitForMobileVideoBuffer(activeVideo).catch(()=>false);
     Promise.all([audioReadyPromise,adTask,bufferTask]).then(async([audioReady,adPassed,bufferReady])=>{
      if(activeVideo!==video||!activeVideo.isConnected)return;
-     if(!adPassed||!bufferReady){$('fileStatus').textContent='Video siap · tekan Putar';return;}
+     if(!adPassed||!bufferReady){
+      $('fileStatus').textContent='MP4 terbaca · tekan Putar';
+      $('playBtn').disabled=false;
+      return;
+     }
      if(audioReady&&activeVideo.__miconAudioGraph){
       if(audioContext&&audioContext.state!=='running')try{await audioContext.resume();}catch(_){}
       configurePitchControls(true);
      }else{
       configurePitchControls(false);
-      $('fileStatus').textContent='Video siap · transpose tidak tersedia di WebView ini';
+      $('fileStatus').textContent='MP4 terbaca · transpose tidak tersedia di WebView ini';
      }
      window.__miconAdForFileDone=true;window.__miconAdAuthorized=true;
-     try{await activeVideo.play();$('fileStatus').textContent='Video sedang diputar';}
-     catch(playError){$('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';}
+     try{
+      await activeVideo.play();
+      $('fileStatus').textContent='Video sedang diputar';
+     }catch(playError){
+      $('playBtn').disabled=false;
+      $('fileStatus').textContent='MP4 terbaca · tekan Putar';
+     }
     }).catch(error=>{
-     $('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';
-     msg('Video lokal berhasil dimuat; audio sedang disiapkan: '+(error.message||error),true);
+     $('playBtn').disabled=false;
+     $('fileStatus').textContent='MP4 terbaca · tekan Putar';
+     msg('MP4 berhasil dibaca, tetapi persiapan pemutaran gagal: '+(error.message||error),true);
     }).finally(()=>{window.__miconOpeningAdRunning=false;});
-   },{once:true});
+   };
+   activeVideo.addEventListener('loadedmetadata',startImportedMp4,{once:true});
    activeVideo.addEventListener('error',()=>{
-    $('fileStatus').textContent='Format video tidak didukung';
-    msg('HP tidak dapat memutar codec video ini. Coba MP4 H.264 dengan audio AAC.',true);
+    $('fileStatus').textContent='Format/codec MP4 tidak didukung';
+    msg('File MP4 terdeteksi, tetapi codec tidak didukung perangkat. Gunakan MP4 H.264 dengan audio AAC.',true);
    },{once:true});
+   /* Tangani kemungkinan metadata selesai sebelum listener terpasang. */
+   if(activeVideo.readyState>=HTMLMediaElement.HAVE_METADATA)startImportedMp4();
   }catch(error){
    $('fileStatus').textContent='Gagal memuat video';
    msg('Gagal membuka file dari penyimpanan HP: '+(error.message||error),true);
