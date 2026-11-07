@@ -1373,10 +1373,17 @@ $('videoFile').addEventListener('change',async event=>{
   msg('Pilih file video MP4.',true);picker.value='';return;
  }
  try{
-  await clearVideo();file=selectedFile;
+  await clearVideo();
+  /* FILE MASTER TETAP ASLI:
+     Simpan objek File yang dipilih apa adanya dan biarkan browser membacanya
+     langsung melalui object URL. Tidak ada FileReader, arrayBuffer, konversi
+     Blob, kompresi, penulisan ulang, atau perubahan byte pada file sumber.
+     AudioWorklet/SoundTouch hanya memproses audio saat playback. */
+  const masterFile=selectedFile;
+  file=masterFile;
   window.__miconAdAuthorized=false;window.__miconAdForFileDone=false;
   window.__miconEndAdShown=false;window.__miconOpeningAdRunning=false;window.__miconOpeningAdPromise=null;
-  url=URL.createObjectURL(selectedFile);
+  url=URL.createObjectURL(masterFile);
   $('fileName').textContent=selectedFile.name;
   $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video/mp4');
   $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
