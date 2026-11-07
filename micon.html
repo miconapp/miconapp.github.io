@@ -1081,8 +1081,8 @@ function applyPitch(value){
 /* Gain +20 dB hanya untuk audio video pada smartphone.
    Satu node gain ditempatkan setelah SoundTouch sehingga Original 0,
    transpose minus, dan transpose plus selalu memakai gain yang sama. */
-const MOBILE_AUDIO_GAIN_DB=20;
-const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/20);
+const MOBILE_AUDIO_GAIN_DB=15;
+const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/15);
 
 function disconnectVideoAudio(target){
  if(!target)return;
