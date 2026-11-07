@@ -1198,6 +1198,74 @@ function setupVideo(){
   }
  });
  video.addEventListener('timeupdate',showTime);
+
+ /* Pemulihan khusus smartphone: jika browser menghentikan sementara pemutaran
+    karena buffer atau AudioContext tersuspend, lanjutkan setelah siap kembali.
+    Pause yang dilakukan pengguna tetap dihormati. */
+ if(window.matchMedia('(max-width:760px)').matches){
+  let mobilePlaybackWanted=false;
+  let mobileBufferRecovery=false;
+  let mobileRecoveryBusy=false;
+
+  const recoverMobilePlayback=async()=>{
+   if(!mobilePlaybackWanted||mobileRecoveryBusy||!video||video!==targetVideo||
+      !video.isConnected||video.ended||document.visibilityState==='hidden')return;
+   if(video.readyState<HTMLMediaElement.HAVE_FUTURE_DATA)return;
+   mobileRecoveryBusy=true;
+   try{
+    if(audioContext&&audioContext.state!=='running'){
+     try{await audioContext.resume();}catch(_){}
+    }
+    if(!video||video!==targetVideo||!video.isConnected||!mobilePlaybackWanted)return;
+    if(video.paused){
+     window.__miconAdAuthorized=true;
+     try{await video.play();}
+     catch(_){window.__miconAdAuthorized=false;}
+    }
+   }finally{mobileRecoveryBusy=false;}
+  };
+
+  video.addEventListener('playing',()=>{
+   mobilePlaybackWanted=true;
+   mobileBufferRecovery=false;
+  });
+  video.addEventListener('waiting',()=>{
+   if(!video.paused&&!video.ended){
+    mobilePlaybackWanted=true;
+    mobileBufferRecovery=true;
+   }
+  });
+  video.addEventListener('stalled',()=>{
+   if(!video.paused&&!video.ended){
+    mobilePlaybackWanted=true;
+    mobileBufferRecovery=true;
+   }
+  });
+  video.addEventListener('canplay',()=>{
+   if(mobileBufferRecovery)recoverMobilePlayback();
+  });
+  video.addEventListener('pause',()=>{
+   if(mobileBufferRecovery&&!video.ended){
+    /* Pertahankan niat memutar hanya untuk pause yang mengikuti buffer stall. */
+    setTimeout(()=>recoverMobilePlayback(),120);
+   }else{
+    mobilePlaybackWanted=false;
+   }
+  });
+  document.addEventListener('visibilitychange',()=>{
+   if(document.visibilityState==='visible'&&mobilePlaybackWanted){
+    setTimeout(()=>recoverMobilePlayback(),180);
+   }
+  });
+  if(audioContext){
+   audioContext.addEventListener('statechange',()=>{
+    if(audioContext.state!=='running'&&mobilePlaybackWanted&&video&&!video.paused){
+     setTimeout(()=>recoverMobilePlayback(),120);
+    }
+   });
+  }
+ }
+
  video.addEventListener('play',()=>{
   if(window.__miconAdAuthorized||window.__miconAdForFileDone){
    window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;
@@ -1311,7 +1379,8 @@ $('videoFile').addEventListener('change',async event=>{
 });
 $('playBtn').addEventListener('click',async()=>{
  if(!video)return;
- if(!video.paused){video.pause();return;}
+ if(!video.paused){video.__miconUserPaused=true;video.pause();return;}
+ video.__miconUserPaused=false;
  /* Panggil resume sebelum await agar aktivasi tap tidak hilang di WebView. */
  const gestureResumeTask=resumeAudioContextFromGesture();
  try{
