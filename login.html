@@ -74,38 +74,29 @@ button,input{font:inherit}
 @media(max-width:900px){.page{grid-template-columns:1fr}.visual{display:none}.auth-side{min-height:100vh;padding:28px 20px}.mobile-brand{display:flex;margin-bottom:34px}.auth-wrap{max-width:430px}}
 @media(max-width:480px){.auth-side{align-items:flex-start;padding:25px 20px calc(25px + env(safe-area-inset-bottom))}.auth-wrap{margin:auto 0}.mobile-brand{margin-bottom:35px}.auth-heading h2{font-size:31px}.auth-heading{margin-bottom:23px}}
 
-/* MicOn splash screen — hanya lapisan pembuka, tidak mengubah form autentikasi */
+/* MicOn splash screen — gambar tajam, utuh, dan tanpa lapisan blur */
 #miconSplash{
   position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
   overflow:hidden;
-  background:#061c3d url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/contain no-repeat;
+  background:#006bc8 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/contain no-repeat;
   opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease;
 }
-#miconSplash::before{
-  content:"";position:absolute;inset:-24px;z-index:0;
-  background:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/cover no-repeat;
-  filter:blur(22px);transform:scale(1.06);opacity:.82;
-}
-#miconSplash::after{
-  content:"";position:absolute;inset:0;z-index:0;
-  background:linear-gradient(180deg,rgba(3,12,25,.06),rgba(3,12,25,.28));
-}
 #miconSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
-.splash-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:22px;padding:24px;text-align:center;color:#fff}
-.splash-loader{width:64px;height:64px;border:3px solid rgba(255,255,255,.25);border-top-color:#75f1df;border-right-color:#75f1df;border-radius:50%;animation:miconSpin .9s linear infinite;filter:drop-shadow(0 0 12px rgba(117,241,223,.45))}
-.splash-equalizer{height:28px;display:flex;align-items:center;gap:5px}
-.splash-equalizer i{display:block;width:4px;height:9px;border-radius:8px;background:#83f4e2;animation:miconBars .8s ease-in-out infinite alternate}
+.splash-content{position:absolute;z-index:2;left:50%;bottom:7%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 18px;text-align:center;color:#fff}
+.splash-loader{width:42px;height:42px;border:3px solid rgba(255,255,255,.28);border-top-color:#75f1df;border-right-color:#75f1df;border-radius:50%;animation:miconSpin .9s linear infinite;filter:drop-shadow(0 0 8px rgba(117,241,223,.35))}
+.splash-equalizer{height:18px;display:flex;align-items:center;gap:4px}
+.splash-equalizer i{display:block;width:3px;height:7px;border-radius:8px;background:#83f4e2;animation:miconBars .8s ease-in-out infinite alternate}
 .splash-equalizer i:nth-child(2n){animation-delay:.18s}.splash-equalizer i:nth-child(3n){animation-delay:.34s}
-.splash-caption{font:700 12px/1.5 Inter,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 2px 12px #0008}
-.splash-hint{display:none;border:1px solid #ffffff70;border-radius:30px;padding:10px 17px;background:#07182780;color:#fff;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
+.splash-caption{font:700 11px/1.5 Inter,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;text-shadow:0 2px 8px #001b36}
+.splash-hint{display:none;border:1px solid #ffffff90;border-radius:30px;padding:9px 15px;background:#063b68;color:#fff;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
 #miconSplash.needs-tap .splash-hint{display:inline-flex}
 #miconSplash.needs-tap .splash-loader{animation:none;border-color:#75f1df}
 @keyframes miconSpin{to{transform:rotate(360deg)}}
-@keyframes miconBars{to{height:25px;opacity:.55}}
+@keyframes miconBars{to{height:16px;opacity:.55}}
 @media(max-width:900px){
   #miconSplash{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
-  #miconSplash::before{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
-  .splash-loader{width:54px;height:54px}
+  .splash-loader{width:36px;height:36px}
+  .splash-content{bottom:5%;gap:9px}
 }
 @media(prefers-reduced-motion:reduce){.splash-loader,.splash-equalizer i{animation:none}#miconSplash{transition:none}}
 
