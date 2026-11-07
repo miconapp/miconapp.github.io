@@ -2851,8 +2851,9 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 @media(max-width:760px){
   body:has(#appDownloadSection.active) #micon-sticky-shell,
-  body:has(#appDownloadSection.active) #micon-floating-dock,
   body:has(#appDownloadSection.active) #mainContent{display:none!important}
+  body:has(#appDownloadSection.active) #micon-floating-dock{display:grid!important;z-index:6000!important}
+  body:has(#appDownloadSection.active) #appDownloadSection{padding-bottom:88px!important}
 }
 @media(max-width:760px){
   #appDownloadSection{inset:0!important;width:100vw!important;height:100dvh!important;max-height:100dvh!important;padding:0!important}
