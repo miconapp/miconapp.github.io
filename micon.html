@@ -1078,12 +1078,19 @@ function applyPitch(value){
  updatePitchDisplay();
 }
 
+/* Gain +20 dB hanya untuk audio video pada smartphone.
+   Satu node gain ditempatkan setelah SoundTouch sehingga Original 0,
+   transpose minus, dan transpose plus selalu memakai gain yang sama. */
+const MOBILE_AUDIO_GAIN_DB=20;
+const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/20);
+
 function disconnectVideoAudio(target){
  if(!target)return;
  const graph=target.__miconAudioGraph;
  if(graph){
   try{graph.source.disconnect();}catch(_){}
   try{graph.worklet.disconnect();}catch(_){}
+  if(graph.gain)try{graph.gain.disconnect();}catch(_){}
   try{graph.worklet.port.close();}catch(_){}
   try{delete target.__miconAudioGraph;}catch(_){target.__miconAudioGraph=null;}
  }
@@ -1097,6 +1104,7 @@ async function connectVideoToAudioWorklet(target){
  if(target.__miconAudioGraph)return true;
  if(!audioContext)audioContext=new AudioContextClass({latencyHint:'playback'});
  if(!audioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
+ const isMobile=window.matchMedia('(max-width:760px)').matches;
  const resumeTask=audioContext.state==='suspended'?audioContext.resume().catch(()=>{}):Promise.resolve();
  if(!workletModulePromise){
   workletModulePromise=audioContext.audioWorklet.addModule(AUDIO_WORKLET_URL).catch(error=>{
@@ -1107,7 +1115,7 @@ async function connectVideoToAudioWorklet(target){
  await Promise.all([workletModulePromise,resumeTask]);
  if(target!==video||!target.isConnected)return false;
  if(target.__miconAudioGraph)return true;
- let source=null,worklet=null;
+ let source=null,worklet=null,gain=null;
  try{
   worklet=new AudioWorkletNode(audioContext,'soundtouch-processor',{
    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
@@ -1119,11 +1127,19 @@ async function connectVideoToAudioWorklet(target){
   const playbackParam=worklet.parameters.get('playbackRate');
   if(playbackParam)playbackParam.value=1;
   source=audioContext.createMediaElementSource(target);
-  /* Satu-satunya routing audio: tidak pernah dialihkan saat playback.
-     Perubahan nada hanya mengubah AudioParam pitchSemitones. */
+
+  /* Routing tunggal dan permanen: source -> SoundTouch -> gain -> destination.
+     Gain tidak ikut berubah ketika pitch digeser sehingga semua nada setara. */
   source.connect(worklet);
-  worklet.connect(audioContext.destination);
-  target.__miconAudioGraph={source,worklet};
+  if(isMobile){
+   gain=audioContext.createGain();
+   gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
+   worklet.connect(gain);
+   gain.connect(audioContext.destination);
+  }else{
+   worklet.connect(audioContext.destination);
+  }
+  target.__miconAudioGraph={source,worklet,gain};
   target.__miconAudioPipeline='soundtouch-audioworklet';
   target.defaultPlaybackRate=1;
   target.playbackRate=1;
@@ -1131,6 +1147,7 @@ async function connectVideoToAudioWorklet(target){
  }catch(error){
   try{if(source)source.disconnect();}catch(_){}
   try{if(worklet){worklet.disconnect();worklet.port.close();}}catch(_){}
+  try{if(gain)gain.disconnect();}catch(_){}
   throw error;
  }
 }
