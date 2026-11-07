@@ -115,7 +115,7 @@ button,input{font:inherit}
     <button class="splash-hint" id="splashStart" type="button">Ketuk untuk memulai audio</button>
   </div>
 </div>
-<audio id="miconSplashAudio" preload="auto" playsinline>
+<audio id="miconSplashAudio" autoplay preload="auto" playsinline>
   <source src="https://github.com/miconapp/miconapp.github.io/blob/main/src/audio%20Splash%20Screen%20desktop%20dan%20mobile.mp3?raw=true" type="audio/mpeg">
 </audio>
 
@@ -240,6 +240,11 @@ button,input{font:inherit}
   }
 
   audio.addEventListener("ended", closeSplash, { once:true });
+  // Coba lagi saat file audio sudah siap, karena beberapa browser belum siap
+  // ketika pemanggilan play() pertama dilakukan.
+  audio.addEventListener("canplay", () => {
+    if (!finished && audio.paused) startAudio();
+  });
   audio.addEventListener("error", () => {
     // Jika file audio gagal dimuat, jangan menahan pengguna di splash.
     fallbackTimer = setTimeout(closeSplash, 2500);
