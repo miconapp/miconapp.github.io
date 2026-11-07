@@ -1024,6 +1024,14 @@ function configurePitchControls(enabled){
  if(range)range.value=String(pitch);
 }
 
+/* Resume AudioContext langsung pada event gesture pengguna agar WebView Android
+   tidak kehilangan izin audio ketika pemanggilan terjadi setelah await/iklan. */
+function resumeAudioContextFromGesture(){
+ if(!audioContext||audioContext.state==='running')return Promise.resolve(true);
+ try{return audioContext.resume().then(()=>audioContext.state==='running').catch(()=>false);}
+ catch(_){return Promise.resolve(false);}
+}
+
 function applyPitch(value){
  const range=$('pitchRange');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
@@ -1139,13 +1147,16 @@ function setupVideo(){
   if(window.__miconAdAuthorized||window.__miconAdForFileDone){
    window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;
   }
+  /* Mulai resume saat event play masih berada dalam gesture pengguna. */
+  const gestureResumeTask=resumeAudioContextFromGesture();
   video.pause();
   if(window.__miconNativeAdPending)return;
   window.__miconNativeAdPending=true;
   Promise.resolve(window.miconAdGate?window.miconAdGate():true).then(async ok=>{
    if(ok&&video&&video.isConnected){
     await audioReadyPromise;
-    if(audioContext&&audioContext.state==='suspended'){
+    await gestureResumeTask;
+    if(audioContext&&audioContext.state!=='running'){
      try{await audioContext.resume();}catch(_){}
     }
     if(!video||!video.isConnected)return;
@@ -1240,11 +1251,14 @@ $('videoFile').addEventListener('change',async event=>{
 $('playBtn').addEventListener('click',async()=>{
  if(!video)return;
  if(!video.paused){video.pause();return;}
+ /* Panggil resume sebelum await agar aktivasi tap tidak hilang di WebView. */
+ const gestureResumeTask=resumeAudioContextFromGesture();
  try{
   const targetVideo=video;
   const ready=await audioReadyPromise;
   if(!ready||!targetVideo.__miconAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
-  if(audioContext&&audioContext.state==='suspended')await audioContext.resume();
+  await gestureResumeTask;
+  if(audioContext&&audioContext.state!=='running')await audioContext.resume();
   if(targetVideo!==video||!targetVideo.isConnected)return;
   window.__miconAdAuthorized=true;
   await targetVideo.play();
