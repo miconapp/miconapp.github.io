@@ -1149,18 +1149,6 @@ async function connectVideoToAudioWorklet(target){
    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
    processorOptions:{sampleBufferType:'circular'}
   });
-  /* Smartphone transpose: prioritaskan pencarian sampel yang lebih teliti.
-     QuickSeek dimatikan untuk mengurangi artefak kasar; overlap sedikit
-     diperpanjang. Window sequence/seek tetap otomatis agar adaptif ke tempo
-     dan tidak membebani perangkat dengan ukuran tetap yang terlalu besar. */
-  if(isMobile){
-   try{
-    worklet.port.postMessage({
-     type:'set-stretch-parameters',
-     params:{quickSeek:false,overlapMs:12,sequenceMs:0,seekWindowMs:0}
-    });
-   }catch(_){}
-  }
   const pitchParam=worklet.parameters.get('pitchSemitones');
   if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada AudioWorklet.');
   pitchParam.value=pitch;
