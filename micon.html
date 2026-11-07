@@ -1093,9 +1093,6 @@ function applyPitch(value){
    else pitchParam.value=next;
   }catch(_){pitchParam.value=next;}
  }
- if(window.matchMedia('(max-width:760px)').matches&&activeVideo&&activeVideo.__miconAudioGraph){
-  setMobileAudioRoute(activeVideo,next!==0);
- }
  updatePitchDisplay();
 }
 
@@ -1140,14 +1137,13 @@ async function connectVideoToAudioWorklet(target){
   const playbackParam=worklet.parameters.get('playbackRate');
   if(playbackParam)playbackParam.value=1;
   source=audioContext.createMediaElementSource(target);
-  if(window.matchMedia('(max-width:760px)').matches&&pitch===0){
-   source.connect(audioContext.destination);
-   target.__miconAudioGraph={source,worklet,mobileWorkletRoute:false};
-  }else{
-   source.connect(worklet);
-   worklet.connect(audioContext.destination);
-   target.__miconAudioGraph={source,worklet,mobileWorkletRoute:window.matchMedia('(max-width:760px)').matches};
-  }
+  /* Jalur audio tetap tersambung melalui Worklet selama video berjalan.
+     Jangan pindah/rutekan ulang source saat tombol transpose ditekan karena
+     perubahan koneksi WebAudio di tengah playback dapat menghentikan playback
+     pada sebagian browser smartphone/WebView. */
+  source.connect(worklet);
+  worklet.connect(audioContext.destination);
+  target.__miconAudioGraph={source,worklet,mobileWorkletRoute:window.matchMedia('(max-width:760px)').matches};
   target.__miconAudioPipeline='soundtouch-audioworklet';
   target.defaultPlaybackRate=1;
   target.playbackRate=1;
@@ -2575,7 +2571,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     let dock=document.getElementById('micon-floating-dock');
     if(!dock){
       dock=document.createElement('nav');dock.id='micon-floating-dock';dock.setAttribute('aria-label','Menu utama');
-      dock.innerHTML='<button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button><button type="button" class="micon-dock-action" data-action="app"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 7h6M10 17h4"/></svg></span><span>App</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
+      dock.innerHTML='<button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>App</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
       document.body.appendChild(dock);
       dock.addEventListener('click',function(event){
         const button=event.target.closest('[data-action]');if(!button)return;
@@ -2585,7 +2581,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
           if(stickyShell)stickyShell.style.removeProperty('display');
           main.classList.remove('hidden');main.style.removeProperty('display');
-          if(action==='transpose'){/* Kontrol transpose sudah berada di area sticky; jangan paksa scroll agar playback video tidak terganggu. */}
+          if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
           else{const input=document.getElementById('videoFile');if(input)input.click();}
         }else if(action==='download'){
           /* Iframe downloader hanya aktif pada menu Download; preview karaoke disembunyikan. */
@@ -2593,10 +2589,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
           if(stickyShell)stickyShell.style.setProperty('display','none','important');
           if(youtube){youtube.classList.add('active');youtube.style.setProperty('display','block','important');}
           window.scrollTo({top:0,behavior:'smooth'});
-        }else if(action==='app'){
-          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
-          if(stickyShell)stickyShell.style.removeProperty('display');
-          if(typeof window.MicOnShowAppDownload==='function')window.MicOnShowAppDownload();
         }else if(action==='profile'){
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
           if(stickyShell)stickyShell.style.removeProperty('display');
@@ -2739,7 +2731,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   #micon-floating-dock{
     position:fixed!important;z-index:6000!important;left:12px!important;right:12px!important;
     bottom:calc(8px + env(safe-area-inset-bottom))!important;display:grid!important;
-    grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;gap:2px!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:center!important;gap:3px!important;
     min-height:61px!important;padding:6px 7px!important;border:1px solid #e3eaf4!important;
     border-radius:20px!important;background:rgba(255,255,255,.98)!important;
     box-shadow:0 8px 28px rgba(24,42,70,.16)!important;backdrop-filter:blur(16px)!important;
@@ -2824,10 +2816,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   if(mobileQuery.addEventListener)mobileQuery.addEventListener('change',setDownloadTarget);else if(mobileQuery.addListener)mobileQuery.addListener(setDownloadTarget);
   document.querySelectorAll('.app-download-link,.app-download-mobile').forEach(link=>link.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();setDownloadTarget();show();}));
   document.addEventListener('click',function(e){
-    const dockApp=e.target.closest('#micon-floating-dock [data-action="app"]');
-    if(dockApp){e.preventDefault();e.stopImmediatePropagation();show();return;}
+    const dockDownload=e.target.closest('#micon-floating-dock [data-action="download"]');
+    if(dockDownload){e.preventDefault();e.stopImmediatePropagation();show();return;}
     if(e.target.closest('#miconDownloadBack')){e.preventDefault();close();return;}
-    if(page.classList.contains('active')&&(e.target.closest('.desktop-nav .nav-link[data-page]')||e.target.closest(' #micon-floating-dock [data-action]:not([data-action="app"])'))){close();}
+    if(page.classList.contains('active')&&(e.target.closest('.desktop-nav .nav-link[data-page]')||e.target.closest('#micon-floating-dock [data-action]:not([data-action="download"])'))){close();}
   },true);
   const share=document.getElementById('miconAppShare');
   if(share)share.addEventListener('click',async()=>{
@@ -2851,9 +2843,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 @media(max-width:760px){
   body:has(#appDownloadSection.active) #micon-sticky-shell,
+  body:has(#appDownloadSection.active) #micon-floating-dock,
   body:has(#appDownloadSection.active) #mainContent{display:none!important}
-  body:has(#appDownloadSection.active) #micon-floating-dock{display:grid!important;z-index:6000!important}
-  body:has(#appDownloadSection.active) #appDownloadSection{padding-bottom:88px!important}
 }
 @media(max-width:760px){
   #appDownloadSection{inset:0!important;width:100vw!important;height:100dvh!important;max-height:100dvh!important;padding:0!important}
@@ -2871,43 +2862,3 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 </style>
 </body>
 </html>
-
-
-<style id="micon-mobile-dock-color-icons">
-@media screen and (max-width:760px){
-  #micon-floating-dock .micon-dock-action{
-    color:#64748b!important;
-    transition:background .18s ease,color .18s ease,transform .18s ease!important;
-  }
-  #micon-floating-dock .micon-dock-icon{
-    width:30px!important;height:30px!important;border-radius:11px!important;
-    display:grid!important;place-items:center!important;
-    transition:background .18s ease,box-shadow .18s ease!important;
-  }
-  #micon-floating-dock .micon-dock-icon svg{
-    width:20px!important;height:20px!important;stroke-width:2.1!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(1) .micon-dock-icon{
-    color:#7c3aed!important;background:#f1eaff!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(2) .micon-dock-icon{
-    color:#0284c7!important;background:#e0f2fe!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(3) .micon-dock-icon{
-    color:#059669!important;background:#dcfce7!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(4) .micon-dock-icon{
-    color:#ea580c!important;background:#ffedd5!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(5) .micon-dock-icon{
-    color:#db2777!important;background:#fce7f3!important;
-  }
-  #micon-floating-dock .micon-dock-action.active{
-    background:#f8fafc!important;color:#172033!important;
-  }
-  #micon-floating-dock .micon-dock-action:active{transform:scale(.96)!important}
-  #micon-floating-dock .micon-dock-action span:last-child{
-    font-size:9px!important;font-weight:750!important;letter-spacing:-.1px!important;
-  }
-}
-</style>
