@@ -803,10 +803,14 @@
     border:0!important;
     border-radius:12px!important;
     background:#f8fbff!important;
+    contain:strict!important;
+    isolation:isolate!important;
+    content-visibility:auto!important;
   }
   .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner>a,
   .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner img,
-  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner video{
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner video,
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner iframe{
     position:absolute!important;
     inset:0!important;
     display:block!important;
@@ -2174,13 +2178,16 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     errorBox.style.display="block";
   });
 
-  /* Banner playlist membaca konfigurasi yang sama dengan halaman Superadmin: PengaturanIklan/MicOn -> banner. */
+  /* Banner playlist berjalan dalam dokumen iframe sandbox tersendiri.
+     Tidak membuat elemen media, AudioContext, timer, atau callback pada player utama. */
   function connectPlaylistBanner(){
     const banner=document.querySelector('.mobile-ad-banner');
     if(!banner)return;
     banner.classList.remove('is-configured');
     banner.replaceChildren();
     if(!db)db=getFirestore(getApp());
+    let lastBannerSignature="";
+    const escapeAttribute=value=>String(value||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     onSnapshot(doc(db,"PengaturanIklan","MicOn"),snapshot=>{
       const root=snapshot.exists()?snapshot.data():{};
       const config=root.banner||{};
@@ -2188,25 +2195,35 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       const active=config.enabled===true&&!!url;
       const allowedPlacement=["home","home-bottom","all"].includes(String(config.placement||"home"));
       banner.classList.toggle('is-configured',active&&allowedPlacement);
-      banner.replaceChildren();
-      if(!active||!allowedPlacement)return;
-      const image=document.createElement('img');
-      image.src=url;
-      image.alt=String(config.name||"Banner iklan MicOn");
-      image.loading="lazy";
-      image.decoding="async";
-      image.style.cssText="display:block;width:100%;height:65px;min-height:65px;max-height:65px;object-fit:fill;border:0;border-radius:inherit";
+      if(!active||!allowedPlacement){
+        lastBannerSignature="";
+        banner.replaceChildren();
+        return;
+      }
       const destination=String(config.clickUrl||"").trim();
-      if(destination){
-        const link=document.createElement('a');
-        link.href=destination;
-        link.target="_blank";
-        link.rel="noopener noreferrer";
-        link.style.cssText="display:block;width:100%;height:100%;overflow:hidden;border-radius:inherit";
-        link.appendChild(image);
-        banner.appendChild(link);
-      }else banner.appendChild(image);
-      banner.title=String(config.name||"Banner iklan");
+      const name=String(config.name||"Banner iklan MicOn");
+      const signature=[url,destination,name].join("\\n");
+      /* Update dokumen iklan hanya jika konfigurasi benar-benar berubah. */
+      if(signature===lastBannerSignature)return;
+      lastBannerSignature=signature;
+      const imageUrl=escapeAttribute(url);
+      const clickUrl=escapeAttribute(destination);
+      const title=escapeAttribute(name);
+      const clickMarkup=destination
+        ? '<a href="'+clickUrl+'" target="_blank" rel="noopener noreferrer" aria-label="'+title+'">'
+        : '';
+      const closeLink=destination?'</a>':'';
+      const frame=document.createElement('iframe');
+      frame.title=name;
+      frame.setAttribute('sandbox','allow-popups allow-popups-to-escape-sandbox');
+      frame.setAttribute('loading','lazy');
+      frame.setAttribute('referrerpolicy','no-referrer');
+      frame.setAttribute('scrolling','no');
+      frame.setAttribute('aria-label',name);
+      frame.style.cssText='display:block;width:100%;height:65px;min-height:65px;max-height:65px;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
+      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
+      banner.replaceChildren(frame);
+      banner.title=name;
     },error=>console.warn("MicOn playlist banner config could not be loaded:",error));
   }
   try{connectPlaylistBanner();}catch(error){console.warn("MicOn playlist banner could not be initialized:",error);}
