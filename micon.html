@@ -1036,6 +1036,49 @@ function resumeAudioContextFromGesture(){
  catch(_){return Promise.resolve(false);}
 }
 
+/* Mobile only: pada nada original, lewatkan audio langsung ke output agar
+   SoundTouch tidak memproses audio tanpa kebutuhan. Worklet aktif hanya saat transpose. */
+function setMobileAudioRoute(target,useWorklet){
+ const graph=target&&target.__miconAudioGraph;
+ if(!graph||!graph.source||!graph.worklet||!audioContext)return;
+ if(!window.matchMedia('(max-width:760px)').matches)return;
+ if(graph.mobileWorkletRoute===!!useWorklet)return;
+ try{
+  if(useWorklet){
+   try{graph.source.disconnect(audioContext.destination);}catch(_){}
+   try{graph.source.disconnect(graph.worklet);}catch(_){}
+   try{graph.worklet.disconnect(audioContext.destination);}catch(_){}
+   graph.source.connect(graph.worklet);
+   graph.worklet.connect(audioContext.destination);
+  }else{
+   try{graph.source.disconnect(graph.worklet);}catch(_){}
+   try{graph.worklet.disconnect(audioContext.destination);}catch(_){}
+   try{graph.source.disconnect(audioContext.destination);}catch(_){}
+   graph.source.connect(audioContext.destination);
+  }
+  graph.mobileWorkletRoute=!!useWorklet;
+ }catch(error){
+  msg('Gagal mengatur jalur audio smartphone: '+(error.message||error),true);
+ }
+}
+
+function waitForMobileVideoBuffer(target){
+ if(!window.matchMedia('(max-width:760px)').matches)return Promise.resolve(true);
+ if(!target)return Promise.resolve(false);
+ if(target.readyState>=HTMLMediaElement.HAVE_FUTURE_DATA)return Promise.resolve(true);
+ return new Promise((resolve,reject)=>{
+  const cleanup=()=>{
+   target.removeEventListener('canplay',onReady);
+   target.removeEventListener('error',onError);
+  };
+  const onReady=()=>{cleanup();resolve(true);};
+  const onError=()=>{cleanup();reject(new Error('Video gagal menyiapkan buffer untuk smartphone.'));};
+  target.addEventListener('canplay',onReady,{once:true});
+  target.addEventListener('error',onError,{once:true});
+  if(target.readyState>=HTMLMediaElement.HAVE_FUTURE_DATA){cleanup();resolve(true);}
+ });
+}
+
 function applyPitch(value){
  const range=$('pitchRange');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
@@ -1049,6 +1092,9 @@ function applyPitch(value){
    if(audioContext&&typeof pitchParam.setTargetAtTime==='function')pitchParam.setTargetAtTime(next,audioContext.currentTime,0.025);
    else pitchParam.value=next;
   }catch(_){pitchParam.value=next;}
+ }
+ if(window.matchMedia('(max-width:760px)').matches&&activeVideo&&activeVideo.__miconAudioGraph){
+  setMobileAudioRoute(activeVideo,next!==0);
  }
  updatePitchDisplay();
 }
@@ -1094,9 +1140,14 @@ async function connectVideoToAudioWorklet(target){
   const playbackParam=worklet.parameters.get('playbackRate');
   if(playbackParam)playbackParam.value=1;
   source=audioContext.createMediaElementSource(target);
-  source.connect(worklet);
-  worklet.connect(audioContext.destination);
-  target.__miconAudioGraph={source,worklet};
+  if(window.matchMedia('(max-width:760px)').matches&&pitch===0){
+   source.connect(audioContext.destination);
+   target.__miconAudioGraph={source,worklet,mobileWorkletRoute:false};
+  }else{
+   source.connect(worklet);
+   worklet.connect(audioContext.destination);
+   target.__miconAudioGraph={source,worklet,mobileWorkletRoute:window.matchMedia('(max-width:760px)').matches};
+  }
   target.__miconAudioPipeline='soundtouch-audioworklet';
   target.defaultPlaybackRate=1;
   target.playbackRate=1;
@@ -1227,9 +1278,10 @@ $('videoFile').addEventListener('change',async event=>{
     const openingAdTask=Promise.resolve(
      window.miconAdGate?window.miconAdGate('opening'):true
     );
+    const mobileBufferTask=waitForMobileVideoBuffer(loadedVideo);
 
-    Promise.all([workletReadyTask,openingAdTask]).then(async([audioReady,passed])=>{
-     if(!passed||loadedVideo!==video||!loadedVideo.isConnected)return;
+    Promise.all([workletReadyTask,openingAdTask,mobileBufferTask]).then(async([audioReady,passed,bufferReady])=>{
+     if(!passed||!bufferReady||loadedVideo!==video||!loadedVideo.isConnected)return;
      if(!audioReady||!loadedVideo.__miconAudioGraph||!loadedVideo.__miconAudioGraph.worklet){
       throw new Error('SoundTouch AudioWorklet belum siap setelah iklan selesai.');
      }
@@ -1266,6 +1318,7 @@ $('playBtn').addEventListener('click',async()=>{
   const targetVideo=video;
   const ready=await audioReadyPromise;
   if(!ready||!targetVideo.__miconAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
+  await waitForMobileVideoBuffer(targetVideo);
   await gestureResumeTask;
   if(audioContext&&audioContext.state!=='running')await audioContext.resume();
   if(targetVideo!==video||!targetVideo.isConnected)return;
