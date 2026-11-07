@@ -115,7 +115,7 @@ button,input{font:inherit}
     <button class="splash-hint" id="splashStart" type="button">Ketuk untuk memulai audio</button>
   </div>
 </div>
-<audio id="miconSplashAudio" autoplay preload="auto" playsinline>
+<audio id="miconSplashAudio" preload="auto" playsinline>
   <source src="https://github.com/miconapp/miconapp.github.io/blob/main/src/audio%20Splash%20Screen%20desktop%20dan%20mobile.mp3?raw=true" type="audio/mpeg">
 </audio>
 
@@ -210,55 +210,41 @@ button,input{font:inherit}
 
 <script>
 (() => {
-  const screen = document.getElementById("miconSplash");
+  const splash = document.getElementById("miconSplash");
   const audio = document.getElementById("miconSplashAudio");
   const startButton = document.getElementById("splashStart");
-  if (!screen || !audio) return;
-  let finished = false;
-  let fallbackTimer = null;
+  if (!splash || !audio || !startButton) return;
+
+  let closed = false;
 
   function closeSplash() {
-    if (finished) return;
-    finished = true;
-    clearTimeout(fallbackTimer);
-    screen.classList.add("is-leaving");
-    window.setTimeout(() => screen.remove(), 700);
-    audio.pause();
+    if (closed) return;
+    closed = true;
+    splash.classList.add("is-leaving");
+    window.setTimeout(() => splash.remove(), 700);
   }
 
-  function startAudio() {
+  function playSplashAudio() {
     audio.play().then(() => {
-      screen.classList.remove("needs-tap");
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        clearTimeout(fallbackTimer);
-        fallbackTimer = setTimeout(closeSplash, (audio.duration + 8) * 1000);
+      splash.classList.remove("needs-tap");
+      startButton.hidden = true;
+    }).catch(error => {
+      // NotAllowedError berarti browser memblokir autoplay bersuara.
+      if (error && error.name === "NotAllowedError") {
+        splash.classList.add("needs-tap");
+        startButton.hidden = false;
+      } else {
+        closeSplash();
       }
-    }).catch(() => {
-      // Browser/WebView tertentu memblokir autoplay bersuara sampai ada sentuhan pengguna.
-      screen.classList.add("needs-tap");
     });
   }
 
-  audio.addEventListener("ended", closeSplash, { once:true });
-  // Coba lagi saat file audio sudah siap, karena beberapa browser belum siap
-  // ketika pemanggilan play() pertama dilakukan.
-  audio.addEventListener("canplay", () => {
-    if (!finished && audio.paused) startAudio();
-  });
-  audio.addEventListener("error", () => {
-    // Jika file audio gagal dimuat, jangan menahan pengguna di splash.
-    fallbackTimer = setTimeout(closeSplash, 2500);
-  }, { once:true });
+  audio.addEventListener("ended", closeSplash, { once: true });
+  audio.addEventListener("error", closeSplash, { once: true });
+  startButton.addEventListener("click", playSplashAudio, { once: true });
 
-  startButton.addEventListener("click", startAudio);
-  screen.addEventListener("click", event => {
-    if (screen.classList.contains("needs-tap") && event.target !== startButton) startAudio();
-  });
-
-  // Coba mulai otomatis. Jika ditolak browser, pengguna cukup mengetuk layar sekali.
-  startAudio();
-
-  // Splash normalnya berakhir tepat saat audio selesai (event ended).
+  // Satu percobaan autoplay. Tidak ada pemanggilan ulang atau listener duplikat.
+  playSplashAudio();
 })();
 </script>
 
