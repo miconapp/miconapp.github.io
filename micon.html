@@ -1010,8 +1010,15 @@ function updatePitchDisplay(){
  const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
  if(range)range.value=String(pitch);
  if(value)value.textContent=String(pitch);
- if(name)name.textContent=pitch===0?'Original':(pitch>0?'+':'')+pitch;
- if(desc)desc.textContent=pitch===0?'0 semitone · nada asli':Math.abs(pitch)+' semitone · '+(pitch>0?'nada dinaikkan':'nada diturunkan');
+ const keySelect=$('keySelect');
+ const keyOption=keySelect&&keySelect.options[keySelect.selectedIndex];
+ const keyLabel=keyOption?keyOption.textContent.trim():'C / Do';
+ const rootNames=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+ const selectedRoot=keySelect&&keySelect.value!==''?Number(keySelect.value):0;
+ const rootIndex=((selectedRoot+pitch)%12+12)%12;
+ const chordQuality=/\b(minor|min)\b|\bm\s*(?:\/|$)/i.test(keyLabel)?'m':'';
+ if(name)name.textContent=pitch===0?'Original':rootNames[rootIndex]+chordQuality+(pitch>0?'+':'-');
+ if(desc)desc.textContent=pitch===0?'0 semitone · nada asli':rootNames[rootIndex]+chordQuality+' · '+Math.abs(pitch)+' semitone '+(pitch>0?'naik':'turun');
  const down=$('downBtn'),up=$('upBtn');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const ready=!!(video&&video.__miconAudioGraph&&video.__miconAudioGraph.worklet);
@@ -1106,9 +1113,8 @@ function applyPitch(value){
  updatePitchDisplay();
 }
 
-/* Gain netral: pertahankan level asli dari file.
-   Node yang sama dipakai pada Original 0 dan semua nilai transpose,
-   tanpa boost atau pengurangan gain tambahan. */
+/* Samakan level output video dengan level volume iklan (adVideo.volume = 1).
+   Gain unity dipakai pada desktop/mobile, Original 0, dan semua transpose. */
 const MOBILE_AUDIO_GAIN_DB=0;
 const MOBILE_AUDIO_GAIN_LINEAR=1;
 
@@ -1156,25 +1162,19 @@ async function connectVideoToAudioWorklet(target){
   if(playbackParam)playbackParam.value=1;
   source=audioContext.createMediaElementSource(target);
 
-  if(isMobile){
-   /* Gain berada setelah jalur Original maupun SoundTouch.
-      SoundTouch tidak memproses audio saat pitch 0 agar CPU smartphone ringan. */
-   gain=audioContext.createGain();
-   gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
-   if(pitch===0){
-    source.connect(gain);
-    gain.connect(audioContext.destination);
-    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:false};
-   }else{
-    source.connect(worklet);
-    worklet.connect(gain);
-    gain.connect(audioContext.destination);
-    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:true};
-   }
+  /* Gain bersama desktop dan smartphone, setelah jalur SoundTouch.
+     Pada pitch 0 smartphone tetap memakai jalur langsung melalui gain. */
+  gain=audioContext.createGain();
+  gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
+  if(isMobile&&pitch===0){
+   source.connect(gain);
+   gain.connect(audioContext.destination);
+   target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:false};
   }else{
    source.connect(worklet);
-   worklet.connect(audioContext.destination);
-   target.__miconAudioGraph={source,worklet,gain:null};
+   worklet.connect(gain);
+   gain.connect(audioContext.destination);
+   target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:isMobile};
   }
   target.__miconAudioPipeline='soundtouch-audioworklet';
   target.defaultPlaybackRate=1;
