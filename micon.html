@@ -1039,6 +1039,31 @@ function resumeAudioContextFromGesture(){
 /* Satu jalur audio tetap untuk Original dan Transpose.
    Tidak ada pemutusan/penyambungan node ketika video sedang berjalan. */
 
+/* Routing smartphone mengikuti implementasi Original yang sudah stabil:
+   Original: source -> gain -> output.
+   Transpose: source -> SoundTouch Worklet -> gain -> output.
+   Gain tetap sama pada kedua jalur. */
+function setMobileAudioRoute(target,useWorklet){
+ const graph=target&&target.__miconAudioGraph;
+ if(!graph||!graph.source||!graph.worklet||!graph.gain||!audioContext)return;
+ if(!window.matchMedia('(max-width:760px)').matches)return;
+ if(graph.mobileWorkletRoute===!!useWorklet)return;
+ try{
+  try{graph.source.disconnect();}catch(_){}
+  try{graph.worklet.disconnect();}catch(_){}
+  if(useWorklet){
+   graph.source.connect(graph.worklet);
+   graph.worklet.connect(graph.gain);
+  }else{
+   graph.source.connect(graph.gain);
+  }
+  graph.gain.connect(audioContext.destination);
+  graph.mobileWorkletRoute=!!useWorklet;
+ }catch(error){
+  msg('Gagal mengatur jalur audio smartphone: '+(error.message||error),true);
+ }
+}
+
 function waitForMobileVideoBuffer(target){
  if(!window.matchMedia('(max-width:760px)').matches)return Promise.resolve(true);
  if(!target)return Promise.resolve(false);
@@ -1070,8 +1095,11 @@ function applyPitch(value){
    else pitchParam.value=next;
   }catch(_){pitchParam.value=next;}
  }
- /* AudioContext di-resume langsung dari gesture tombol, tanpa menunggu await.
-    Jalur source -> worklet -> destination tetap sama pada semua nilai pitch. */
+ /* Pertahankan pola routing mobile dari file Original:
+    Original memakai jalur langsung, SoundTouch aktif saat transpose. */
+ if(window.matchMedia('(max-width:760px)').matches&&activeVideo&&activeVideo.__miconAudioGraph){
+  setMobileAudioRoute(activeVideo,next!==0);
+ }
  if(audioContext&&audioContext.state!=='running'){
   try{audioContext.resume().catch(()=>{});}catch(_){}
  }
@@ -1081,8 +1109,8 @@ function applyPitch(value){
 /* Gain +20 dB hanya untuk audio video pada smartphone.
    Satu node gain ditempatkan setelah SoundTouch sehingga Original 0,
    transpose minus, dan transpose plus selalu memakai gain yang sama. */
-const MOBILE_AUDIO_GAIN_DB=13;
-const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/13);
+const MOBILE_AUDIO_GAIN_DB=20;
+const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/20);
 
 function disconnectVideoAudio(target){
  if(!target)return;
@@ -1128,18 +1156,26 @@ async function connectVideoToAudioWorklet(target){
   if(playbackParam)playbackParam.value=1;
   source=audioContext.createMediaElementSource(target);
 
-  /* Routing tunggal dan permanen: source -> SoundTouch -> gain -> destination.
-     Gain tidak ikut berubah ketika pitch digeser sehingga semua nada setara. */
-  source.connect(worklet);
   if(isMobile){
+   /* Gain berada setelah jalur Original maupun SoundTouch.
+      SoundTouch tidak memproses audio saat pitch 0 agar CPU smartphone ringan. */
    gain=audioContext.createGain();
    gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
-   worklet.connect(gain);
-   gain.connect(audioContext.destination);
+   if(pitch===0){
+    source.connect(gain);
+    gain.connect(audioContext.destination);
+    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:false};
+   }else{
+    source.connect(worklet);
+    worklet.connect(gain);
+    gain.connect(audioContext.destination);
+    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:true};
+   }
   }else{
+   source.connect(worklet);
    worklet.connect(audioContext.destination);
+   target.__miconAudioGraph={source,worklet,gain:null};
   }
-  target.__miconAudioGraph={source,worklet,gain};
   target.__miconAudioPipeline='soundtouch-audioworklet';
   target.defaultPlaybackRate=1;
   target.playbackRate=1;
