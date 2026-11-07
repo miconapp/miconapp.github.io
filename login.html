@@ -77,10 +77,19 @@ button,input{font:inherit}
 /* MicOn splash screen — hanya lapisan pembuka, tidak mengubah form autentikasi */
 #miconSplash{
   position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
-  overflow:hidden;background:#006bc8 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/contain no-repeat;
+  overflow:hidden;
+  background:#061c3d url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/contain no-repeat;
   opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease;
 }
-#miconSplash::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,12,25,.12),rgba(3,12,25,.55))}
+#miconSplash::before{
+  content:"";position:absolute;inset:-24px;z-index:0;
+  background:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center/cover no-repeat;
+  filter:blur(22px);transform:scale(1.06);opacity:.82;
+}
+#miconSplash::after{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:linear-gradient(180deg,rgba(3,12,25,.06),rgba(3,12,25,.28));
+}
 #miconSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
 .splash-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:22px;padding:24px;text-align:center;color:#fff}
 .splash-loader{width:64px;height:64px;border:3px solid rgba(255,255,255,.25);border-top-color:#75f1df;border-right-color:#75f1df;border-radius:50%;animation:miconSpin .9s linear infinite;filter:drop-shadow(0 0 12px rgba(117,241,223,.45))}
@@ -95,6 +104,7 @@ button,input{font:inherit}
 @keyframes miconBars{to{height:25px;opacity:.55}}
 @media(max-width:900px){
   #miconSplash{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
+  #miconSplash::before{background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true")}
   .splash-loader{width:54px;height:54px}
 }
 @media(prefers-reduced-motion:reduce){.splash-loader,.splash-equalizer i{animation:none}#miconSplash{transition:none}}
