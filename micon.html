@@ -1216,22 +1216,27 @@ $('videoFile').addEventListener('change',async event=>{
   $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
   setupVideo();
   const loadedVideo=video;
-  loadedVideo.addEventListener('loadedmetadata',async()=>{
-   if(loadedVideo!==video)return;
-   await audioReadyPromise;
+  loadedVideo.addEventListener('loadedmetadata',()=>{
    if(loadedVideo!==video||!loadedVideo.isConnected)return;
-   if(audioContext&&audioContext.state==='suspended'){
-    try{await audioContext.resume();}catch(_){}
-   }
    if(!window.__miconOpeningAdRunning&&!window.__miconAdForFileDone){
     window.__miconOpeningAdRunning=true;
-    Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true).then(async passed=>{
+
+    /* AudioWorklet + SoundTouch sudah mulai disiapkan sejak setupVideo().
+       Jalankan iklan secara paralel, jangan menunggu Worklet selesai lebih dulu. */
+    const workletReadyTask=audioReadyPromise;
+    const openingAdTask=Promise.resolve(
+     window.miconAdGate?window.miconAdGate('opening'):true
+    );
+
+    Promise.all([workletReadyTask,openingAdTask]).then(async([audioReady,passed])=>{
      if(!passed||loadedVideo!==video||!loadedVideo.isConnected)return;
-     await audioReadyPromise;
-     if(loadedVideo!==video||!loadedVideo.isConnected)return;
+     if(!audioReady||!loadedVideo.__miconAudioGraph||!loadedVideo.__miconAudioGraph.worklet){
+      throw new Error('SoundTouch AudioWorklet belum siap setelah iklan selesai.');
+     }
      if(audioContext&&audioContext.state==='suspended'){
       try{await audioContext.resume();}catch(_){}
      }
+     if(loadedVideo!==video||!loadedVideo.isConnected)return;
      window.__miconAdForFileDone=true;
      $('fileStatus').textContent='Video siap diputar';
      loadedVideo.currentTime=0;window.__miconAdAuthorized=true;
@@ -1241,7 +1246,7 @@ $('videoFile').addEventListener('change',async event=>{
       $('fileStatus').textContent='Video siap diputar · tekan Putar video';
       if(playError&&playError.name!=='NotAllowedError'&&playError.name!=='AbortError')throw playError;
      }
-    }).catch(error=>msg('Gagal memulai video setelah iklan: '+(error.message||error),true))
+    }).catch(error=>msg('Gagal menyiapkan audio atau memulai video: '+(error.message||error),true))
       .finally(()=>{window.__miconOpeningAdRunning=false;});
    }
   },{once:true});
