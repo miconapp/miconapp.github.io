@@ -840,27 +840,88 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 
 <style id="micon-dock-profile-reference-style">
 @media(max-width:760px){
- .mobile-profile-page{padding:0!important;background:#fff!important;color:#111!important;font-family:Arial,system-ui,sans-serif!important}
- .mobile-profile-page.mobile-profile-page-open{display:block!important}
- .mobile-profile-page .mdp-brand{height:135px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e5e7eb;background:#fff}
- .mobile-profile-page .mdp-brand img{width:240px;max-width:65%;height:92px;object-fit:contain}
- .mobile-profile-page .mdp-user{height:80px;display:flex;align-items:center;padding:0 12px}
- .mobile-profile-page .mdp-avatar{width:94px;height:94px;flex:0 0 94px;border-radius:50%;display:grid;place-items:center;background:#000;color:#fff;font-size:25px;z-index:1}
- .mobile-profile-page .mdp-name{height:29px;display:flex;align-items:center;flex:1;min-width:0;margin-left:2px;padding:0 14px;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .mobile-profile-page .mdp-options{padding:76px 30px 30px;display:flex;flex-direction:column}
- .mobile-profile-page .mdp-row{height:35px;min-height:35px;display:flex;align-items:center;gap:16px;border:0;background:transparent;color:#111;text-align:left;padding:0;font:14px Arial,system-ui,sans-serif;cursor:pointer}
- .mobile-profile-page .mdp-ico{width:12px;flex:0 0 12px;font-size:14px}
- .mobile-profile-page .mdp-theme{margin-left:auto;display:flex;border:1px solid #111;height:23px}
- .mobile-profile-page .mdp-theme button{width:54px;border:0;border-right:1px solid #111;background:#fff;color:#111;font:10px Arial}
+ /* Halaman profil harus berada di atas preview/video dan kontrol nada yang sticky. */
+ .mobile-profile-page{
+   position:fixed!important;inset:0!important;z-index:15000!important;
+   display:none;box-sizing:border-box!important;width:100%!important;height:100dvh!important;
+   max-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;
+   overscroll-behavior:contain!important;padding:0!important;
+   background:#fff!important;color:#111!important;
+   font-family:Arial,system-ui,sans-serif!important;
+   -webkit-overflow-scrolling:touch!important;
+ }
+ .mobile-profile-page.mobile-profile-page-open{display:block!important;z-index:15000!important}
+ .mobile-profile-page .mdp-brand{
+   height:135px;display:flex;align-items:center;justify-content:center;
+   border-bottom:1px solid #e5e7eb;background:#fff;
+ }
+ .mobile-profile-page .mdp-brand img{
+   display:block;width:240px;max-width:65%;height:92px;object-fit:contain;
+ }
+ /* Foto profil menimpa sedikit garis bawah area logo, sama seperti referensi. */
+ .mobile-profile-page .mdp-user{
+   position:relative;height:80px;margin-top:-27px;
+   display:flex;align-items:center;padding:0 12px;
+ }
+ .mobile-profile-page .mdp-avatar{
+   width:94px;height:94px;flex:0 0 94px;border-radius:50%;
+   display:grid;place-items:center;background:#000;color:#fff;
+   font-size:25px;font-weight:500;z-index:1;
+ }
+ .mobile-profile-page .mdp-name{
+   height:29px;display:flex;align-items:center;flex:1;min-width:0;
+   margin-left:2px;padding:0 14px;border-top:1px solid #e5e7eb;
+   border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;
+   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ }
+ .mobile-profile-page .mdp-options{
+   display:flex;flex-direction:column;gap:0;padding:48px 30px 30px;
+ }
+ .mobile-profile-page .mdp-row{
+   box-sizing:border-box;width:100%;height:35px;min-height:35px;
+   display:flex;align-items:center;gap:16px;border:0;background:transparent;
+   color:#111;text-align:left;padding:0;font:14px Arial,system-ui,sans-serif;cursor:pointer;
+ }
+ .mobile-profile-page .mdp-ico{width:26px;flex:0 0 26px;font-size:14px;line-height:1;color:inherit}
+ .mobile-profile-page .mdp-theme{
+   width:110px;height:23px;flex:0 0 110px;margin-left:auto;
+   display:flex;border:1px solid #111;box-sizing:border-box;
+ }
+ .mobile-profile-page .mdp-theme button{
+   box-sizing:border-box;width:55px;height:21px;padding:0;
+   border:0;border-right:1px solid #111;background:#fff;color:#111;
+   font:10px Arial;cursor:pointer;
+ }
  .mobile-profile-page .mdp-theme button:last-child{border-right:0}
- .mobile-profile-page .mdp-theme button.selected{background:#111;color:#fff}
- .mobile-profile-page .mobile-profile-back{position:absolute;top:10px;right:12px;width:30px;height:30px;border:0;border-radius:50%;background:#f3f4f6;color:#111;font-size:21px;line-height:1}
- .mobile-profile-page .mdp-logout{color:#b91c1c!important}
+ .mobile-profile-page .mdp-theme button.selected{
+   background:#fff;color:#111;font-weight:700;
+ }
+ .mobile-profile-page .mobile-profile-back{display:none!important}
+ /* Logout mengikuti baris menu biasa, bukan tombol/pill merah. */
+ .mobile-profile-page #micon-profile-logout{
+   display:flex!important;box-sizing:border-box!important;align-items:center!important;
+   width:100%!important;height:35px!important;min-height:35px!important;
+   margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+   background:transparent!important;color:#111!important;text-align:left!important;
+   font:14px Arial,system-ui,sans-serif!important;font-weight:400!important;
+   box-shadow:none!important;cursor:pointer!important;
+ }
+ .mobile-profile-page #micon-profile-logout .mdp-ico{width:26px;flex:0 0 26px}
+ /* Dock tetap terlihat di atas halaman profil, sesuai gambar acuan. */
+ body:has(.mobile-profile-page.mobile-profile-page-open) #micon-floating-dock{
+   z-index:25000!important;
+ }
+ html:has(.mobile-profile-page.mobile-profile-page-open),
+ body:has(.mobile-profile-page.mobile-profile-page-open){overflow:hidden!important}
  .mobile-profile-page.mdp-night{background:#111827!important;color:#f9fafb!important}
- .mobile-profile-page.mdp-night .mdp-brand,.mobile-profile-page.mdp-night .mdp-name{background:#111827;color:#f9fafb;border-color:#374151}
+ .mobile-profile-page.mdp-night .mdp-brand{background:#111827;border-color:#374151}
+ .mobile-profile-page.mdp-night .mdp-name{background:#111827;color:#f9fafb;border-color:#374151}
  .mobile-profile-page.mdp-night .mdp-row{color:#f9fafb}
- .mobile-profile-page.mdp-night .mdp-theme button{background:#1f2937;color:#f9fafb;border-color:#6b7280}
- .mobile-profile-page.mdp-night .mdp-theme button.selected{background:#f9fafb;color:#111827}
+ .mobile-profile-page.mdp-night .mdp-ico{color:#f9fafb}
+ .mobile-profile-page.mdp-night .mdp-theme{border-color:#9ca3af}
+ .mobile-profile-page.mdp-night .mdp-theme button{background:#111827;color:#f9fafb;border-color:#9ca3af}
+ .mobile-profile-page.mdp-night .mdp-theme button.selected{background:#111827;color:#fff}
+ .mobile-profile-page.mdp-night #micon-profile-logout{background:transparent!important;color:#f9fafb!important}
 }
 @media(min-width:761px){.mobile-profile-page{display:none!important}}
 </style>
@@ -1859,6 +1920,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar,body:has(#youtubeSection.act
      profile.setAttribute('aria-expanded','false');
      if(profileTrigger)profileTrigger.setAttribute('aria-expanded','false');
    };
+   window.MicOnCloseDockProfile=closeProfilePage;
    profile.addEventListener('click',event=>{
      syncProfileIdentity();
      event.preventDefault();
@@ -2729,7 +2791,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       document.body.appendChild(dock);
       dock.addEventListener('click',function(event){
         const button=event.target.closest('[data-action]');if(!button)return;
-        const action=button.dataset.action;const youtube=document.getElementById('youtubeSection');
+        const action=button.dataset.action;if(action!=='profile'&&typeof window.MicOnCloseDockProfile==='function')window.MicOnCloseDockProfile();const youtube=document.getElementById('youtubeSection');
         const stickyShell=document.getElementById('micon-sticky-shell');
         if(action==='transpose'||action==='upload'){
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
