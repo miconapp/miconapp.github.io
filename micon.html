@@ -3044,6 +3044,43 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
  .mobile-playlist-picker,.desktop-playlist-picker{display:none!important}
 }
 </style>
+
+<style id="micon-floating-dock-persistent-fix">
+@media screen and (max-width:760px){
+  body>#micon-floating-dock{
+    display:grid!important;visibility:visible!important;opacity:1!important;
+    pointer-events:auto!important;position:fixed!important;
+    z-index:25000!important;
+  }
+  body:has(#youtubeSection.active)>#micon-floating-dock,
+  body:has(#appDownloadSection.active)>#micon-floating-dock{
+    display:grid!important;visibility:visible!important;opacity:1!important;
+    pointer-events:auto!important;z-index:25000!important;
+  }
+}
+</style>
+<script id="micon-floating-dock-persistent-guard">
+(function(){
+  const mobile=()=>window.matchMedia('(max-width:760px)').matches;
+  function keepDock(){
+    if(!mobile())return;
+    let dock=document.getElementById('micon-floating-dock');
+    if(!dock)return;
+    if(dock.parentElement!==document.body)document.body.appendChild(dock);
+    if(dock.hidden)dock.hidden=false;
+    const required={display:'grid',visibility:'visible',opacity:'1',pointerEvents:'auto',position:'fixed',zIndex:'25000'};
+    for(const [key,value] of Object.entries(required)){
+      if(dock.style[key]!==value)dock.style.setProperty(key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),value,'important');
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',keepDock,{once:true});else keepDock();
+  const observer=new MutationObserver(()=>keepDock());
+  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class','hidden']});
+  window.addEventListener('pageshow',keepDock);
+  window.addEventListener('resize',keepDock);
+  document.addEventListener('click',()=>{if(mobile())requestAnimationFrame(keepDock)},true);
+})();
+</script>
 </body>
 </html>
 
