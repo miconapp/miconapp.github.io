@@ -916,7 +916,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
         <a class="micon-play-developer" href="#micon-app-details">MicOnApp</a>
         <div class="micon-play-tags"><span>Musik &amp; Audio</span><i></i><span>Aplikasi Android</span><i></i><span>APK</span></div>
         <div class="micon-play-actions">
-          <a class="micon-play-download" href="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-desktop="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-mobile="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" target="_blank" rel="noopener noreferrer" download>Download</a>
+          <a class="micon-play-download" href="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-desktop="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-mobile="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" target="_blank" rel="noopener noreferrer" download>App</a>
           <button type="button" class="micon-play-share" id="miconAppShare"><span>↗</span> Bagikan</button>
           <button type="button" class="micon-play-wishlist" id="miconAppWishlist"><span>♡</span> Wishlist</button>
         </div>
@@ -1072,7 +1072,7 @@ function setMobileAudioRoute(target,useWorklet){
   }else{
    graph.source.connect(graph.gain);
   }
-  graph.gain.connect(audioContext.destination);
+  graph.gain.connect(graph.limiter||audioContext.destination);
   graph.mobileWorkletRoute=!!useWorklet;
  }catch(error){
   msg('Gagal mengatur jalur audio smartphone: '+(error.message||error),true);
@@ -1133,6 +1133,7 @@ function disconnectVideoAudio(target){
   try{graph.source.disconnect();}catch(_){}
   try{graph.worklet.disconnect();}catch(_){}
   if(graph.gain)try{graph.gain.disconnect();}catch(_){}
+  if(graph.limiter)try{graph.limiter.disconnect();}catch(_){}
   try{graph.worklet.port.close();}catch(_){}
   try{delete target.__miconAudioGraph;}catch(_){target.__miconAudioGraph=null;}
  }
@@ -1175,16 +1176,24 @@ async function connectVideoToAudioWorklet(target){
       SoundTouch tidak memproses audio saat pitch 0 agar CPU smartphone ringan. */
    gain=audioContext.createGain();
    gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
+   /* Limiter setelah gain +5 dB untuk menahan puncak agar tidak clipping. */
+   const limiter=audioContext.createDynamicsCompressor();
+   limiter.threshold.setValueAtTime(-1,audioContext.currentTime);
+   limiter.knee.setValueAtTime(0,audioContext.currentTime);
+   limiter.ratio.setValueAtTime(20,audioContext.currentTime);
+   limiter.attack.setValueAtTime(0.003,audioContext.currentTime);
+   limiter.release.setValueAtTime(0.12,audioContext.currentTime);
+   limiter.connect(audioContext.destination);
    /* Samakan level output mobile dengan video iklan (volume 1.0 / 100%). */
    if(pitch===0){
     source.connect(gain);
-    gain.connect(audioContext.destination);
-    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:false};
+    gain.connect(limiter);
+    target.__miconAudioGraph={source,worklet,gain,limiter,mobileWorkletRoute:false};
    }else{
     source.connect(worklet);
     worklet.connect(gain);
-    gain.connect(audioContext.destination);
-    target.__miconAudioGraph={source,worklet,gain,mobileWorkletRoute:true};
+    gain.connect(limiter);
+    target.__miconAudioGraph={source,worklet,gain,limiter,mobileWorkletRoute:true};
    }
   }else{
    source.connect(worklet);
