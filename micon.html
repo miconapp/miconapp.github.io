@@ -1560,6 +1560,7 @@ async function setupVideo(){
  video.addEventListener('ended',()=>{
   playing=false;$('playBtn').textContent='▶ Putar video';
   if(window.__miconPlaylistHasNext&&typeof window.__miconPlaylistAdvance==='function'){window.__miconPlaylistAdvance();return;}
+  if(window.__miconPlaylistActive){window.__miconPlaylistHasNext=false;return;}
   if(window.__miconAdForFileDone&&!window.__miconEndAdShown){
    window.__miconEndAdShown=true;
    Promise.resolve(window.miconAdGate?window.miconAdGate('ending'):true)
@@ -1607,7 +1608,9 @@ async function clearVideo(){
 }
 const uploadDockButton=document.querySelector('.upload-dock[data-upload-video]');
 if(uploadDockButton)uploadDockButton.addEventListener('click',event=>{
- event.preventDefault();$('videoFile')?.click();
+ event.preventDefault();
+ const playlistPicker=document.querySelector('.desktop-playlist-view input[type="file"]');
+ if(playlistPicker)playlistPicker.click();else $('videoFile')?.click();
 });
 $('videoFile').addEventListener('change',async event=>{
  const picker=event.currentTarget,selectedFile=picker.files&&picker.files[0];
@@ -2327,6 +2330,7 @@ try {
     if(!picker)return;
     currentIndex=index;
     loadingIndex=index;
+    window.__miconPlaylistActive=true;
     window.__miconPlaylistHasNext=index<playlist.length-1;
     markActive();
     try{
@@ -2374,6 +2378,7 @@ try {
     });
     playlistPicker.value='';
     renderPlaylist();
+    if(playlist.length)window.__miconPlaylistActive=true;
     /* Impor batch pertama langsung memulai lagu pertama; batch tambahan tidak
        mengganggu lagu yang sedang diputar dan masuk ke urutan antrean berikutnya. */
     if(beforeCount===0&&playlist.length>0&&currentIndex===-1)loadPlaylistItem(0);
@@ -2784,6 +2789,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
    }
   });
   picker.value='';render();
+  if(playlist.length)window.__miconPlaylistActive=true;
   if(currentIndex===-1&&playlist.length)loadItem(0);
   window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
  });
