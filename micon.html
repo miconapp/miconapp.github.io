@@ -875,7 +875,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
     <option value="11">B / Si</option>
   </select>
 </label>
-<div class="noteBox"><small>Nada relatif</small><div class="note" id="noteName">Original</div><div class="mini" id="noteDesc">0 semitone · nada asli</div></div>
+<div class="noteBox"><small>Nada relatif</small><div class="note" id="noteName">Original</div><div class="mini" id="noteDesc">Nada asli</div></div>
 <div class="stepper"><button class="step" id="downBtn" aria-label="Turunkan nada" disabled>−</button><input class="range" id="pitchRange" type="range" min="-6" max="6" step="1" value="0" disabled><button class="step" id="upBtn" aria-label="Naikkan nada" disabled>+</button></div>
 <div class="rangeLabels"><span>−6 semitone</span><span>0</span><span>+6 semitone</span></div>
 <div class="row" style="margin-top:14px"><button class="btn secondary" id="clearBtn" disabled>Hapus video</button></div>
@@ -916,7 +916,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
         <a class="micon-play-developer" href="#micon-app-details">MicOnApp</a>
         <div class="micon-play-tags"><span>Musik &amp; Audio</span><i></i><span>Aplikasi Android</span><i></i><span>APK</span></div>
         <div class="micon-play-actions">
-          <a class="micon-play-download" href="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-desktop="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-mobile="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" target="_blank" rel="noopener noreferrer" download>App</a>
+          <a class="micon-play-download" href="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-desktop="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" data-download-mobile="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" target="_blank" rel="noopener noreferrer" download>Download</a>
           <button type="button" class="micon-play-share" id="miconAppShare"><span>↗</span> Bagikan</button>
           <button type="button" class="micon-play-wishlist" id="miconAppWishlist"><span>♡</span> Wishlist</button>
         </div>
@@ -1010,8 +1010,23 @@ function updatePitchDisplay(){
  const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
  if(range)range.value=String(pitch);
  if(value)value.textContent=String(pitch);
- if(name)name.textContent=pitch===0?'Original':(pitch>0?'+':'')+pitch;
- if(desc)desc.textContent=pitch===0?'0 semitone · nada asli':Math.abs(pitch)+' semitone · '+(pitch>0?'nada dinaikkan':'nada diturunkan');
+
+ /* Tampilan nada relatif saja: gunakan nama tangga nada/chord yang sudah tersedia.
+    Tidak mengubah nilai pitch, AudioWorklet, SoundTouch, maupun alur kontrol nada. */
+ const keySelect=$('keySelect');
+ const chordNames=['C / Do','C♯ / D♭','D / Re','D♯ / E♭','E / Mi','F / Fa',
+                   'F♯ / G♭','G / Sol','G♯ / A♭','A / La','A♯ / B♭','B / Si'];
+ const selectedKey=keySelect&&keySelect.value!==''?Number(keySelect.value):null;
+ if(name){
+  if(selectedKey===null||!Number.isFinite(selectedKey)){
+   name.textContent=pitch===0?'Original':chordNames[((pitch%12)+12)%12];
+  }else{
+   name.textContent=chordNames[((selectedKey+pitch)%12+12)%12];
+  }
+ }
+ if(desc){
+  desc.textContent=pitch===0?'Nada asli':(pitch>0?'Nada dinaikkan':'Nada diturunkan');
+ }
  const down=$('downBtn'),up=$('upBtn');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
  const ready=!!(video&&video.__miconAudioGraph&&video.__miconAudioGraph.worklet);
