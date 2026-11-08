@@ -1121,11 +1121,10 @@ function applyPitch(value){
  updatePitchDisplay();
 }
 
-/* Gain netral: pertahankan level asli dari file.
-   Node yang sama dipakai pada Original 0 dan semua nilai transpose,
-   tanpa boost atau pengurangan gain tambahan. */
-const MOBILE_AUDIO_GAIN_DB=0;
-const MOBILE_AUDIO_GAIN_LINEAR=1;
+/* Gain +5 dB pada jalur audio smartphone.
+   Node yang sama dipakai pada Original 0 dan seluruh jalur SoundTouch/transpose. */
+const MOBILE_AUDIO_GAIN_DB=5;
+const MOBILE_AUDIO_GAIN_LINEAR=Math.pow(10,MOBILE_AUDIO_GAIN_DB/20);
 
 function disconnectVideoAudio(target){
  if(!target)return;
@@ -1175,7 +1174,7 @@ async function connectVideoToAudioWorklet(target){
    /* Gain berada setelah jalur Original maupun SoundTouch.
       SoundTouch tidak memproses audio saat pitch 0 agar CPU smartphone ringan. */
    gain=audioContext.createGain();
-   gain.gain.setValueAtTime(1,audioContext.currentTime);
+   gain.gain.setValueAtTime(MOBILE_AUDIO_GAIN_LINEAR,audioContext.currentTime);
    /* Samakan level output mobile dengan video iklan (volume 1.0 / 100%). */
    if(pitch===0){
     source.connect(gain);
