@@ -838,34 +838,32 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 @media(max-width:760px){header.top .brand .brand-logo{height:36px!important;max-height:36px!important;max-width:112px!important}}
 </style>
 
-<style id="micon-dock-profile-page-style">
+<style id="micon-dock-profile-reference-style">
 @media(max-width:760px){
-  #micon-dock-profile-page{display:none;position:fixed;inset:0;z-index:20000;overflow-y:auto;overscroll-behavior:contain;background:#fff;color:#111;font:14px/1.45 Arial,system-ui,sans-serif}
-  #micon-dock-profile-page.open{display:block}
-  #micon-dock-profile-page .mdp-brand{height:135px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e5e7eb;background:#fff}
-  #micon-dock-profile-page .mdp-brand img{display:block;width:240px;max-width:65%;height:92px;object-fit:contain}
-  #micon-dock-profile-page .mdp-user{height:80px;display:flex;align-items:center;gap:0;padding:0 12px;position:relative}
-  #micon-dock-profile-page .mdp-avatar{width:94px;height:94px;flex:0 0 94px;border-radius:50%;display:grid;place-items:center;background:#000;color:#fff;font-size:25px;font-weight:500;z-index:1}
-  #micon-dock-profile-page .mdp-name{height:29px;display:flex;align-items:center;min-width:0;flex:1;margin-left:2px;padding:0 14px;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;color:#111;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #micon-dock-profile-page .mdp-back{position:absolute;right:12px;top:12px;width:30px;height:30px;border:0;border-radius:50%;background:#f3f4f6;color:#111;font-size:21px;line-height:1}
-  #micon-dock-profile-page .mdp-options{padding:20px 30px 30px 30px;display:flex;flex-direction:column;gap:0}
-  #micon-dock-profile-page .mdp-row{height:35px;display:flex;align-items:center;gap:16px;border:0;background:transparent;color:#111;text-align:left;padding:0;font:14px Arial,system-ui,sans-serif}
-  #micon-dock-profile-page .mdp-row .mdp-ico{width:12px;flex:0 0 12px;color:#111;font-size:14px}
-  #micon-dock-profile-page .mdp-theme{margin-left:auto;display:flex;border:1px solid #111;height:23px}
-  #micon-dock-profile-page .mdp-theme button{width:54px;border:0;border-right:1px solid #111;background:#fff;color:#111;font:10px Arial}
-  #micon-dock-profile-page .mdp-theme button:last-child{border-right:0}
-  #micon-dock-profile-page .mdp-theme button.selected{background:#111;color:#fff}
-  #micon-dock-profile-page.night{background:#111827;color:#f9fafb}
-  #micon-dock-profile-page.night .mdp-brand,#micon-dock-profile-page.night .mdp-name{background:#111827;color:#f9fafb;border-color:#374151}
-  #micon-dock-profile-page.night .mdp-row{color:#f9fafb}
-  #micon-dock-profile-page.night .mdp-row .mdp-ico{color:#f9fafb}
-  #micon-dock-profile-page.night .mdp-theme button{background:#1f2937;color:#f9fafb;border-color:#6b7280}
-  #micon-dock-profile-page.night .mdp-theme button.selected{background:#f9fafb;color:#111827}
-  #micon-dock-profile-page .mdp-logout{margin-top:4px;color:#b91c1c}
+ .mobile-profile-page{padding:0!important;background:#fff!important;color:#111!important;font-family:Arial,system-ui,sans-serif!important}
+ .mobile-profile-page.mobile-profile-page-open{display:block!important}
+ .mobile-profile-page .mdp-brand{height:135px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e5e7eb;background:#fff}
+ .mobile-profile-page .mdp-brand img{width:240px;max-width:65%;height:92px;object-fit:contain}
+ .mobile-profile-page .mdp-user{height:80px;display:flex;align-items:center;padding:0 12px}
+ .mobile-profile-page .mdp-avatar{width:94px;height:94px;flex:0 0 94px;border-radius:50%;display:grid;place-items:center;background:#000;color:#fff;font-size:25px;z-index:1}
+ .mobile-profile-page .mdp-name{height:29px;display:flex;align-items:center;flex:1;min-width:0;margin-left:2px;padding:0 14px;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .mobile-profile-page .mdp-options{padding:76px 30px 30px;display:flex;flex-direction:column}
+ .mobile-profile-page .mdp-row{height:35px;min-height:35px;display:flex;align-items:center;gap:16px;border:0;background:transparent;color:#111;text-align:left;padding:0;font:14px Arial,system-ui,sans-serif;cursor:pointer}
+ .mobile-profile-page .mdp-ico{width:12px;flex:0 0 12px;font-size:14px}
+ .mobile-profile-page .mdp-theme{margin-left:auto;display:flex;border:1px solid #111;height:23px}
+ .mobile-profile-page .mdp-theme button{width:54px;border:0;border-right:1px solid #111;background:#fff;color:#111;font:10px Arial}
+ .mobile-profile-page .mdp-theme button:last-child{border-right:0}
+ .mobile-profile-page .mdp-theme button.selected{background:#111;color:#fff}
+ .mobile-profile-page .mobile-profile-back{position:absolute;top:10px;right:12px;width:30px;height:30px;border:0;border-radius:50%;background:#f3f4f6;color:#111;font-size:21px;line-height:1}
+ .mobile-profile-page .mdp-logout{color:#b91c1c!important}
+ .mobile-profile-page.mdp-night{background:#111827!important;color:#f9fafb!important}
+ .mobile-profile-page.mdp-night .mdp-brand,.mobile-profile-page.mdp-night .mdp-name{background:#111827;color:#f9fafb;border-color:#374151}
+ .mobile-profile-page.mdp-night .mdp-row{color:#f9fafb}
+ .mobile-profile-page.mdp-night .mdp-theme button{background:#1f2937;color:#f9fafb;border-color:#6b7280}
+ .mobile-profile-page.mdp-night .mdp-theme button.selected{background:#f9fafb;color:#111827}
 }
-@media(min-width:761px){#micon-dock-profile-page{display:none!important}}
+@media(min-width:761px){.mobile-profile-page{display:none!important}}
 </style>
-
 </head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MiCon"></div><nav class="desktop-nav" aria-label="Navigasi utama"><span class="nav-link" data-page="homePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>Home</span><span class="nav-link" data-page="karaokePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>Karaoke</span><span class="nav-link" data-page="youtubePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Video YouTube</span><span class="nav-link" data-page="packagePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"/></svg></span>Perpanjang Paket</span><a class="nav-link app-download-link" href="https://www.mediafire.com/file/p1vvkhjt974pswe/micon.apk/file" target="_blank" rel="noopener noreferrer" aria-label="Download Aplikasi MicOn"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Aplikasi MicOn</a><span class="social-icons" aria-label="Media sosial"><span class="social-icon whatsapp" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.4 9.8c-.4-.8-.8-.8-1.2-.8h-1c-.4 0-.9.2-1.4.7s-1.8 1.8-1.8 4.3 1.9 5 2.2 5.4c.3.3 3.7 5.9 9.1 7.4 4.5 1.3 5.4 1 6.4.9 1-.1 3.2-1.3 3.7-2.6.5-1.3.5-2.4.3-2.6-.2-.2-.5-.3-1.1-.6s-3.2-1.6-3.7-1.8c-.5-.2-.9-.3-1.2.3-.4.5-1.4 1.8-1.7 2.2-.3.4-.6.4-1.1.1-.5-.3-2.3-.9-4.3-2.7-1.6-1.4-2.7-3.1-3-3.6-.3-.5 0-.8.2-1.1.2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9-.1-.3-1.1-2.8-1.5-3.8Z" fill="currentColor" transform="translate(1 0) scale(.82)"/></svg></span><span class="social-icon tiktok" title="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 6.7a5.1 5.1 0 0 1-3.9-4.6V1.5h-3.8v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.1a7 7 0 1 0 5.8 6.9V8.4a8.7 8.7 0 0 0 4.9 1.5V6.8c-.3 0-.7 0-1-.1Z" fill="currentColor"/></svg></span><span class="social-icon facebook" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.47h-2.8v8.38C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/></svg></span></span></nav><div class="pill">IMPORT VIDEO · LOKAL</div>
@@ -1846,10 +1844,15 @@ html:has(#youtubeSection.active)::-webkit-scrollbar,body:has(#youtubeSection.act
    const profilePage=document.createElement('section');
    profilePage.className='mobile-profile-page';
    profilePage.setAttribute('aria-label','Halaman profil');
-   profilePage.innerHTML='<div class="mobile-profile-page-header"><button type="button" class="mobile-profile-back" aria-label="Kembali">‹</button><div class="mobile-profile-page-title">Profil Akun</div></div>';
+   profilePage.innerHTML='<div class="mdp-brand"><img src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MicOn"></div><div class="mdp-user"><div class="mdp-avatar" id="mdp-avatar">M</div><div class="mdp-name" id="mdp-name">Akun MicOn</div></div><div class="mdp-options"><div class="mdp-row"><span class="mdp-ico">icon</span><span>Mode Tampilan</span><div class="mdp-theme"><button type="button" data-micon-theme="light" class="selected">Light</button><button type="button" data-micon-theme="night">Night</button></div></div><button type="button" class="mdp-row" data-micon-info="Panduan MicOn"><span class="mdp-ico">icon</span><span>Panduan MicOn</span></button><button type="button" class="mdp-row" data-micon-info="Kebijakan Privasi"><span class="mdp-ico">icon</span><span>Kebijakan Privasi</span></button><button type="button" class="mdp-row" data-micon-info="Chat Admin Micon"><span class="mdp-ico">icon</span><span>Chat Admin Micon</span></button><div class="mdp-logout-slot"></div></div><button type="button" class="mobile-profile-back" aria-label="Kembali">‹</button>';
    document.body.appendChild(profilePage);
-   profilePage.appendChild(profileMenu);
+   const logoutButton=profileMenu.querySelector('#micon-profile-logout');
+   if(logoutButton){logoutButton.className='mdp-row mdp-logout';logoutButton.innerHTML='<span class="mdp-ico">icon</span><span>Log Out</span>';profilePage.querySelector('.mdp-logout-slot').appendChild(logoutButton);}
    profileMenu.classList.remove('open','mobile-profile-open');
+   const syncProfileIdentity=()=>{const full=document.getElementById('micon-profile-fullname');const avatar=document.getElementById('micon-profile-avatar');const name=(full&&full.textContent.trim())||'Akun MicOn';const target=profilePage.querySelector('#mdp-name');const face=profilePage.querySelector('#mdp-avatar');if(target)target.textContent=name;if(face){const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part.charAt(0).toUpperCase()).join('');face.textContent=initials||(avatar?avatar.textContent:'M');}};
+   syncProfileIdentity();
+   profilePage.querySelectorAll('[data-micon-theme]').forEach(button=>button.addEventListener('click',()=>{const night=button.dataset.miconTheme==='night';profilePage.classList.toggle('mdp-night',night);profilePage.querySelectorAll('[data-micon-theme]').forEach(item=>item.classList.toggle('selected',item===button));}));
+   profilePage.querySelectorAll('[data-micon-info]').forEach(button=>button.addEventListener('click',()=>{const label=button.dataset.miconInfo;alert(label+' belum dihubungkan.');}));
    const back=profilePage.querySelector('.mobile-profile-back');
    const closeProfilePage=()=>{
      profilePage.classList.remove('mobile-profile-page-open');
@@ -1857,6 +1860,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar,body:has(#youtubeSection.act
      if(profileTrigger)profileTrigger.setAttribute('aria-expanded','false');
    };
    profile.addEventListener('click',event=>{
+     syncProfileIdentity();
      event.preventDefault();
      event.stopPropagation();
      profilePage.classList.add('mobile-profile-page-open');
@@ -2553,57 +2557,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       frame.setAttribute('scrolling','no');
       frame.setAttribute('aria-label',name);
       frame.style.cssText='display:block;width:100%;height:65px;min-height:65px;max-height:65px;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
-      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'
-<script id="micon-dock-profile-page-js">
-(function(){
-  function install(){
-    if(window.MicOnOpenDockProfile)return;
-    const page=document.createElement('section');
-    page.id='micon-dock-profile-page';
-    page.setAttribute('aria-label','Profil MicOn');
-    page.innerHTML=`
-      <div class="mdp-brand"><img src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MicOn"></div>
-      <button type="button" class="mdp-back" aria-label="Kembali">‹</button>
-      <div class="mdp-user"><div class="mdp-avatar">DB</div><div class="mdp-name">Dewa Bujana</div></div>
-      <div class="mdp-options">
-        <div class="mdp-row"><span class="mdp-ico">icon</span><span>Mode Tampilan</span><div class="mdp-theme"><button type="button" data-theme="light" class="selected">Light</button><button type="button" data-theme="night">Night</button></div></div>
-        <button type="button" class="mdp-row" data-info="Panduan MicOn"><span class="mdp-ico">icon</span><span>Panduan MicOn</span></button>
-        <button type="button" class="mdp-row" data-info="Kebijakan Privasi"><span class="mdp-ico">icon</span><span>Kebijakan Privasi</span></button>
-        <button type="button" class="mdp-row" data-info="Chat Admin Micon"><span class="mdp-ico">icon</span><span>Chat Admin Micon</span></button>
-        <button type="button" class="mdp-row mdp-logout"><span class="mdp-ico">icon</span><span>Log Out</span></button>
-      </div>`;
-    document.body.appendChild(page);
-    const close=()=>{page.classList.remove('open');};
-    page.querySelector('.mdp-back').addEventListener('click',close);
-    page.querySelector('[data-theme="light"]').addEventListener('click',()=>{
-      page.classList.remove('night');
-      page.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('selected',b.dataset.theme==='light'));
-    });
-    page.querySelector('[data-theme="night"]').addEventListener('click',()=>{
-      page.classList.add('night');
-      page.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('selected',b.dataset.theme==='night'));
-    });
-    page.querySelectorAll('[data-info]').forEach(b=>b.addEventListener('click',()=>alert(b.dataset.info+' belum tersedia pada halaman ini.')));
-    page.querySelector('.mdp-logout').addEventListener('click',()=>{
-      const logout=document.getElementById('micon-profile-logout');
-      if(logout)logout.click();
-    });
-    window.MicOnOpenDockProfile=function(){
-      const full=document.getElementById('micon-profile-fullname');
-      const avatar=document.getElementById('micon-profile-avatar');
-      const name=(full&&full.textContent.trim())||'Pengguna MicOn';
-      page.querySelector('.mdp-name').textContent=name;
-      const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join('');
-      page.querySelector('.mdp-avatar').textContent=initials||'M';
-      page.classList.add('open');
-      page.scrollTop=0;
-    };
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
-})();
-</script>
-
-</body></html>';
+      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
     },error=>console.warn("MicOn playlist banner config could not be loaded:",error));
@@ -2797,7 +2751,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
           if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
           if(stickyShell)stickyShell.style.removeProperty('display');
           main.classList.remove('hidden');main.style.removeProperty('display');
-          if(typeof window.MicOnOpenDockProfile==='function')window.MicOnOpenDockProfile();
+          const profileButton=document.querySelector('.profile-dock');
+          if(profileButton)profileButton.click();
         }
         dock.querySelectorAll('.micon-dock-action').forEach(el=>el.classList.toggle('active',el===button));
       });
