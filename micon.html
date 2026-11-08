@@ -2299,12 +2299,40 @@ try {
   if(before===0&&playlist.length>0&&currentIndex===-1)loadItem(0);
  }
 
+ async function fileFromWebToApkFS(selection,fs){
+  const name=String(selection.name||'Video tanpa nama').trim();
+  const uri=selection.uri;
+  if(!uri)throw new Error('Android tidak mengembalikan alamat file.');
+  let size=Number(selection.size||0);
+  if(!size&&typeof fs.stat==='function'){
+   const info=fs.stat(uri);
+   if(info&&info.ok)size=Number(info.size||0);
+  }
+  if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran file tidak terbaca: '+name);
+  const chunkSize=Math.max(65536,Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576);
+  const chunks=[];
+  let offset=0;
+  while(offset<size){
+   const result=fs.readBytes(uri,offset,Math.min(chunkSize,size-offset));
+   if(!result||!result.ok)throw new Error('Gagal membaca '+name+': '+(result&&result.error||'kesalahan file'));
+   const binary=atob(result.base64||'');
+   const bytes=new Uint8Array(binary.length);
+   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+   if(bytes.length)chunks.push(bytes);
+   const read=Number(result.bytesRead||bytes.length);
+   if(read<=0)throw new Error('Pembacaan video terhenti: '+name);
+   offset+=read;
+  }
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
+   ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
+  return new File(chunks,name,{type:mime,lastModified:Date.now()});
+ }
+
  async function openPlaylistPicker(){
-  /* FreeWebToApk menyediakan File System Access API yang membuka pemilih
-     dokumen Android. FileSystemFileHandle.name mengambil nama tampilan asli
-     dokumen, tidak memakai nama sementara dari Android Photo Picker. */
-  const inApk=!!(window.WebToApk||window.AppMint||window.WebToApkFS);
-  if(mobile&&inApk&&typeof window.showOpenFilePicker==='function'){
+  /* Pilihan pertama: pemilih dokumen standar FreeWebToApk. Tidak digantungkan
+     pada global penanda APK karena beberapa build hanya mengekspos API picker. */
+  if(mobile&&typeof window.showOpenFilePicker==='function'){
    try{
     const handles=await window.showOpenFilePicker({
      multiple:true,
@@ -2319,14 +2347,67 @@ try {
     const picked=[];
     for(const handle of handles||[]){
      const file=await handle.getFile();
-     picked.push({file,displayName:handle.name||file.name||'Video tanpa nama'});
+     const originalName=typeof handle.name==='string'&&handle.name.trim()?handle.name:file.name;
+     picked.push({file,displayName:originalName||'Video tanpa nama'});
     }
     if(picked.length)importFiles(picked);
     return;
    }catch(error){
     if(error&&error.name==='AbortError')return;
-    console.warn('MicOn: pemilih dokumen Android gagal, memakai pemilih video standar.',error);
+    console.error('MicOn: pemilih dokumen standar gagal:',error);
+    /* Lanjut ke native SAF bila build mengaktifkannya. */
    }
+  }
+
+  /* Alternatif native FreeWebToApk. pickFile memberikan properti name langsung
+     dari Android. API ini memilih satu file tiap panggilan, maka pemilih dibuka
+     kembali sampai pengguna menekan Batal untuk menyelesaikan batch playlist. */
+  const fs=window.WebToApkFS;
+  if(mobile&&fs&&typeof fs.pickFile==='function'&&typeof fs.readBytes==='function'){
+   if(typeof fs.isAvailable==='function'&&!fs.isAvailable()){
+    alert('Akses file native belum aktif pada APK ini. Saat membuat APK, aktifkan Native Folder Access (SAF), lalu buat ulang APK.');
+    return;
+   }
+   const picked=[];
+   let firstError=null;
+   while(true){
+    let selection;
+    try{selection=await fs.pickFile('video/*');}
+    catch(error){firstError=error;break;}
+    if(!selection||!selection.ok){
+     if(selection&&selection.error==='cancelled')break;
+     if(selection&&selection.error==='busy')break;
+     if(!picked.length)firstError=new Error(selection&&selection.error||'Pemilih file native tidak tersedia.');
+     break;
+    }
+    try{
+     const name=String(selection.name||'').trim();
+     if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(name)){
+      throw new Error('File bukan video yang didukung: '+(name||'tanpa nama'));
+     }
+     const file=await fileFromWebToApkFS(selection,fs);
+     picked.push({file,displayName:name});
+    }catch(error){
+     firstError=error;
+     if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
+     break;
+    }
+    if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
+   }
+   if(picked.length){importFiles(picked);return;}
+   if(firstError){
+    console.error('MicOn: impor file native gagal:',firstError);
+    alert('Impor video Android gagal: '+(firstError.message||firstError));
+   }
+   return;
+  }
+
+  /* Jangan diam-diam memakai input file di APK yang menyediakan bridge tetapi
+     tidak menyediakan picker bernama asli: itulah jalur nama angka sebelumnya. */
+  const isNativeApp=!!(window.WebToApk||window.AppMint||window.Capacitor||/; wv\)/i.test(navigator.userAgent||''));
+  if(mobile&&isNativeApp){
+   alert('APK ini belum menyediakan pemilih dokumen Android. Aktifkan Native Folder Access (SAF) pada pengaturan pembuat APK dan buat ulang APK.');
+   return;
   }
   picker.click();
  }
