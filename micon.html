@@ -2311,7 +2311,7 @@ try {
   }
   if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran video tidak terbaca: '+name);
   const reportedChunk=Number(typeof fs.maxChunkSize==='function'?fs.maxChunkSize():0);
-  const chunkSize=Math.max(65536,reportedChunk||1048576);
+  const chunkSize=Math.max(65536,Math.min(reportedChunk||1048576,1048576));
   const chunks=[];
   let offset=0;
   while(offset<size){
@@ -2324,7 +2324,9 @@ try {
    const read=Number(result.bytesRead||bytes.length);
    if(read<=0)throw new Error('Pembacaan video terhenti: '+name);
    offset+=read;
+   if(result.eof)break;
   }
+  if(offset<size)throw new Error('Video belum terbaca lengkap: '+name+' ('+offset+' / '+size+' byte).');
   const ext=(name.split('.').pop()||'').toLowerCase();
   const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
    ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
@@ -2333,60 +2335,45 @@ try {
  }
 
  async function openPlaylistPicker(){
-  /* APK FreeWebToApk: gunakan SAF pickFile lebih dahulu.
-     Berbeda dari nama file temporer yang kadang dikembalikan pemilih WebView,
-     selection.name adalah nama tampilan yang dikembalikan Android Document Provider. */
+  /* Di APK FreeWebToApk, SAF hanya memilih SATU file setiap pemanggilan.
+     Karena itu impor langsung ditambahkan dan dirender setelah satu pilihan,
+     bukan membuka picker berulang sampai pengguna menekan Batal. */
   if(mobile){
    const fs=window.WebToApkFS;
-   const isNativeApp=!!(window.WebToApk||window.AppMint||window.Capacitor||/;\s*wv\)/i.test(navigator.userAgent||''));
-   if(fs&&typeof fs.pickFile==='function'){
-    if(typeof fs.isAvailable==='function'&&!fs.isAvailable()){
-     alert('Pemilih nama file asli memerlukan Native Folder Access (SAF). Aktifkan Native Folder Access (SAF) pada Langkah 4 saat membuat APK, lalu buat ulang APK.');
-     return;
+   if(fs&&typeof fs.pickFile==='function'&&
+      (typeof fs.isAvailable!=='function'||fs.isAvailable())){
+    let selection=null;
+    try{selection=await fs.pickFile('video/*');}
+    catch(error){
+     console.warn('MicOn: pemilih SAF tidak dapat dibuka; memakai pemilih standar.',error);
+     picker.click();return;
     }
-    if(typeof fs.readBytes!=='function'){
-     alert('Bridge file Android tidak lengkap. Aktifkan Native Folder Access (SAF), lalu buat ulang APK.');
-     return;
+    if(!selection||!selection.ok){
+     const reason=selection&&selection.error;
+     if(reason==='cancelled'||reason==='busy')return;
+     console.warn('MicOn: SAF tidak tersedia ('+(reason||'tanpa hasil')+'); memakai pemilih standar.');
+     picker.click();return;
     }
-    const picked=[];
-    let firstError=null;
-    while(true){
-     let selection;
-     try{selection=await fs.pickFile('video/*');}
-     catch(error){firstError=error;break;}
-     if(!selection||!selection.ok){
-      if(selection&&selection.error==='cancelled')break;
-      if(selection&&selection.error==='busy')break;
-      if(!picked.length)firstError=new Error(selection&&selection.error||'Pemilih file Android tidak tersedia.');
-      break;
-     }
-     try{
-      const entry=await fileFromNativePicker(selection,fs);
-      if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(entry.displayName)){
-       throw new Error('Format video tidak didukung: '+entry.displayName);
-      }
-      picked.push(entry);
-     }catch(error){
-      firstError=error;
-      if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
-      break;
-     }
+    try{
+     const entry=await fileFromNativePicker(selection,fs);
+     if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(entry.displayName))
+      throw new Error('Format video tidak didukung: '+entry.displayName);
+     /* Nama SAF dan objek File langsung masuk ke antrean; render terjadi
+        sebelum pemilih berikutnya dibuka oleh ketukan pengguna berikutnya. */
+     importFiles([entry]);
+     return;
+    }catch(error){
+     console.error('MicOn: impor video SAF gagal; memakai pemilih standar.',error);
      if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
+     picker.click();
+     return;
+    }finally{
+     if(typeof fs.releaseFile==='function'&&selection&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
     }
-    if(picked.length){importFiles(picked);return;}
-    if(firstError){
-     console.error('MicOn: impor video dari SAF gagal:',firstError);
-     alert('Impor video Android gagal: '+(firstError.message||firstError));
-    }
-    return;
-   }
-   if(isNativeApp){
-    alert('APK ini belum mengaktifkan Native Folder Access (SAF). Aktifkan fitur tersebut pada Langkah 4 pembuat FreeWebToApk dan buat ulang APK agar nama file asli Android dapat dibaca.');
-    return;
    }
   }
 
-  /* Browser biasa: pertahankan multi-select melalui File System Access API. */
+  /* Browser atau APK tanpa SAF: fallback tetap menambahkan video ke playlist. */
   if(typeof window.showOpenFilePicker==='function'){
    try{
     const handles=await window.showOpenFilePicker({
@@ -2411,6 +2398,7 @@ try {
   }
   picker.click();
  }
+
  addButton.addEventListener('click',openPlaylistPicker);
  picker.addEventListener('change',()=>{
   const files=Array.from(picker.files||[]);
