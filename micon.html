@@ -2299,17 +2299,19 @@ try {
   if(before===0&&playlist.length>0&&currentIndex===-1)loadItem(0);
  }
 
- async function fileFromWebToApkFS(selection,fs){
-  const name=String(selection.name||'Video tanpa nama').trim();
-  const uri=selection.uri;
-  if(!uri)throw new Error('Android tidak mengembalikan alamat file.');
+ async function fileFromNativePicker(selection,fs){
+  const name=String(selection&&selection.name||'').trim();
+  const uri=selection&&selection.uri;
+  if(!name)throw new Error('Android tidak memberikan nama tampilan file.');
+  if(!uri)throw new Error('Android tidak memberikan alamat file: '+name);
   let size=Number(selection.size||0);
   if(!size&&typeof fs.stat==='function'){
    const info=fs.stat(uri);
    if(info&&info.ok)size=Number(info.size||0);
   }
-  if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran file tidak terbaca: '+name);
-  const chunkSize=Math.max(65536,Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576);
+  if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran video tidak terbaca: '+name);
+  const reportedChunk=Number(typeof fs.maxChunkSize==='function'?fs.maxChunkSize():0);
+  const chunkSize=Math.max(65536,reportedChunk||1048576);
   const chunks=[];
   let offset=0;
   while(offset<size){
@@ -2326,92 +2328,89 @@ try {
   const ext=(name.split('.').pop()||'').toLowerCase();
   const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
    ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
-  return new File(chunks,name,{type:mime,lastModified:Date.now()});
+  const file=new File(chunks,name,{type:mime,lastModified:Date.now()});
+  return {file,displayName:name};
  }
 
  async function openPlaylistPicker(){
-  /* Pilihan pertama: pemilih dokumen standar FreeWebToApk. Tidak digantungkan
-     pada global penanda APK karena beberapa build hanya mengekspos API picker. */
-  if(mobile&&typeof window.showOpenFilePicker==='function'){
+  /* APK FreeWebToApk: gunakan SAF pickFile lebih dahulu.
+     Berbeda dari nama file temporer yang kadang dikembalikan pemilih WebView,
+     selection.name adalah nama tampilan yang dikembalikan Android Document Provider. */
+  if(mobile){
+   const fs=window.WebToApkFS;
+   const isNativeApp=!!(window.WebToApk||window.AppMint||window.Capacitor||/;\s*wv\)/i.test(navigator.userAgent||''));
+   if(fs&&typeof fs.pickFile==='function'){
+    if(typeof fs.isAvailable==='function'&&!fs.isAvailable()){
+     alert('Pemilih nama file asli memerlukan Native Folder Access (SAF). Aktifkan Native Folder Access (SAF) pada Langkah 4 saat membuat APK, lalu buat ulang APK.');
+     return;
+    }
+    if(typeof fs.readBytes!=='function'){
+     alert('Bridge file Android tidak lengkap. Aktifkan Native Folder Access (SAF), lalu buat ulang APK.');
+     return;
+    }
+    const picked=[];
+    let firstError=null;
+    while(true){
+     let selection;
+     try{selection=await fs.pickFile('video/*');}
+     catch(error){firstError=error;break;}
+     if(!selection||!selection.ok){
+      if(selection&&selection.error==='cancelled')break;
+      if(selection&&selection.error==='busy')break;
+      if(!picked.length)firstError=new Error(selection&&selection.error||'Pemilih file Android tidak tersedia.');
+      break;
+     }
+     try{
+      const entry=await fileFromNativePicker(selection,fs);
+      if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(entry.displayName)){
+       throw new Error('Format video tidak didukung: '+entry.displayName);
+      }
+      picked.push(entry);
+     }catch(error){
+      firstError=error;
+      if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
+      break;
+     }
+     if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
+    }
+    if(picked.length){importFiles(picked);return;}
+    if(firstError){
+     console.error('MicOn: impor video dari SAF gagal:',firstError);
+     alert('Impor video Android gagal: '+(firstError.message||firstError));
+    }
+    return;
+   }
+   if(isNativeApp){
+    alert('APK ini belum mengaktifkan Native Folder Access (SAF). Aktifkan fitur tersebut pada Langkah 4 pembuat FreeWebToApk dan buat ulang APK agar nama file asli Android dapat dibaca.');
+    return;
+   }
+  }
+
+  /* Browser biasa: pertahankan multi-select melalui File System Access API. */
+  if(typeof window.showOpenFilePicker==='function'){
    try{
     const handles=await window.showOpenFilePicker({
      multiple:true,
      types:[{description:'File video',accept:{
-      'video/mp4':['.mp4'],
-      'video/x-m4v':['.m4v'],
-      'video/webm':['.webm'],
-      'video/quicktime':['.mov'],
-      'video/3gpp':['.3gp']
+      'video/mp4':['.mp4'],'video/x-m4v':['.m4v'],'video/webm':['.webm'],
+      'video/quicktime':['.mov'],'video/3gpp':['.3gp']
      }}]
     });
     const picked=[];
     for(const handle of handles||[]){
      const file=await handle.getFile();
-     const originalName=typeof handle.name==='string'&&handle.name.trim()?handle.name:file.name;
-     picked.push({file,displayName:originalName||'Video tanpa nama'});
+     const name=String(handle.name||file.name||'Video tanpa nama');
+     picked.push({file,displayName:name});
     }
     if(picked.length)importFiles(picked);
     return;
    }catch(error){
     if(error&&error.name==='AbortError')return;
-    console.error('MicOn: pemilih dokumen standar gagal:',error);
-    /* Lanjut ke native SAF bila build mengaktifkannya. */
+    console.warn('MicOn: pemilih dokumen browser gagal, memakai input file.',error);
    }
-  }
-
-  /* Alternatif native FreeWebToApk. pickFile memberikan properti name langsung
-     dari Android. API ini memilih satu file tiap panggilan, maka pemilih dibuka
-     kembali sampai pengguna menekan Batal untuk menyelesaikan batch playlist. */
-  const fs=window.WebToApkFS;
-  if(mobile&&fs&&typeof fs.pickFile==='function'&&typeof fs.readBytes==='function'){
-   if(typeof fs.isAvailable==='function'&&!fs.isAvailable()){
-    alert('Akses file native belum aktif pada APK ini. Saat membuat APK, aktifkan Native Folder Access (SAF), lalu buat ulang APK.');
-    return;
-   }
-   const picked=[];
-   let firstError=null;
-   while(true){
-    let selection;
-    try{selection=await fs.pickFile('video/*');}
-    catch(error){firstError=error;break;}
-    if(!selection||!selection.ok){
-     if(selection&&selection.error==='cancelled')break;
-     if(selection&&selection.error==='busy')break;
-     if(!picked.length)firstError=new Error(selection&&selection.error||'Pemilih file native tidak tersedia.');
-     break;
-    }
-    try{
-     const name=String(selection.name||'').trim();
-     if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(name)){
-      throw new Error('File bukan video yang didukung: '+(name||'tanpa nama'));
-     }
-     const file=await fileFromWebToApkFS(selection,fs);
-     picked.push({file,displayName:name});
-    }catch(error){
-     firstError=error;
-     if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
-     break;
-    }
-    if(typeof fs.releaseFile==='function'&&selection.uri)try{fs.releaseFile(selection.uri);}catch(_){}
-   }
-   if(picked.length){importFiles(picked);return;}
-   if(firstError){
-    console.error('MicOn: impor file native gagal:',firstError);
-    alert('Impor video Android gagal: '+(firstError.message||firstError));
-   }
-   return;
-  }
-
-  /* Jangan diam-diam memakai input file di APK yang menyediakan bridge tetapi
-     tidak menyediakan picker bernama asli: itulah jalur nama angka sebelumnya. */
-  const isNativeApp=!!(window.WebToApk||window.AppMint||window.Capacitor||/; wv\)/i.test(navigator.userAgent||''));
-  if(mobile&&isNativeApp){
-   alert('APK ini belum menyediakan pemilih dokumen Android. Aktifkan Native Folder Access (SAF) pada pengaturan pembuat APK dan buat ulang APK.');
-   return;
   }
   picker.click();
  }
-
  addButton.addEventListener('click',openPlaylistPicker);
  picker.addEventListener('change',()=>{
   const files=Array.from(picker.files||[]);
