@@ -922,6 +922,45 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
  .mobile-profile-page.mdp-night .mdp-theme button{background:#111827;color:#f9fafb;border-color:#9ca3af}
  .mobile-profile-page.mdp-night .mdp-theme button.selected{background:#111827;color:#fff}
  .mobile-profile-page.mdp-night #micon-profile-logout{background:transparent!important;color:#f9fafb!important}
+
+ /* Night mode berlaku untuk seluruh halaman Profil, bukan bilah dock bawah. */
+ .mobile-profile-page.mdp-night,
+ .mobile-profile-page.mdp-night .mdp-brand,
+ .mobile-profile-page.mdp-night .mdp-user,
+ .mobile-profile-page.mdp-night .mdp-options{
+   background:#111827!important;color:#f9fafb!important;
+ }
+ .mobile-profile-page.mdp-night .mdp-name{
+   background:#111827!important;color:#f9fafb!important;border-color:#374151!important;
+ }
+ .mobile-profile-page.mdp-night .mdp-row,
+ .mobile-profile-page.mdp-night #micon-profile-logout{
+   background:#1f2937!important;border-color:#4b5563!important;color:#f9fafb!important;
+   box-shadow:0 1px 5px rgba(0,0,0,.2)!important;
+ }
+ .mobile-profile-page.mdp-night .mdp-ico,
+ .mobile-profile-page.mdp-night .mdp-row>span:not(.mdp-ico){color:#f9fafb!important}
+ .mobile-profile-page.mdp-night .mdp-ico svg{stroke:#f9fafb!important}
+ .mobile-profile-page.mdp-night .mdp-mode-row .mdp-theme{
+   background:#111827!important;border-color:#6b7280!important;
+ }
+ .mobile-profile-page.mdp-night .mdp-mode-row .mdp-theme button{
+   background:#111827!important;color:#f9fafb!important;border-color:#4b5563!important;
+ }
+ .mobile-profile-page.mdp-night .mdp-mode-row .mdp-theme button.selected{
+   background:#374151!important;color:#fff!important;
+ }
+ /* Bilah dock utama selalu memakai tema Light, termasuk saat Profil Night aktif. */
+ body:has(.mobile-profile-page.mobile-profile-page-open.mdp-night) #micon-floating-dock{
+   background:rgba(255,255,255,.98)!important;border-color:#e3eaf4!important;
+   color:#64748b!important;box-shadow:0 8px 28px rgba(24,42,70,.16)!important;
+ }
+ body:has(.mobile-profile-page.mobile-profile-page-open.mdp-night) #micon-floating-dock .micon-dock-action{
+   background:transparent!important;color:#64748b!important;
+ }
+ body:has(.mobile-profile-page.mobile-profile-page-open.mdp-night) #micon-floating-dock .micon-dock-action.active{
+   background:#f8fafc!important;color:#172033!important;
+ }
 }
 @media(min-width:761px){.mobile-profile-page{display:none!important}}
 
