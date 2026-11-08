@@ -2968,10 +2968,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   if(mobileQuery.addEventListener)mobileQuery.addEventListener('change',setDownloadTarget);else if(mobileQuery.addListener)mobileQuery.addListener(setDownloadTarget);
   document.querySelectorAll('.app-download-link,.app-download-mobile').forEach(link=>link.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();setDownloadTarget();show();}));
   document.addEventListener('click',function(e){
-    const dockApp=e.target.closest('#micon-floating-dock [data-action="app"]');
-    if(dockApp){e.preventDefault();e.stopImmediatePropagation();show();return;}
+    /* Klik App ditangani oleh satu handler utama milik dock. Jangan hentikan
+       propagasi di fase capture karena itu membuat handler dock tidak pernah jalan. */
     if(e.target.closest('#miconDownloadBack')){e.preventDefault();close();return;}
-    if(page.classList.contains('active')&&(e.target.closest('.desktop-nav .nav-link[data-page]')||e.target.closest(' #micon-floating-dock [data-action]:not([data-action="app"])'))){close();}
+    if(page.classList.contains('active')&&(e.target.closest('.desktop-nav .nav-link[data-page]')||e.target.closest('#micon-floating-dock [data-action]:not([data-action="app"])'))){close();}
   },true);
   const share=document.getElementById('miconAppShare');
   if(share)share.addEventListener('click',async()=>{
@@ -3120,6 +3120,25 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   #micon-floating-dock .micon-dock-action:active{transform:scale(.96)!important}
   #micon-floating-dock .micon-dock-action span:last-child{
     font-size:9px!important;font-weight:750!important;letter-spacing:-.1px!important;
+  }
+}
+</style>
+
+<style id="micon-dock-app-hover-click-final-fix">
+@media screen and (max-width:760px){
+  #micon-floating-dock .micon-dock-action{
+    cursor:pointer!important;pointer-events:auto!important;
+    -webkit-tap-highlight-color:transparent!important;
+    transition:background .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease!important;
+  }
+  #micon-floating-dock .micon-dock-action:hover,
+  #micon-floating-dock .micon-dock-action:focus-visible{
+    background:#eff6ff!important;color:#2563eb!important;
+    box-shadow:inset 0 0 0 1px rgba(37,99,235,.12)!important;
+    outline:none!important;
+  }
+  #micon-floating-dock .micon-dock-action:active{
+    background:#dbeafe!important;color:#1d4ed8!important;transform:scale(.95)!important;
   }
 }
 </style>
