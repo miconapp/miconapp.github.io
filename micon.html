@@ -2243,7 +2243,9 @@ try {
    icon.className=mobile?'mobile-playlist-icon':'desktop-playlist-icon';icon.textContent='♫';
    const copy=document.createElement('span');
    copy.className=mobile?'mobile-playlist-copy':'desktop-playlist-copy';
-   const name=document.createElement('strong');name.textContent=entry.file.name;
+   const name=document.createElement('strong');
+   name.textContent=entry.displayName||entry.file.name||'Video tanpa nama';
+   name.title=name.textContent;
    const size=document.createElement('small');size.textContent=formatSize(entry.file)+(mobile?' · file lokal':'');
    copy.append(name,size);row.append(icon,copy);
    row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
@@ -2286,7 +2288,8 @@ try {
   Array.from(files||[]).forEach(file=>{
    if(!file.type.startsWith('video/')&&!/\.(mp4|m4v|webm|mov|3gp)$/i.test(file.name))return;
    const key=fileKey(file);
-   if(!playlist.some(item=>item.key===key))playlist.push({file,key});
+   const displayName=String(file.name||file.webkitRelativePath&&file.webkitRelativePath.split('/').pop()||'Video tanpa nama');
+   if(!playlist.some(item=>item.key===key))playlist.push({file,key,displayName});
   });
   render();
   window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
@@ -2751,7 +2754,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     /* Satu kali susun kontrol di kolom scroll; video dikeluarkan dari area scroll. */
     let stack=main.querySelector(':scope > .micon-reference-stack');
     if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
-    stack.append(file,drop,clear,panel);
+    stack.append(file,drop,panel);
+    /* Tombol hapus tetap tepat di bawah Tambah Playlist pada tampilan smartphone. */
+    const addPlaylist=panel.querySelector('.mobile-playlist-import');
+    if(addPlaylist)addPlaylist.insertAdjacentElement('afterend',clear);
     /* Satu wadah sticky sebagai saudara mainContent, bukan anak elemen yang ikut scroll. */
     let shell=document.getElementById('micon-sticky-shell');
     if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
@@ -3021,10 +3027,11 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 .desktop-playlist-empty{padding:15px 8px;text-align:center;color:#94a3b8;font-size:11px}
 @media(max-width:760px){
  .mobile-playlist-panel{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
- .mobile-playlist-import{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 13px!important;padding:0 12px!important;border:0!important;border-radius:13px!important;background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:800!important;box-shadow:0 4px 9px rgba(37,99,235,.10)!important}
+ .mobile-playlist-import{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 7px!important;padding:0 12px!important;border:0!important;border-radius:13px!important;background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:800!important;box-shadow:0 4px 9px rgba(37,99,235,.10)!important}
+ .mobile-playlist-panel>#clearBtn{display:block!important;position:static!important;width:100%!important;height:42px!important;min-height:42px!important;margin:0 0 13px!important;padding:0 12px!important;border:0!important;border-radius:13px!important;background:#e5e7eb!important;color:#374151!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important}
  .mobile-playlist-heading{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;height:29px!important;min-height:29px!important;margin:0 0 4px!important;padding:0!important;border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:800!important}
- .mobile-playlist-list{display:flex!important;flex-direction:column!important;gap:8px!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important}
- .mobile-playlist-item{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;height:56px!important;min-height:56px!important;margin:0!important;padding:8px 10px!important;border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#111827!important;text-align:left!important;box-shadow:none!important}
+ .mobile-playlist-list{display:flex!important;flex-direction:column!important;gap:8px!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important;list-style:none!important;counter-reset:none!important}
+ .mobile-playlist-item{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;height:56px!important;min-height:56px!important;margin:0!important;padding:8px 10px!important;border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#111827!important;text-align:left!important;box-shadow:none!important;list-style:none!important;counter-increment:none!important}
  .mobile-playlist-item.active{border-color:#93c5fd!important;background:#f1f7ff!important}
  .mobile-playlist-icon{display:grid!important;place-items:center!important;flex:0 0 33px!important;width:33px!important;height:33px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important;font-size:19px!important}
  .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
