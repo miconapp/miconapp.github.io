@@ -3509,9 +3509,12 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 </style>
 
-<style id="micon-subscription-mobile-package-price-spacing">
-/* Jarak nama paket dan harga lebih lega; hanya memengaruhi kartu langganan mobile. */
+<style id="micon-subscription-mobile-package-row-spacing">
+/* Jarak antar-kotak paket dibuat lebih renggang; khusus kartu langganan mobile. */
 @media screen and (max-width:760px){
+  body.micon-subscription-mobile-active #micon-subscription-gate .package-list{
+    row-gap:10px!important;
+  }
   body.micon-subscription-mobile-active #micon-subscription-gate .package-row{
     gap:18px!important;
     padding-left:12px!important;
