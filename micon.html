@@ -1934,6 +1934,10 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
  }
 })();
 </script>
+
+<style id="micon-subscription-gate-style">
+#micon-subscription-gate{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(10,18,32,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#172033}#micon-subscription-gate.show{display:flex}#micon-subscription-gate .msg-card{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:22px;padding:26px;box-shadow:0 25px 80px #0005}#micon-subscription-gate .msg-logo{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#7658ff);display:grid;place-items:center;color:#fff;font-size:27px;margin-bottom:16px}#micon-subscription-gate h2{font-size:24px;line-height:1.2;margin:0 0 8px;color:#172033}#micon-subscription-gate p{font-size:13px;line-height:1.65;color:#64748b;margin:0 0 16px}#micon-subscription-gate .package-list{display:grid;gap:8px;margin:16px 0}#micon-subscription-gate .package-row{display:flex;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid #e2e8f0;border-radius:12px;font-size:13px;color:#334155}#micon-subscription-gate .package-row b{color:#1d4ed8;white-space:nowrap}#micon-subscription-gate .gate-actions{display:flex;gap:10px;margin-top:18px}#micon-subscription-gate button{flex:1;border:0;border-radius:11px;padding:12px 14px;font-weight:750;cursor:pointer;background:#2563eb;color:#fff}#micon-subscription-gate button.secondary{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}@media(max-width:480px){#micon-subscription-gate .msg-card{padding:21px;border-radius:18px}#micon-subscription-gate h2{font-size:21px}}
+</style>
 <script type="module" id="micon-firebase-session-guard">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -2040,6 +2044,43 @@ try {
     if (fullName) fullName.textContent = label;
     if (contact) contact.textContent = detail;
     if (avatar) avatar.textContent = (label.trim().charAt(0) || "M").toUpperCase();
+
+    // Superadmin tidak dikenai masa expired. Pengguna biasa wajib memiliki langganan aktif.
+    const role = String(profile?.role || "Pengguna").trim().toLowerCase();
+    const sub = profile?.subscription || {};
+    const forever = String(sub.planId || "").toLowerCase() === "selamanya" || String(sub.planName || "").toLowerCase() === "selamanya";
+    let expiry = null;
+    if (sub.expiresAt) expiry = typeof sub.expiresAt.toDate === "function" ? sub.expiresAt.toDate() : new Date(sub.expiresAt);
+    const subscriptionActive = role === "superadmin" || (String(sub.status || "").toLowerCase() === "active" && (forever || (expiry && Number.isFinite(expiry.getTime()) && expiry.getTime() > Date.now())));
+    const gateId = "micon-subscription-gate";
+    let gate = document.getElementById(gateId);
+    if (!subscriptionActive) {
+      if (!gate) {
+        gate = document.createElement("div");
+        gate.id = gateId;
+        gate.innerHTML = `<div class="msg-card"><div class="msg-logo">♫</div><h2 id="micon-gate-title">Masa berlangganan MicOn habis</h2><p id="micon-gate-desc">Akses seluruh fitur MicOn sedang dikunci karena akun belum memiliki paket aktif. Silakan lakukan pembayaran sesuai paket, lalu kirim konfirmasi kepada admin. Setelah pembayaran diverifikasi, Superadmin akan mengaktifkan akun dan seluruh fitur terbuka otomatis.</p><div class="package-list"><div class="package-row"><span>Selamanya</span><b>Tanpa expired</b></div><div class="package-row"><span>1 Bulan</span><b>Rp5.000</b></div><div class="package-row"><span>2 Bulan</span><b>Rp10.000</b></div><div class="package-row"><span>5 Bulan</span><b>Rp20.000</b></div></div><p id="micon-gate-status">Status: belum berlangganan atau masa aktif sudah berakhir.</p><div class="gate-actions"><button type="button" class="secondary" id="micon-gate-logout">Keluar akun</button><button type="button" id="micon-gate-refresh">Periksa kembali</button></div></div>`;
+        document.body.appendChild(gate);
+        gate.querySelector("#micon-gate-logout").addEventListener("click", async () => { try { await signOut(auth); window.location.replace(LOGIN_URL); } catch (e) { alert("Gagal keluar dari akun. Silakan coba lagi."); } });
+        gate.querySelector("#micon-gate-refresh").addEventListener("click", () => window.location.reload());
+      }
+      const title = gate.querySelector("#micon-gate-title");
+      const desc = gate.querySelector("#micon-gate-desc");
+      const status = gate.querySelector("#micon-gate-status");
+      if (sub.planName) {
+        title.textContent = "Masa berlangganan MicOn telah berakhir";
+        desc.textContent = "Paket " + sub.planName + " sudah tidak aktif. Silakan lakukan pembayaran perpanjangan dan konfirmasi kepada admin. Setelah Superadmin memperbarui langganan, semua fitur MicOn akan terbuka otomatis.";
+      }
+      if (status) status.textContent = expiry && Number.isFinite(expiry.getTime()) ? "Tanggal expired: " + expiry.toLocaleDateString("id-ID", {day:"2-digit",month:"long",year:"numeric"}) : "Status: belum ada paket aktif.";
+      gate.classList.add("show");
+      document.body.style.overflow = "hidden";
+    } else {
+      if (gate) gate.remove();
+      document.body.style.overflow = "";
+      if (role !== "superadmin" && expiry && Number.isFinite(expiry.getTime()) && expiry.getTime() > Date.now()) {
+        const remaining = expiry.getTime() - Date.now();
+        window.setTimeout(() => window.location.reload(), Math.min(remaining + 500, 2147483000));
+      }
+    }
     document.documentElement.classList.remove("micon-auth-check");
   }, error => {
     console.error("MicOn Firebase session check failed:", error);
