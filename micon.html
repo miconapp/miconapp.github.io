@@ -2129,6 +2129,7 @@ try {
           <div class="msg-logo" aria-hidden="true">♫</div>
           <h2 id="micon-gate-title">Masa berlangganan MicOn habis</h2>
           <p id="micon-gate-desc">Akses seluruh fitur MicOn sedang dikunci karena akun belum memiliki paket aktif. Silakan pilih paket yang tersedia, lakukan pembayaran, lalu hubungi admin untuk konfirmasi.</p>
+          <p class="micon-gate-reminder">Silakan pilih paket yang tersedia, lakukan pembayaran, lalu hubungi admin untuk konfirmasi.</p>
           <div class="package-list">${packageRows}</div>
           <p id="micon-gate-status">Status: belum berlangganan atau masa aktif sudah berakhir.</p>
           <div class="gate-actions">
@@ -2139,14 +2140,21 @@ try {
             </a>
           </div>
         </div>`
-        const transposeColumnForGate = document.getElementById("transposeSection");
-        if (transposeColumnForGate) transposeColumnForGate.appendChild(gate);
+        // Penempatan gate dilakukan satu kali di bawah, sesuai perangkat.
         gate.querySelector("#micon-gate-logout").addEventListener("click", async () => { try { await signOut(auth); window.location.replace(LOGIN_URL); } catch (e) { alert("Gagal keluar dari akun. Silakan coba lagi."); } });
       }
       const transposeColumn = document.getElementById("transposeSection");
-      if (transposeColumn) {
+      const mobileGateContainer = document.querySelector(".micon-reference-stack");
+      const useMobileGateLayout = window.matchMedia("(max-width:760px)").matches && !!mobileGateContainer;
+      if (useMobileGateLayout) {
+        // Pada smartphone, gate ditempatkan setelah preview video, bukan di dalam panel transpose.
+        if (gate.parentElement !== mobileGateContainer) mobileGateContainer.appendChild(gate);
+        document.body.classList.add("micon-subscription-mobile-active");
+        transposeColumn?.classList.remove("subscription-inline-mode");
+      } else if (transposeColumn) {
         if (gate.parentElement !== transposeColumn) transposeColumn.appendChild(gate);
         transposeColumn.classList.add("subscription-inline-mode");
+        document.body.classList.remove("micon-subscription-mobile-active");
       }
       const title = gate.querySelector("#micon-gate-title");
       const desc = gate.querySelector("#micon-gate-desc");
@@ -2160,6 +2168,7 @@ try {
     } else {
       if (gate) gate.remove();
       document.getElementById("transposeSection")?.classList.remove("subscription-inline-mode");
+      document.body.classList.remove("micon-subscription-mobile-active");
       if (role !== "superadmin" && expiry && Number.isFinite(expiry.getTime()) && expiry.getTime() > Date.now()) {
         const remaining = expiry.getTime() - Date.now();
         window.setTimeout(() => window.location.reload(), Math.min(remaining + 500, 2147483000));
@@ -3309,6 +3318,11 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     if(!mobile())return;
     let dock=document.getElementById('micon-floating-dock');
     if(!dock)return;
+    if(document.body.classList.contains('micon-subscription-mobile-active')){
+      if(!dock.hidden)dock.hidden=true;
+      if(dock.style.getPropertyValue('display')!=='none'||dock.style.getPropertyPriority('display')!=='important')dock.style.setProperty('display','none','important');
+      return;
+    }
     if(dock.parentElement!==document.body)document.body.appendChild(dock);
     if(dock.hidden)dock.hidden=false;
     const required={display:'grid',visibility:'visible',opacity:'1',pointerEvents:'auto',position:'fixed',zIndex:'25000'};
@@ -3387,22 +3401,19 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 </style>
 
 <style id="micon-subscription-inline-in-transpose-final">
-/* Subscription message is part of the transpose column, never a modal overlay. */
+/* Desktop tetap menampilkan pesan langganan di kolom transpose. */
 #transposeSection.subscription-inline-mode{
   display:flex!important;flex-direction:column!important;align-items:stretch!important;
   justify-content:flex-start!important;min-width:0!important;
 }
-#transposeSection.subscription-inline-mode > :not(#micon-subscription-gate){
-  display:none!important;
-}
+#transposeSection.subscription-inline-mode > :not(#micon-subscription-gate){display:none!important}
 #transposeSection #micon-subscription-gate{
   position:static!important;inset:auto!important;z-index:auto!important;
   display:none!important;width:100%!important;max-width:100%!important;
-  min-height:0!important;height:auto!important;max-height:none!important;
+  min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;
   margin:0!important;padding:0!important;overflow:visible!important;
   align-items:stretch!important;justify-content:flex-start!important;
-  background:transparent!important;backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
+  background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
 }
 #transposeSection #micon-subscription-gate.show{display:block!important}
 #transposeSection #micon-subscription-gate .msg-card{
@@ -3412,9 +3423,89 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   background:#fff!important;box-shadow:0 8px 24px rgba(15,23,42,.08)!important;
 }
 @media(max-width:760px){
-  #transposeSection #micon-subscription-gate .msg-card{padding:17px!important;border-radius:16px!important}
-  #transposeSection #micon-subscription-gate h2{font-size:20px!important}
-  #transposeSection #micon-subscription-gate p{font-size:12px!important}
+  /* Saat langganan habis, preview 16:9 tetap di atas dan kontrol/dock disembunyikan. */
+  body.micon-subscription-mobile-active #micon-sticky-shell{
+    padding-bottom:0!important;border-bottom:0!important;box-shadow:none!important;
+  }
+  body.micon-subscription-mobile-active #micon-sticky-shell>.pitch-compact-row{display:none!important}
+  body.micon-subscription-mobile-active .micon-reference-stack{
+    padding:56.25vw 15px 28px!important;margin:0!important;gap:0!important;
+    background:#fff!important;box-sizing:border-box!important;
+  }
+  body.micon-subscription-mobile-active .micon-reference-stack>:not(#micon-subscription-gate){display:none!important}
+  body.micon-subscription-mobile-active #micon-subscription-gate{
+    position:relative!important;inset:auto!important;z-index:auto!important;
+    display:none!important;width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:0!important;overflow:visible!important;
+    background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate.show{display:block!important}
+  body.micon-subscription-mobile-active #micon-subscription-gate .msg-card{
+    display:block!important;width:100%!important;max-width:none!important;max-height:none!important;
+    margin:0!important;padding:7px 0 0!important;overflow:visible!important;
+    border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
+    color:#172033!important;font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .msg-logo{
+    display:grid!important;place-items:center!important;width:40px!important;height:40px!important;
+    margin:0 0 10px!important;padding:0!important;border:0!important;border-radius:13px!important;
+    background:linear-gradient(135deg,#2563eb,#7658ff)!important;color:#fff!important;
+    font-size:23px!important;line-height:1!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate h2{
+    margin:0 0 7px!important;color:#172033!important;font-size:20px!important;
+    font-weight:850!important;line-height:1.2!important;letter-spacing:-.35px!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate p{
+    margin:0!important;color:#64748b!important;font-size:12px!important;
+    font-weight:400!important;line-height:1.48!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-reminder{
+    margin:17px 0 8px!important;padding:7px 0 0!important;
+    border-top:1px solid #f1f3f5!important;box-shadow:0 -5px 10px rgba(15,23,42,.025)!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .package-list{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;
+    width:100%!important;margin:7px 0 9px!important;padding:0!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .package-row{
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    box-sizing:border-box!important;width:100%!important;min-height:29px!important;height:29px!important;
+    margin:0!important;padding:5px 9px!important;border:1px solid #e2e8f0!important;
+    border-radius:11px!important;background:#fff!important;color:#475569!important;
+    font-size:11px!important;line-height:1.2!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .package-row b{
+    color:#1d4ed8!important;font-size:11px!important;font-weight:800!important;white-space:nowrap!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate #micon-gate-status{
+    display:block!important;margin:0 0 7px!important;color:#64748b!important;
+    font-size:11px!important;line-height:1.4!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions{
+    display:flex!important;align-items:stretch!important;gap:10px!important;
+    width:100%!important;margin:8px 0 0!important;padding:0!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions button,
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions .whatsapp-contact{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    flex:1 1 0!important;box-sizing:border-box!important;width:50%!important;min-width:0!important;
+    height:37px!important;min-height:37px!important;margin:0!important;padding:7px 8px!important;
+    border:1px solid transparent!important;border-radius:12px!important;
+    font-size:12px!important;font-weight:750!important;line-height:1!important;text-decoration:none!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions button.secondary{
+    background:#f1f5f9!important;color:#334155!important;border-color:#e2e8f0!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions .whatsapp-contact{
+    gap:8px!important;background:#20ce68!important;color:#fff!important;
+    box-shadow:0 4px 10px rgba(32,206,104,.22)!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .gate-actions .whatsapp-contact svg{
+    display:block!important;width:17px!important;height:17px!important;flex:0 0 17px!important;fill:currentColor!important;
+  }
+  body.micon-subscription-mobile-active #micon-floating-dock{display:none!important;visibility:hidden!important;pointer-events:none!important}
 }
 </style>
 </body>
