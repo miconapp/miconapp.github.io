@@ -2145,13 +2145,24 @@ try {
       }
       const transposeColumn = document.getElementById("transposeSection");
       const mobileGateContainer = document.querySelector(".micon-reference-stack");
+      const desktopTransposeView = document.querySelector(".desktop-player-panel .desktop-transpose-view");
       const useMobileGateLayout = window.matchMedia("(max-width:760px)").matches && !!mobileGateContainer;
       if (useMobileGateLayout) {
         // Pada smartphone, gate ditempatkan setelah preview video, bukan di dalam panel transpose.
         if (gate.parentElement !== mobileGateContainer) mobileGateContainer.appendChild(gate);
         document.body.classList.add("micon-subscription-mobile-active");
         transposeColumn?.classList.remove("subscription-inline-mode");
+        desktopTransposeView?.classList.remove("subscription-inline-mode");
+      } else if (desktopTransposeView) {
+        // Desktop: kontrol nada dipindahkan ke desktop-transpose-view oleh panel player.
+        // Gate harus berada di wadah kontrol yang benar agar tampil di kolom kanan.
+        if (gate.parentElement !== desktopTransposeView) desktopTransposeView.appendChild(gate);
+        desktopTransposeView.classList.add("subscription-inline-mode");
+        transposeColumn?.classList.remove("subscription-inline-mode");
+        document.querySelector(".desktop-player-panel")?.__activateTranspose?.();
+        document.body.classList.remove("micon-subscription-mobile-active");
       } else if (transposeColumn) {
+        // Fallback untuk layout desktop tanpa panel player.
         if (gate.parentElement !== transposeColumn) transposeColumn.appendChild(gate);
         transposeColumn.classList.add("subscription-inline-mode");
         document.body.classList.remove("micon-subscription-mobile-active");
@@ -2168,6 +2179,7 @@ try {
     } else {
       if (gate) gate.remove();
       document.getElementById("transposeSection")?.classList.remove("subscription-inline-mode");
+      document.querySelector(".desktop-player-panel .desktop-transpose-view")?.classList.remove("subscription-inline-mode");
       document.body.classList.remove("micon-subscription-mobile-active");
       if (role !== "superadmin" && expiry && Number.isFinite(expiry.getTime()) && expiry.getTime() > Date.now()) {
         const remaining = expiry.getTime() - Date.now();
@@ -3530,5 +3542,55 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   }
 }
 </style>
+
+
+<style id="micon-subscription-desktop-transpose-placement">
+/* Desktop only: place expired-subscription card inside the actual Transpose panel. */
+@media screen and (min-width:761px){
+  .desktop-player-panel .desktop-transpose-view.subscription-inline-mode{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    justify-content:flex-start!important;gap:0!important;min-width:0!important;
+    padding:18px 22px 22px!important;overflow-y:auto!important;overflow-x:hidden!important;
+    background:#fff!important;
+  }
+  .desktop-player-panel .desktop-transpose-view.subscription-inline-mode > :not(#micon-subscription-gate){
+    display:none!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate{
+    position:static!important;inset:auto!important;z-index:auto!important;
+    display:none!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;
+    min-width:0!important;height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:0!important;overflow:visible!important;
+    background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate.show{display:block!important}
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .msg-card{
+    display:block!important;box-sizing:border-box!important;width:100%!important;max-width:none!important;
+    height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;
+    padding:22px!important;overflow:visible!important;border:1px solid #dbe3ef!important;
+    border-radius:18px!important;background:#fff!important;color:#172033!important;
+    box-shadow:0 8px 24px rgba(15,23,42,.08)!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .msg-logo{
+    width:46px!important;height:46px!important;margin:0 0 12px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate h2{
+    font-size:22px!important;line-height:1.2!important;margin:0 0 9px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate p{
+    font-size:12px!important;line-height:1.55!important;margin:0 0 11px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .package-list{
+    gap:10px!important;margin:13px 0!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .package-row{
+    min-height:36px!important;padding:8px 12px!important;gap:18px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions{
+    gap:10px!important;margin-top:14px!important;
+  }
+}
+</style>
+
 </body>
 </html>
