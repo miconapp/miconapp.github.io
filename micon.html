@@ -1094,6 +1094,9 @@ const $=id=>document.getElementById(id);
 const AUDIO_WORKLET_URL='https://cdn.jsdelivr.net/npm/@soundtouchjs/audio-worklet@2.1.1/.dist/soundtouch-processor.js';
 let audioContext=null,workletModulePromise=null,audioReadyPromise=Promise.resolve(false),pitch=0;
 let file=null,url=null,video=null,playing=false;
+/* Deteksi shell Android WebView yang dipakai APK MicOn. */
+const isAndroidAppShell=/Android/i.test(navigator.userAgent)&&(/;\s*wv\)/i.test(navigator.userAgent)||/Version\/[\d.]+.*Chrome\//i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches);
+const isMobilePlaybackTarget=()=>window.matchMedia('(max-width:760px)').matches||isAndroidAppShell;
 
 /* Satu mesin AudioWorklet global untuk desktop dan smartphone. */
 function updatePitchDisplay(){
@@ -1237,7 +1240,7 @@ async function connectVideoToAudioWorklet(target){
  if(target.__miconAudioGraph)return true;
  if(!audioContext)audioContext=new AudioContextClass({latencyHint:'playback'});
  if(!audioContext.audioWorklet)throw new Error('AudioWorklet tidak tersedia pada browser ini.');
- const isMobile=window.matchMedia('(max-width:760px)').matches;
+ const isMobile=isMobilePlaybackTarget();
  const resumeTask=audioContext.state==='suspended'?audioContext.resume().catch(()=>{}):Promise.resolve();
  if(!workletModulePromise){
   workletModulePromise=audioContext.audioWorklet.addModule(AUDIO_WORKLET_URL).catch(error=>{
@@ -1298,6 +1301,11 @@ async function connectVideoToAudioWorklet(target){
   try{if(source)source.disconnect();}catch(_){}
   try{if(worklet){worklet.disconnect();worklet.port.close();}}catch(_){}
   try{if(gain)gain.disconnect();}catch(_){}
+  /* Jika WebView Android gagal membangun Worklet, kembalikan audio ke jalur
+     native video agar kegagalan transpose tidak membuat video bisu/terhenti. */
+  if(isAndroidAppShell&&source){
+   try{source.connect(audioContext.destination);target.__miconAudioGraph={source,worklet:null,gain:null,limiter:null,nativeFallback:true};target.__miconAudioPipeline='native-video-fallback';return false;}catch(_){}
+  }
   throw error;
  }
 }
@@ -1312,12 +1320,12 @@ async function setupVideo(){
  if(video){video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
  video=document.createElement('video');
  video.id='karaokeVideo';video.controls=true;video.playsInline=true;
- if(window.matchMedia('(max-width:760px)').matches){video.volume=1;video.muted=false;}
- video.preload=window.matchMedia('(max-width:760px)').matches?'auto':'metadata';
+ if(isMobilePlaybackTarget()){video.volume=1;video.muted=false;}
+ video.preload=isMobilePlaybackTarget()?'auto':'metadata';
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
  $('videoStage').appendChild(video);
  const targetVideo=video;
- const isMobileAudioTarget=window.matchMedia('(max-width:760px)').matches;
+ const isMobileAudioTarget=isMobilePlaybackTarget();
  audioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
   if(targetVideo===video){
    updatePitchDisplay();
@@ -1327,6 +1335,11 @@ async function setupVideo(){
  }).catch(error=>{
   if(targetVideo===video){
    configurePitchControls(false);
+   if(isAndroidAppShell){
+    targetVideo.muted=false;targetVideo.volume=1;
+    msg('Mode kompatibilitas APK aktif: video diputar melalui audio native perangkat. Kontrol transpose tidak tersedia pada sesi ini.',false);
+    return true;
+   }
    msg('AudioWorklet tidak dapat diaktifkan: '+(error.message||error),true);
   }
   return false;
@@ -1348,7 +1361,7 @@ async function setupVideo(){
     Browser/WebView tertentu mengirim pause setelah buffer stall tanpa selalu
     mengirim waiting terlebih dahulu. Karena itu niat playback dilacak terpisah
     dari status paused, dan pause pengguna tetap dibedakan dari pause internal. */
- if(window.matchMedia('(max-width:760px)').matches){
+ if(isMobilePlaybackTarget()){
   let mobilePlaybackWanted=false;
   let mobileBufferRecovery=false;
   let mobileRecoveryBusy=false;
@@ -1653,10 +1666,15 @@ $('playBtn').addEventListener('click',async()=>{
  try{
   const targetVideo=video;
   const ready=await audioReadyPromise;
-  if(!ready||!targetVideo.__miconAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
+  if((!ready||!targetVideo.__miconAudioGraph)&&!isAndroidAppShell)
+   throw new Error('SoundTouch AudioWorklet belum siap.');
+  if(isAndroidAppShell){targetVideo.muted=false;targetVideo.volume=1;}
   await waitForMobileVideoBuffer(targetVideo);
   await gestureResumeTask;
-  if(audioContext&&audioContext.state!=='running')await audioContext.resume();
+  if(audioContext&&audioContext.state!=='running'){
+   try{await audioContext.resume();}
+   catch(error){if(!isAndroidAppShell)throw error;}
+  }
   if(targetVideo!==video||!targetVideo.isConnected)return;
   window.__miconAdAuthorized=true;
   await targetVideo.play();
