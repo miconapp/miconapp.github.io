@@ -80,7 +80,7 @@ button,input{font:inherit}
 #miconSplash{
   position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
   overflow:hidden;
-  background:#006bc8 url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20desktop.png?raw=true") center center/cover no-repeat;
+  background:#006bc8 url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20desktop.png") center center/cover no-repeat;
   opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease;
 }
 #miconSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
@@ -94,7 +94,7 @@ button,input{font:inherit}
 @keyframes miconBars{to{height:16px;opacity:.55}}
 @media(max-width:900px){
   #miconSplash{
-    background-image:url("https://github.com/miconapp/miconapp.github.io/blob/main/src/Splash%20Screen%20mobile.png?raw=true");
+    background-image:url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20mobile.png");
     background-position:center center;background-size:cover;
   }
   .splash-content{bottom:5%;gap:9px}
@@ -113,7 +113,7 @@ button,input{font:inherit}
   </div>
 </div>
 <audio id="miconSplashAudio" preload="auto" playsinline>
-  <source src="https://github.com/miconapp/miconapp.github.io/blob/main/src/audio%20Splash%20Screen%20desktop%20dan%20mobile.mp3?raw=true" type="audio/mpeg">
+  <source src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/audio%20Splash%20Screen%20desktop%20dan%20mobile.mp3" type="audio/mpeg">
 </audio>
 
 <div class="page">
@@ -213,20 +213,27 @@ button,input{font:inherit}
   if (!splash || !audio || !startButton) return;
 
   let closed = false;
+  let fallbackTimer = null;
+  let playbackTimer = null;
 
   function closeSplash() {
     if (closed) return;
     closed = true;
+    window.clearTimeout(fallbackTimer);
+    window.clearTimeout(playbackTimer);
+    audio.pause();
     splash.classList.add("is-leaving");
     window.setTimeout(() => splash.remove(), 700);
   }
 
   function playSplashAudio() {
+    if (closed) return;
     audio.play().then(() => {
       splash.classList.remove("needs-tap");
       startButton.hidden = true;
+      window.clearTimeout(fallbackTimer);
     }).catch(error => {
-      // NotAllowedError berarti browser memblokir autoplay bersuara.
+      // Autoplay bersuara dapat diblokir browser; pengguna bisa memulai lewat tombol.
       if (error && error.name === "NotAllowedError") {
         splash.classList.add("needs-tap");
         startButton.hidden = false;
@@ -236,11 +243,19 @@ button,input{font:inherit}
     });
   }
 
+  audio.addEventListener("playing", () => {
+    window.clearTimeout(fallbackTimer);
+    window.clearTimeout(playbackTimer);
+    // Pengaman jika file audio macet dan event ended tidak pernah datang.
+    playbackTimer = window.setTimeout(closeSplash, 60000);
+  });
   audio.addEventListener("ended", closeSplash, { once: true });
   audio.addEventListener("error", closeSplash, { once: true });
-  startButton.addEventListener("click", playSplashAudio, { once: true });
+  audio.addEventListener("abort", closeSplash, { once: true });
+  startButton.addEventListener("click", playSplashAudio);
 
-  // Satu percobaan autoplay. Tidak ada pemanggilan ulang atau listener duplikat.
+  // Jangan biarkan splash menutupi halaman login tanpa batas waktu.
+  fallbackTimer = window.setTimeout(closeSplash, 15000);
   playSplashAudio();
 })();
 </script>
