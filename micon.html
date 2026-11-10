@@ -1257,6 +1257,18 @@ async function connectVideoToAudioWorklet(target){
    numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],
    processorOptions:{sampleBufferType:'circular'}
   });
+  /* Tingkatkan kejernihan saat SoundTouch menggeser nada:
+     pencarian overlap dibuat lebih teliti (tanpa quick seek) dan crossfade
+     sedikit diperpanjang untuk mengurangi artefak sambungan audio.
+     Interpolasi bawaan Lanczos tetap dipakai; gain dan limiter tidak diubah. */
+  try{
+   worklet.port.postMessage({
+    type:'set-stretch-parameters',
+    params:{quickSeek:false,overlapMs:12}
+   });
+  }catch(qualityError){
+   console.warn('MicOn: pengaturan kualitas SoundTouch tidak tersedia pada processor ini.',qualityError);
+  }
   const pitchParam=worklet.parameters.get('pitchSemitones');
   if(!pitchParam)throw new Error('Parameter pitchSemitones tidak ditemukan pada AudioWorklet.');
   pitchParam.value=pitch;
