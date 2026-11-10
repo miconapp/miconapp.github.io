@@ -2030,7 +2030,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
 <script type="module" id="micon-firebase-session-guard">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDsoHofWuEfD2gwMNgfsad0KXxYlMMxw0w",
   authDomain: "rekapinyu-storage.firebaseapp.com",
@@ -2105,90 +2105,81 @@ try {
 
     try {
       // Masa gratis dihitung dari waktu pendaftaran Firebase, bukan dari waktu
-      // pertama kali aplikasi dibuka. Penanda permanen mencegah trial diberikan
-      // ulang setelah Superadmin menghapus paket langganan.
+      // pertama kali aplikasi dibuka. Trial hanya ditulis satu kali ke profil.
       const freeTrialDurationMs = 7 * 24 * 60 * 60 * 1000;
       const authCreatedAtMs = Date.parse(user.metadata?.creationTime || "");
       const hasValidAuthCreationTime = Number.isFinite(authCreatedAtMs) && authCreatedAtMs > 0;
+      const nowMs = Date.now();
+      const signupIso = hasValidAuthCreationTime
+        ? new Date(authCreatedAtMs).toISOString()
+        : null;
+      const profileSnap = await getDoc(profileRef);
 
-      await runTransaction(db, async transaction => {
-        const profileSnap = await transaction.get(profileRef);
-        const nowMs = Date.now();
-        const signupIso = hasValidAuthCreationTime
-          ? new Date(authCreatedAtMs).toISOString()
-          : null;
+      if (!profileSnap.exists()) {
+        // Profil baru dibuat dengan satu setDoc biasa agar sesuai jalur tulis
+        // profil yang sebelumnya dipakai aplikasi (tanpa transaksi tambahan).
+        const newProfile = {
+          Nama: user.displayName || "Pengguna MicOn",
+          NomorHp: phoneFromInternalEmail,
+          role: "Pengguna",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
 
-        if (!profileSnap.exists()) {
-          const newProfile = {
-            Nama: user.displayName || "Pengguna MicOn",
-            NomorHp: phoneFromInternalEmail,
-            role: "Pengguna",
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
+        if (hasValidAuthCreationTime && authCreatedAtMs + freeTrialDurationMs > nowMs) {
+          newProfile.subscription = {
+            planId: "gratis7hari",
+            planName: "Gratis 7 Hari",
+            status: "active",
+            startAt: signupIso,
+            expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
+            paidManually: false,
+            source: "free_trial",
+            updatedAt: new Date(nowMs).toISOString(),
+            updatedBy: "system"
           };
-
-          if (hasValidAuthCreationTime && authCreatedAtMs + freeTrialDurationMs > nowMs) {
-            const trialExpiresAt = new Date(authCreatedAtMs + freeTrialDurationMs).toISOString();
-            newProfile.subscription = {
-              planId: "gratis7hari",
-              planName: "Gratis 7 Hari",
-              status: "active",
-              startAt: signupIso,
-              expiresAt: trialExpiresAt,
-              paidManually: false,
-              source: "free_trial",
-              updatedAt: new Date(nowMs).toISOString(),
-              updatedBy: "system"
-            };
-            newProfile.freeTrialGrantedAt = signupIso;
-          }
-          // Tandai sudah diperiksa, termasuk akun lama yang tidak memenuhi syarat.
-          newProfile.freeTrialCheckedAt = serverTimestamp();
-          transaction.set(profileRef, newProfile);
-          return;
+          newProfile.freeTrialGrantedAt = signupIso;
         }
-
+        await setDoc(profileRef, newProfile);
+      } else {
         const profile = profileSnap.data() || {};
-        // Profil lama yang sudah diperiksa tidak pernah menerima trial kedua kali.
-        if (profile.freeTrialCheckedAt || profile.freeTrialGrantedAt) return;
-
         const role = String(profile.role || "Pengguna").trim().toLowerCase();
         const hasExistingSubscription = !!profile.subscription &&
           typeof profile.subscription === "object" &&
           Object.keys(profile.subscription).length > 0;
 
-        // Jangan mengganti paket yang sudah diatur Superadmin, atau memberi trial
-        // kepada akun Superadmin maupun akun yang sudah melewati 7 hari sejak daftar.
-        if (role === "superadmin" || hasExistingSubscription ||
-            !hasValidAuthCreationTime || authCreatedAtMs + freeTrialDurationMs <= nowMs) {
-          transaction.update(profileRef, { freeTrialCheckedAt: serverTimestamp() });
-          return;
-        }
+        // Berikan trial hanya pada akun yang masih dalam 7 hari sejak daftar,
+        // belum pernah mendapat trial, dan belum memiliki paket dari Superadmin.
+        // Jangan menulis penanda pada akun lama/paket yang sudah ada karena
+        // aturan Firestore pengguna bisa membatasi pembaruan field yang tidak perlu.
+        const eligibleForTrial = role !== "superadmin" &&
+          !hasExistingSubscription &&
+          !profile.freeTrialGrantedAt &&
+          !profile.freeTrialCheckedAt &&
+          hasValidAuthCreationTime &&
+          authCreatedAtMs + freeTrialDurationMs > nowMs;
 
-        const trialExpiresAt = new Date(authCreatedAtMs + freeTrialDurationMs).toISOString();
-        transaction.update(profileRef, {
-          subscription: {
+        if (eligibleForTrial) {
+          const trialSubscription = {
             planId: "gratis7hari",
             planName: "Gratis 7 Hari",
             status: "active",
             startAt: signupIso,
-            expiresAt: trialExpiresAt,
+            expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
             paidManually: false,
             source: "free_trial",
             updatedAt: new Date(nowMs).toISOString(),
             updatedBy: "system"
-          },
-          freeTrialGrantedAt: signupIso,
-          freeTrialCheckedAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-      });
+          };
+          await updateDoc(profileRef, {
+            subscription: trialSubscription,
+            freeTrialGrantedAt: signupIso,
+            updatedAt: serverTimestamp()
+          });
+        }
 
-      // Perbaikan data profil lama yang tidak berkaitan dengan langganan.
-      // setDoc merge menjaga field subscription dan penanda trial tetap utuh.
-      const profileRepairSnap = await getDoc(profileRef);
-      if (profileRepairSnap.exists()) {
-        const profile = profileRepairSnap.data() || {};
+        // Perbaikan nama/nomor hanya bila benar-benar kosong. Tidak menyentuh
+        // subscription, role, atau penanda trial yang sudah ada.
         const repair = {};
         if (!String(profile.Nama || "").trim() && user.displayName) repair.Nama = user.displayName;
         if (!String(profile.NomorHp || "").trim() && phoneFromInternalEmail) repair.NomorHp = phoneFromInternalEmail;
@@ -2200,7 +2191,11 @@ try {
     } catch (profileError) {
       console.error("MicOn user profile Firestore error:", profileError);
       document.documentElement.classList.remove("micon-auth-check");
-      alert("Profil akun belum dapat dibaca atau disimpan ke Firestore Pengguna. Periksa Firestore Rules untuk dokumen milik akun ini.");
+      const errorCode = profileError?.code || "unknown";
+      const errorMessage = profileError?.message || String(profileError || "Kesalahan tidak diketahui");
+      alert("Profil akun belum dapat dibaca atau disimpan ke Firestore Pengguna. " +
+        "Detail: " + errorCode + " — " + errorMessage +
+        ". Periksa izin read/create/update pada Firestore Rules untuk Pengguna/UID akun ini.");
       return;
     }
 
