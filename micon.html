@@ -1974,11 +1974,20 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
 }
 #micon-subscription-gate.show{display:flex}
 #micon-subscription-gate *{box-sizing:border-box}
+#micon-subscription-gate .micon-gate-banner{
+  display:none;width:100%;height:65px;min-height:65px;max-height:65px;
+  overflow:hidden;background:#f1f5f9;border-radius:0
+}
+#micon-subscription-gate .micon-gate-banner.is-configured{display:block}
+#micon-subscription-gate .micon-gate-banner iframe{
+  display:block;width:100%;height:65px;min-height:65px;max-height:65px;border:0
+}
 #micon-subscription-gate .msg-card{
   width:min(480px,100%);max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);
   overflow:hidden;background:#fff;border-radius:22px;padding:22px;
   box-shadow:0 25px 80px #0005
 }
+#micon-subscription-gate .micon-gate-logo{display:none}
 #micon-subscription-gate .msg-logo{
   width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#2563eb,#7658ff);
   display:grid;place-items:center;color:#fff;font-size:25px;margin-bottom:12px
@@ -2124,8 +2133,10 @@ try {
       `<div class="package-row"><span>${item.name}</span><b>${item.price}</b></div>`
     ).join("");
 
-    gate.innerHTML = `<div class="msg-card">
+    gate.innerHTML = `<div id="micon-gate-banner" class="micon-gate-banner" aria-label="Banner iklan dari Superadmin"></div>
+    <div class="msg-card">
       <div class="msg-logo" aria-hidden="true">♫</div>
+      <div class="micon-gate-logo"><img src="https://github.com/miconapp/miconapp.github.io/blob/main/src/micon%20logo.png?raw=true" alt="MicOn"></div>
       <h2 id="micon-gate-title">Masa berlangganan MicOn habis</h2>
       <p id="micon-gate-desc">Akses seluruh fitur MicOn sedang dikunci karena akun belum memiliki paket aktif. Silakan pilih paket yang tersedia, lakukan pembayaran, lalu hubungi admin untuk konfirmasi.</p>
       <p class="micon-gate-reminder">Silakan pilih paket yang tersedia, lakukan pembayaran, lalu hubungi admin untuk konfirmasi.</p>
@@ -2139,6 +2150,9 @@ try {
         </a>
       </div>
     </div>`;
+
+    // Pakai snapshot Banner Gambar yang sama dengan halaman Beranda.
+    window.MicOnRefreshSubscriptionBanner?.();
 
     gate.querySelector("#micon-gate-logout").addEventListener("click", async () => {
       try {
@@ -3118,34 +3132,34 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     errorBox.style.display="block";
   });
 
-  /* Banner playlist berjalan dalam dokumen iframe sandbox tersendiri.
-     Tidak membuat elemen media, AudioContext, timer, atau callback pada player utama. */
-  function connectPlaylistBanner(){
-    const banner=document.querySelector('.mobile-ad-banner');
-    if(!banner)return;
-    banner.classList.remove('is-configured');
-    banner.replaceChildren();
+  /* Satu listener Banner Gambar Firestore dipakai bersama oleh banner Beranda
+     dan banner pada layar kunci langganan. Tidak ada koleksi atau listener duplikat. */
+  function connectBannerGambar(){
+    const homeBanner=document.querySelector('.mobile-ad-banner');
+    if(homeBanner){homeBanner.classList.remove('is-configured');homeBanner.replaceChildren();}
     if(!db)db=getFirestore(getApp());
-    let lastBannerSignature="";
+    let latestBannerConfig=null;
     const escapeAttribute=value=>String(value||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    onSnapshot(doc(db,"PengaturanIklan","MicOn"),snapshot=>{
-      const root=snapshot.exists()?snapshot.data():{};
-      const config=root.banner||{};
-      const url=String(config.url||"").trim();
-      const active=config.enabled===true&&!!url;
-      const allowedPlacement=["home","home-bottom","all"].includes(String(config.placement||"home"));
-      banner.classList.toggle('is-configured',active&&allowedPlacement);
-      if(!active||!allowedPlacement){
-        lastBannerSignature="";
+
+    const renderBannerTarget=(banner,config)=>{
+      if(!banner)return;
+      const url=String(config?.url||"").trim();
+      const active=config?.enabled===true&&!!url;
+      const allowedPlacement=["home","home-bottom","all"].includes(String(config?.placement||"home"));
+      const visible=active&&allowedPlacement;
+      banner.classList.toggle('is-configured',visible);
+      if(!visible){
+        banner.dataset.miconBannerSignature="";
         banner.replaceChildren();
         return;
       }
+
       const destination=String(config.clickUrl||"").trim();
       const name=String(config.name||"Banner iklan MicOn");
-      const signature=[url,destination,name].join("\\n");
-      /* Update dokumen iklan hanya jika konfigurasi benar-benar berubah. */
-      if(signature===lastBannerSignature)return;
-      lastBannerSignature=signature;
+      const signature=[url,destination,name].join("\n");
+      if(signature===banner.dataset.miconBannerSignature)return;
+      banner.dataset.miconBannerSignature=signature;
+
       const imageUrl=escapeAttribute(url);
       const clickUrl=escapeAttribute(destination);
       const title=escapeAttribute(name);
@@ -3164,9 +3178,22 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
-    },error=>console.warn("MicOn playlist banner config could not be loaded:",error));
+    };
+
+    // Dipanggil saat elemen layar kunci dibuat setelah listener mendapat snapshot awal.
+    window.MicOnRefreshSubscriptionBanner=()=>{
+      const gateBanner=document.getElementById('micon-gate-banner');
+      if(gateBanner&&latestBannerConfig)renderBannerTarget(gateBanner,latestBannerConfig);
+    };
+
+    onSnapshot(doc(db,"PengaturanIklan","MicOn"),snapshot=>{
+      const root=snapshot.exists()?snapshot.data():{};
+      latestBannerConfig=root.banner||{};
+      renderBannerTarget(homeBanner,latestBannerConfig);
+      renderBannerTarget(document.getElementById('micon-gate-banner'),latestBannerConfig);
+    },error=>console.warn("MicOn Banner Gambar config could not be loaded:",error));
   }
-  try{connectPlaylistBanner();}catch(error){console.warn("MicOn playlist banner could not be initialized:",error);}
+  try{connectBannerGambar();}catch(error){console.warn("MicOn Banner Gambar could not be initialized:",error);}
 
   window.miconAdGate=async(phase="opening")=>{
     try{
@@ -3695,33 +3722,43 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate.show{display:block!important}
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner{
+    display:none!important;position:relative!important;box-sizing:border-box!important;
+    width:calc(100% + 30px)!important;height:65px!important;min-height:65px!important;max-height:65px!important;
+    margin:0 -15px 10px!important;padding:0!important;overflow:hidden!important;
+    border:0!important;border-radius:0!important;background:#f1f5f9!important;
+  }
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner.is-configured{display:block!important}
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner iframe{
+    display:block!important;width:100%!important;height:65px!important;min-height:65px!important;max-height:65px!important;border:0!important;
+  }
   body.micon-subscription-mobile-active #micon-subscription-gate .msg-card{
     display:block!important;width:100%!important;max-width:none!important;max-height:none!important;
-    margin:0!important;padding:7px 0 0!important;overflow:visible!important;
+    margin:0!important;padding:0!important;overflow:visible!important;
     border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
     color:#172033!important;font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;
   }
-  body.micon-subscription-mobile-active #micon-subscription-gate .msg-logo{
-    display:grid!important;place-items:center!important;width:40px!important;height:40px!important;
-    margin:0 0 10px!important;padding:0!important;border:0!important;border-radius:13px!important;
-    background:linear-gradient(135deg,#2563eb,#7658ff)!important;color:#fff!important;
-    font-size:23px!important;line-height:1!important;
+  body.micon-subscription-mobile-active #micon-subscription-gate .msg-logo{display:none!important}
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-logo{
+    display:block!important;width:165px!important;height:48px!important;max-width:60%!important;
+    margin:18px 0 10px!important;padding:0!important;overflow:hidden!important;
   }
-  body.micon-subscription-mobile-active #micon-subscription-gate h2{
-    margin:0 0 7px!important;color:#172033!important;font-size:20px!important;
-    font-weight:850!important;line-height:1.2!important;letter-spacing:-.35px!important;
+  body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-logo img{
+    display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
+    margin:0!important;padding:0!important;object-fit:contain!important;object-position:left center!important;
   }
+  body.micon-subscription-mobile-active #micon-subscription-gate h2,
+  body.micon-subscription-mobile-active #micon-subscription-gate #micon-gate-desc{display:none!important}
   body.micon-subscription-mobile-active #micon-subscription-gate p{
     margin:0!important;color:#64748b!important;font-size:12px!important;
     font-weight:400!important;line-height:1.48!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-reminder{
-    margin:17px 0 8px!important;padding:7px 0 0!important;
-    border-top:1px solid #f1f3f5!important;box-shadow:0 -5px 10px rgba(15,23,42,.025)!important;
+    margin:0 0 28px!important;padding:0!important;border:0!important;box-shadow:none!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .package-list{
     display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;
-    width:100%!important;margin:7px 0 9px!important;padding:0!important;
+    width:100%!important;margin:0 0 30px!important;padding:0!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .package-row{
     display:flex!important;align-items:center!important;justify-content:space-between!important;
@@ -3764,10 +3801,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 </style>
 
 <style id="micon-subscription-mobile-package-row-spacing">
-/* Jarak antar-kotak paket tepat 20px; khusus kartu langganan mobile. */
+/* Jarak antar-kotak paket mengikuti referensi; khusus kartu langganan mobile. */
 @media screen and (max-width:760px){
   body.micon-subscription-mobile-active #micon-subscription-gate .package-list{
-    row-gap:20px!important;
+    row-gap:33px!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .package-row{
     gap:18px!important;
