@@ -2337,7 +2337,9 @@ try {
       return;
     }
 
-    const profileRef = doc(db, "Pengguna", user.uid);
+    // Dokumen langganan selalu menggunakan ID dokumen = Firebase Auth UID.
+    // Path ini harus sama persis dengan target dokumen yang ditulis Superadmin.
+    const profileRef = doc(db, "Pengguna", String(user.uid));
     const internalPhone = user.email ? user.email.split("@")[0] : "";
     const phoneFromInternalEmail = /^62\\d{8,13}$/.test(internalPhone)
       ? "0" + internalPhone.slice(2)
@@ -2346,6 +2348,7 @@ try {
     // LISTENER DIPASANG TERLEBIH DAHULU. Dengan demikian, pembukaan/penghapusan
     // paket oleh Superadmin selalu didengar meskipun proses inisialisasi profil
     // memerlukan waktu atau gagal pada langkah berikutnya.
+    console.info("[MicOn realtime] Mendengarkan dokumen:", profileRef.path, "UID:", user.uid);
     stopUserProfileListener = onSnapshot(
       profileRef,
       { includeMetadataChanges: true },
@@ -2353,6 +2356,15 @@ try {
         if (auth.currentUser?.uid !== user.uid) return;
 
         const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
+        console.info("[MicOn realtime] Snapshot diterima:", {
+          path: profileRef.path,
+          fromCache: profileSnap.metadata.fromCache,
+          planId: profile.subscription?.planId || null,
+          status: profile.subscription?.status || "none",
+          expiresAt: profile.subscription?.expiresAt || null
+        });
+        // Setiap perubahan subscription pada Pengguna/{UID} langsung diproses,
+        // tanpa reload dan tanpa mengambil profil dari cache selain snapshot awal.
         renderSubscriptionGate(profile, user, phoneFromInternalEmail);
 
         // Inisialisasi profil/trial hanya dijalankan sekali setelah snapshot
