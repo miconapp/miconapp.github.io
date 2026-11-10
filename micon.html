@@ -2151,8 +2151,7 @@ try {
       </div>
     </div>`;
 
-    // Pakai snapshot Banner Gambar yang sama dengan halaman Beranda.
-    window.MicOnRefreshSubscriptionBanner?.();
+    // Banner dirender setelah gate ditempelkan ke DOM oleh renderSubscriptionGate.
 
     gate.querySelector("#micon-gate-logout").addEventListener("click", async () => {
       try {
@@ -2212,6 +2211,11 @@ try {
         transposeColumn.classList.add("subscription-inline-mode");
         document.body.classList.remove("micon-subscription-mobile-active");
       }
+
+      // Pastikan target banner sudah berada di DOM sebelum memakai konfigurasi
+      // terakhir dari listener Banner Gambar Firestore. Jika snapshot belum masuk,
+      // listener akan merendernya ketika snapshot pertama diterima.
+      window.MicOnRefreshSubscriptionBanner?.();
 
       const title = gate.querySelector("#micon-gate-title");
       const desc = gate.querySelector("#micon-gate-desc");
