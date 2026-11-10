@@ -2030,7 +2030,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
 <script type="module" id="micon-firebase-session-guard">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDsoHofWuEfD2gwMNgfsad0KXxYlMMxw0w",
   authDomain: "rekapinyu-storage.firebaseapp.com",
@@ -2104,25 +2104,94 @@ try {
       : (user.phoneNumber || "");
 
     try {
-      const profileSnap = await getDoc(profileRef);
-      if (!profileSnap.exists()) {
-        await setDoc(profileRef, {
-          Nama: user.displayName || "Pengguna MicOn",
-          NomorHp: phoneFromInternalEmail,
-          role: "Pengguna",
-          createdAt: serverTimestamp(),
+      // Masa gratis dihitung dari waktu pendaftaran Firebase, bukan dari waktu
+      // pertama kali aplikasi dibuka. Penanda permanen mencegah trial diberikan
+      // ulang setelah Superadmin menghapus paket langganan.
+      const freeTrialDurationMs = 7 * 24 * 60 * 60 * 1000;
+      const authCreatedAtMs = Date.parse(user.metadata?.creationTime || "");
+      const hasValidAuthCreationTime = Number.isFinite(authCreatedAtMs) && authCreatedAtMs > 0;
+
+      await runTransaction(db, async transaction => {
+        const profileSnap = await transaction.get(profileRef);
+        const nowMs = Date.now();
+        const signupIso = hasValidAuthCreationTime
+          ? new Date(authCreatedAtMs).toISOString()
+          : null;
+
+        if (!profileSnap.exists()) {
+          const newProfile = {
+            Nama: user.displayName || "Pengguna MicOn",
+            NomorHp: phoneFromInternalEmail,
+            role: "Pengguna",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          };
+
+          if (hasValidAuthCreationTime && authCreatedAtMs + freeTrialDurationMs > nowMs) {
+            const trialExpiresAt = new Date(authCreatedAtMs + freeTrialDurationMs).toISOString();
+            newProfile.subscription = {
+              planId: "gratis7hari",
+              planName: "Gratis 7 Hari",
+              status: "active",
+              startAt: signupIso,
+              expiresAt: trialExpiresAt,
+              paidManually: false,
+              source: "free_trial",
+              updatedAt: new Date(nowMs).toISOString(),
+              updatedBy: "system"
+            };
+            newProfile.freeTrialGrantedAt = signupIso;
+          }
+          // Tandai sudah diperiksa, termasuk akun lama yang tidak memenuhi syarat.
+          newProfile.freeTrialCheckedAt = serverTimestamp();
+          transaction.set(profileRef, newProfile);
+          return;
+        }
+
+        const profile = profileSnap.data() || {};
+        // Profil lama yang sudah diperiksa tidak pernah menerima trial kedua kali.
+        if (profile.freeTrialCheckedAt || profile.freeTrialGrantedAt) return;
+
+        const role = String(profile.role || "Pengguna").trim().toLowerCase();
+        const hasExistingSubscription = !!profile.subscription &&
+          typeof profile.subscription === "object" &&
+          Object.keys(profile.subscription).length > 0;
+
+        // Jangan mengganti paket yang sudah diatur Superadmin, atau memberi trial
+        // kepada akun Superadmin maupun akun yang sudah melewati 7 hari sejak daftar.
+        if (role === "superadmin" || hasExistingSubscription ||
+            !hasValidAuthCreationTime || authCreatedAtMs + freeTrialDurationMs <= nowMs) {
+          transaction.update(profileRef, { freeTrialCheckedAt: serverTimestamp() });
+          return;
+        }
+
+        const trialExpiresAt = new Date(authCreatedAtMs + freeTrialDurationMs).toISOString();
+        transaction.update(profileRef, {
+          subscription: {
+            planId: "gratis7hari",
+            planName: "Gratis 7 Hari",
+            status: "active",
+            startAt: signupIso,
+            expiresAt: trialExpiresAt,
+            paidManually: false,
+            source: "free_trial",
+            updatedAt: new Date(nowMs).toISOString(),
+            updatedBy: "system"
+          },
+          freeTrialGrantedAt: signupIso,
+          freeTrialCheckedAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-      } else {
-        const profile = profileSnap.data();
-        // Isi field profil lama yang masih kosong tanpa mengubah role atau data lain.
+      });
+
+      // Perbaikan data profil lama yang tidak berkaitan dengan langganan.
+      // setDoc merge menjaga field subscription dan penanda trial tetap utuh.
+      const profileRepairSnap = await getDoc(profileRef);
+      if (profileRepairSnap.exists()) {
+        const profile = profileRepairSnap.data() || {};
         const repair = {};
-        if (!String(profile.Nama || "").trim() && user.displayName) {
-          repair.Nama = user.displayName;
-        }
-        if (!String(profile.NomorHp || "").trim() && phoneFromInternalEmail) {
-          repair.NomorHp = phoneFromInternalEmail;
-        }
+        if (!String(profile.Nama || "").trim() && user.displayName) repair.Nama = user.displayName;
+        if (!String(profile.NomorHp || "").trim() && phoneFromInternalEmail) repair.NomorHp = phoneFromInternalEmail;
         if (Object.keys(repair).length) {
           repair.updatedAt = serverTimestamp();
           await setDoc(profileRef, repair, { merge: true });
@@ -2218,7 +2287,10 @@ try {
         const title = gate.querySelector("#micon-gate-title");
         const desc = gate.querySelector("#micon-gate-desc");
         const status = gate.querySelector("#micon-gate-status");
-        if (sub.planName) {
+        if (String(sub.planId || "").toLowerCase() === "gratis7hari") {
+          title.textContent = "Masa gratis MicOn 7 hari telah berakhir";
+          desc.textContent = "Masa akses gratis selama 7 hari sejak pendaftaran sudah selesai. Silakan pilih paket berlangganan dan hubungi admin untuk mengaktifkan kembali seluruh fitur MicOn.";
+        } else if (sub.planName) {
           title.textContent = "Masa berlangganan MicOn telah berakhir";
           desc.textContent = "Paket langganan kamu sudah tidak aktif. Silakan lakukan pembayaran perpanjangan dan konfirmasi kepada admin. Setelah Superadmin memperbarui langganan, semua fitur MicOn akan terbuka otomatis.";
         } else {
