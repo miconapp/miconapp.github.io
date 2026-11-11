@@ -1413,6 +1413,14 @@ $('videoFile').addEventListener('change',async event=>{
      msg('Video lokal berhasil dimuat; audio sedang disiapkan: '+(error.message||error),true);
     }).finally(()=>{window.__miconOpeningAdRunning=false;});
    },{once:true});
+   /* File playlist berikutnya dapat berasal dari cache lokal dan metadata
+      kadang sudah tersedia sebelum listener di atas terpasang. Pastikan alur
+      iklan -> persiapan audio/buffer -> autoplay tetap dijalankan satu kali. */
+   if(activeVideo.error){
+    $('fileStatus').textContent='Format video tidak didukung';
+   }else if(activeVideo.readyState>=HTMLMediaElement.HAVE_METADATA){
+    activeVideo.dispatchEvent(new Event('loadedmetadata'));
+   }
    activeVideo.addEventListener('error',()=>{
     $('fileStatus').textContent='Format video tidak didukung';
     msg('HP tidak dapat memutar codec video ini. Coba MP4 H.264 dengan audio AAC.',true);
