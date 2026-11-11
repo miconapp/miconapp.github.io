@@ -6,11 +6,11 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%232563eb%22/%3E%3Cpath d=%22M18 15v25a8 8 0 1 0 6 7V25l22-5v15a8 8 0 1 0 6 7V10z%22 fill=%22white%22/%3E%3C/svg%3E">
 <title>MicOn - Bebaskan Suaramu</title>
 <style id="micon-auth-gate-style">
+/* Splash hanya ditampilkan oleh index.html saat pembukaan awal aplikasi.
+   Setelah tombol Login ditekan, pengaman auth tetap menyembunyikan konten
+   sampai Firebase selesai memeriksa sesi, tetapi tanpa memunculkan splash lagi. */
 html.micon-auth-check{background:#fff!important}
 html.micon-auth-check body{visibility:hidden}
-html.micon-auth-check::before{content:"";position:fixed;inset:0;z-index:2147483647;background:#006bc8 url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20desktop.png") center/cover no-repeat;display:block}
-html.micon-auth-check::after{content:"Sedang Menyiapkan Sistem Mohon Tunggu";position:fixed;left:0;right:0;bottom:7%;text-align:center;padding:0 14px;color:#fff;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 8px #001b36;z-index:2147483647}
-@media(max-width:760px){html.micon-auth-check::before{background-image:url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20mobile.png")}}
 </style>
 <script>
 document.documentElement.classList.add('micon-auth-check');
