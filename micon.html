@@ -2733,11 +2733,8 @@ try {
   }
  }
  if(mobile){
-  addButton.addEventListener('click',async event=>{
-   if(typeof window.showDirectoryPicker!=='function')return;
-   event.preventDefault();event.stopImmediatePropagation();
-   await chooseMasterFolder();
-  },true);
+  /* Jangan cegat klik Tambah Playlist: biarkan handler utama membuka pemilih video.
+     Folder Master yang sudah diizinkan tetap dipulihkan otomatis saat aplikasi dibuka. */
   restoreMasterFolder();
  }
  let advancing=false;
