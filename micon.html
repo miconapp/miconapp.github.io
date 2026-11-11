@@ -1491,7 +1491,17 @@ $('videoFile').addEventListener('change',async event=>{
    msg('Browser tidak dapat membaca video ini. Coba MP4 dengan codec H.264 dan audio AAC.',true);
    $('fileStatus').textContent='Video gagal dibaca';
   },{once:true});
-  loadedVideo.load();
+  /* Pada perpindahan playlist yang cepat, Android WebView kadang sudah
+     mengirim loadedmetadata sebelum listener di atas terpasang. Akibatnya
+     gate iklan menunggu event yang sudah lewat dan video berikutnya tertahan
+     pada tampilan kosong. Jalankan jalur kesiapan yang sama bila metadata
+     ternyata sudah tersedia, tanpa memuat ulang atau mengganti File sumber. */
+  if(loadedVideo.error){
+   $('fileStatus').textContent='Video gagal dibaca';
+   msg('Browser tidak dapat membaca file video berikutnya (kode '+loadedVideo.error.code+').',true);
+  }else if(loadedVideo.readyState>=HTMLMediaElement.HAVE_METADATA){
+   loadedVideo.dispatchEvent(new Event('loadedmetadata'));
+  }
  }catch(error){msg('Gagal mengimpor video: '+(error.message||error),true);}
 });
 $('playBtn').addEventListener('click',async()=>{
