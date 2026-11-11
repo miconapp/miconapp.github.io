@@ -11,42 +11,11 @@
 
 <style>
 :root{color-scheme:light;--bg:#ffffff;--panel:#ffffff;--panel2:#f8fafc;--line:#dbe3ef;--muted:#64748b;--text:#172033;--blue:#5287ff;--cyan:#0f9f91;--danger:#ff667e}*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}.wrap{width:min(1050px,100%);margin:auto;padding:24px 18px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--blue),#8a5cff);display:grid;place-items:center;font-size:23px;box-shadow:0 8px 28px #426dff40}.brand h1{font-size:clamp(20px,4vw,28px);margin:0;letter-spacing:-.5px}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}.pill{border:1px solid var(--line);border-radius:99px;padding:7px 11px;color:var(--muted);font-size:12px;white-space:nowrap}.hero{margin-bottom:20px}.hero h2{font-size:clamp(26px,5vw,42px);line-height:1.12;letter-spacing:-1px;margin:0 0 9px}.hero h2 span{color:var(--cyan)}.hero p{margin:0;color:var(--muted);max-width:650px}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 15px 45px #0002;min-width:0}.card h3{font-size:17px;margin:0 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 16px}.drop{border:1.5px dashed #40577c;background:#f8fafc;border-radius:17px;min-height:190px;display:flex;align-items:center;justify-content:center;text-align:center;padding:22px;cursor:pointer;transition:.2s}.drop:hover, .drop.drag{border-color:var(--cyan);background:#102033}.uploadIcon{font-size:32px;margin-bottom:8px}.drop strong{display:block;font-size:15px}.drop small{display:block;color:var(--muted);margin-top:6px}.filemeta{margin-top:13px;background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:12px;display:flex;gap:12px;align-items:center;min-width:0}.fileIcon{width:42px;height:42px;flex:none;border-radius:12px;background:#e8efff;display:grid;place-items:center;font-size:20px}.filetext{min-width:0;flex:1}.filetext b{display:block;overflow-wrap:anywhere}.filetext small{color:var(--muted)}.status{font-size:12px;color:var(--cyan);margin-top:4px}.btn{border:0;border-radius:12px;padding:12px 16px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font-size:14px;transition:filter .2s,transform .2s}.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:#202e47;border:1px solid #334763}.btn.danger{background:#3a1d2b;color:#ffb4c1;border:1px solid #653044}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row .btn{flex:1}.transposeCard{display:flex;flex-direction:column}.noteBox{background:#f8fafc;border:1px solid var(--line);border-radius:16px;text-align:center;padding:17px 10px;margin:12px 0 18px}.noteBox small{color:var(--muted);display:block}.note{font-size:38px;line-height:1.2;font-weight:800;letter-spacing:-1px}.stepper{display:grid;grid-template-columns:58px 1fr 58px;gap:10px;align-items:center}.step{height:54px;border-radius:14px;border:1px solid #344764;background:#1b2a43;color:#fff;font-size:27px;cursor:pointer}.step:disabled{opacity:.35}.range{width:100%;accent-color:var(--cyan)}.rangeLabels{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px}.semitone{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:20px;margin-top:14px}.semitone small{font-size:12px;color:var(--muted);font-weight:500}.playrow{margin-top:auto;padding-top:20px}.playbtn{width:100%;padding:15px;font-size:16px;background:linear-gradient(100deg,#4d82ff,#7658ff)}.progress{height:5px;background:#273650;border-radius:9px;overflow:hidden;margin-top:14px}.progress>div{height:100%;width:0;background:var(--cyan);transition:width .15s}.config{margin-top:16px}.config summary{cursor:pointer;font-weight:700;color:#c9d7f3}.configBody{padding-top:16px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field label{font-size:12px;color:var(--muted)}.field input{width:100%;padding:12px;border-radius:11px;border:1px solid #30415d;background:#f8fafc;color:#172033;outline:none}.field input:focus{border-color:var(--blue)}.hint{font-size:12px;color:var(--muted);line-height:1.55}.alert{display:none;border-radius:12px;padding:11px 13px;margin-top:12px;font-size:13px;overflow-wrap:anywhere}.alert.show{display:block}.alert.ok{background:#0e302c;color:#9af2df;border:1px solid #1e5c51}.alert.err{background:#3a1b27;color:#ffc1cc;border:1px solid #683044}.foot{text-align:center;color:#657796;font-size:12px;margin-top:20px}.mini{font-size:12px;color:var(--muted)}
-@media(max-width:760px){.wrap{padding:16px 12px 34px}.top{align-items:flex-start;margin-bottom:22px}.pill{max-width:120px;white-space:normal;text-align:center}.grid{grid-template-columns:1fr}.card{padding:16px;border-radius:18px}.drop{min-height:160px}.transposeCard{min-height:350px}.hero h2{font-size:32px}.row .btn{min-width:110px}}
+
 
 /* Mobile-only white theme and bottom dock; desktop styles above remain unchanged. */
 .mobile-dock, .more-sheet{display:none}
-@media(max-width:760px){
-  :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#f7f9fc;--line:#e5e7eb;--muted:#6b7280;--text:#172033;--blue:#2563eb;--cyan:#0891b2;--danger:#dc2626}
-  body{background:#fff;color:#172033;min-height:100vh}
-  .wrap{padding:14px 12px calc(104px + env(safe-area-inset-bottom))}
-  .top{align-items:center;margin-bottom:18px}
-  .brand p, .hero p, .sub, .mini, .hint, .foot, .pill, .field label{color:#6b7280}
-  .pill{border-color:#e5e7eb;background:#f8fafc}
-  .hero h2 span{color:#2563eb}
-  .card{background:#fff;color:#172033;border:1px solid #e5e7eb;box-shadow:0 5px 20px rgba(15,23,42,.05)}
-  .drop{background:#f8fafc;border-color:#cbd5e1;color:#172033}
-  .drop small{color:#64748b}
-  .filemeta, .noteBox{background:#f8fafc;border-color:#e2e8f0}
-  .fileIcon{background:#eaf1ff;color:#2563eb}
-  .step{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
-  .field input{background:#fff;color:#172033;border-color:#d1d5db}
-  .config summary{color:#1f2937}
-  .config.card{background:#f8fafc!important;border-color:#e5e7eb}
-  .btn.secondary{background:#f1f5f9;color:#334155;border-color:#cbd5e1}
-  .btn.danger{background:#fff1f2;color:#be123c;border-color:#fecdd3}
-  .alert.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
-  .alert.err{background:#fff1f2;color:#be123c;border-color:#fecdd3}
-  .progress{background:#e5e7eb}
-  .mobile-dock{display:grid;position:fixed;z-index:1000;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding:8px 6px;background:rgba(255,255,255,.97);border:1px solid #e5e7eb;border-radius:20px;box-shadow:0 8px 30px rgba(15,23,42,.15);backdrop-filter:blur(16px)}
-  .dock-item{appearance:none;border:0;background:transparent;color:#64748b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:4px 2px;font:600 10px/1.2 system-ui;cursor:pointer;border-radius:13px}
-  .dock-icon{font-size:22px;line-height:1.15;font-weight:700;min-height:24px}
-  .dock-item.active{background:#eff6ff;color:#2563eb}
-  .more-sheet{display:flex;flex-direction:column;gap:10px;position:fixed;z-index:1001;left:12px;right:12px;bottom:calc(82px + env(safe-area-inset-bottom));padding:16px;background:#fff;border:1px solid #e5e7eb;border-radius:20px;box-shadow:0 12px 35px rgba(15,23,42,.18);transform:translateY(12px);opacity:0;pointer-events:none;transition:.18s}
-  .more-sheet.open{transform:translateY(0);opacity:1;pointer-events:auto}
-  .sheet-close{align-self:flex-end;border:0;background:#f1f5f9;color:#475569;border-radius:10px;padding:8px 12px;font-weight:700}
-  .sheet-link{border:1px solid #dbeafe;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:13px;text-align:left;font-weight:700}
-  .sheet-note{color:#334155;font-weight:700;padding:8px 2px}.sheet-note small{font-weight:400;color:#64748b}
-}
+
 /* Reference design: Mic On header, large video left and compact pitch controls right.
    These are presentation-only overrides; playback/transpose behavior remains intact. */
 @media (min-width:761px){
@@ -142,7 +111,7 @@
   #transposeSection .alert{width:100%;max-width:none;margin:10px 0 0!important;min-height:57px;background:#fff1f2;color:#be123c;border-color:#fecdd3}
   #transposeSection .alert:not(.show){display:none}
 }
-@media(max-width:760px){.desktop-nav{display:none!important}}
+
 /* Header-only update: keep the navigation pinned while scrolling and modernize social icons. */
 .top{position:sticky;top:0;z-index:1200;background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 rgba(148,163,184,.22)}
 @media (min-width:761px){
@@ -163,7 +132,7 @@
   .foot ul{margin:0;padding-left:18px;line-height:1.7}
   @media(max-width:760px){.foot{grid-template-columns:1fr;gap:18px;margin-top:24px;padding:20px 2px 8px}.social-icons{gap:8px}.social-icon{width:34px;height:34px;flex-basis:34px}}
 }
-@media(max-width:760px){.top{position:sticky;top:0;z-index:1200;background:rgba(255,255,255,.97);box-shadow:0 1px 0 rgba(148,163,184,.22)}}
+
 /* Layout refinement based on the supplied reference image; visual-only desktop overrides. */
 @media (min-width:761px){
   .wrap{padding:0 30px 16px}
@@ -229,10 +198,7 @@
   #transposeSection .row{grid-column:2;grid-row:7;margin-top:18px!important}
   #transposeSection .alert{grid-column:2;grid-row:8}
 }
-@media(max-width:760px){
-  .keySelect{height:44px;border-color:#cbd5e1;background:#f8fafc;font-size:14px}
-  #transposeSection .keySelectWrap{margin:12px 0}
-}
+
 </style>
 <style id="micon-account-profile-style">
 /* Profil akun MicOn di sisi kanan header. */
@@ -256,449 +222,8 @@
   .top{gap:8px}
 }
 </style>
-<style id="micon-mobile-master">
-/* MicOn mobile UI — visual redesign only; existing controls and behavior remain intact. */
-@media screen and (max-width:760px){
-  :root{
-    color-scheme:light!important;
-    --micon-bg:#f3f6fb;
-    --micon-card:#ffffff;
-    --micon-ink:#172033;
-    --micon-muted:#718096;
-    --micon-line:#e4eaf2;
-    --micon-blue:#2563eb;
-    --micon-blue-soft:#eff6ff;
-  }
-  html, body{
-    width:100%!important;min-width:0!important;min-height:100%!important;height:auto!important;
-    margin:0!important;padding:0!important;overflow-x:hidden!important;overflow-y:auto!important;
-    background:var(--micon-bg)!important;color:var(--micon-ink)!important;
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
-  }
-  body{overscroll-behavior-y:auto!important}
-  .wrap{
-    display:block!important;width:100%!important;max-width:none!important;height:auto!important;
-    min-height:100dvh!important;max-height:none!important;margin:0!important;
-    padding:0 0 28px!important;overflow:visible!important;background:var(--micon-bg)!important;
-  }
-  /* Android app shell: compact toolbar, no website-style menu strip or hero banner. */
-  .top{
-    display:flex!important;position:sticky!important;top:0!important;z-index:100!important;
-    flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;
-    gap:10px!important;width:100%!important;box-sizing:border-box!important;margin:0!important;
-    padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important;
-    border:0!important;border-bottom:1px solid #edf0f5!important;border-radius:0!important;
-    background:rgba(255,255,255,.97)!important;color:var(--micon-ink)!important;
-    box-shadow:0 2px 8px rgba(18,32,56,.045)!important;backdrop-filter:blur(12px)!important;
-  }
-  .top .brand{display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important}
-  .top .logo{display:grid!important;place-items:center!important;flex:0 0 38px!important;width:38px!important;height:38px!important;
-    border-radius:12px!important;background:#2563eb!important;color:#fff!important;font-size:21px!important}
-  .top .brand h1{margin:0!important;color:#172033!important;font-size:18px!important;font-weight:850!important;line-height:1.1!important;letter-spacing:-.4px!important}
-  .top .brand p{display:none!important}
-  .top .desktop-nav, .top .social-icons{display:none!important}
-  .hero{display:none!important}
-  #mainContent{
-    display:block!important;width:100%!important;max-width:none!important;
-    margin:0!important;padding:0 0 24px!important;background:var(--micon-bg)!important;
-  }
-  .home-layout{display:flex!important;flex-direction:column!important;gap:0!important;width:100%!important}
-  .home-preview-column{
-    display:block!important;order:0!important;width:100%!important;min-width:0!important;
-    margin:0!important;padding:0!important;border:0!important;background:#080b12!important;
-    overflow:hidden!important;
-  }
-  #videoStage, .home-preview-column #videoStage{
-    position:relative!important;display:grid!important;place-items:center!important;
-    box-sizing:border-box!important;width:100%!important;height:auto!important;
-    min-height:0!important;max-height:none!important;aspect-ratio:16/9!important;
-    margin:0!important;padding:0!important;overflow:hidden!important;
-    border:0!important;border-radius:0!important;background:#080b12!important;
-  }
-  #videoStage:not(:has(#karaokeVideo))::before{
-    content:"Video akan diputar disini"!important;position:absolute!important;inset:0!important;
-    z-index:1!important;display:flex!important;align-items:center!important;justify-content:center!important;
-    padding:14px!important;background:#080b12!important;color:#e8edf7!important;
-    font:700 14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif!important;
-    letter-spacing:.02em!important;text-align:center!important;pointer-events:none!important;
-  }
-  #videoStage #karaokeVideo{
-    position:relative!important;z-index:2!important;display:block!important;
-    width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9!important;
-    object-fit:contain!important;margin:0!important;padding:0!important;border:0!important;
-    border-radius:0!important;background:#080b12!important;
-  }
-  .home-scroll-column{padding:12px 12px 28px!important}
-  #importSection, #transposeSection{padding:14px!important;border-radius:17px!important;box-shadow:0 2px 8px rgba(20,35,60,.045)!important}
-  #importSection h3, #transposeSection h3{font-size:13px!important;letter-spacing:0!important}
-  #importSection>.sub, #transposeSection>.sub{font-size:10px!important}
-  
-  
-  
-  #transposeSection .pitch-compact-row{grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .playbtn, #transposeSection #playBtn{height:48px!important;border-radius:14px!important}
-  .mobile-ad-banner, .mobile-fill, .home-scroll-column .foot{margin-top:10px!important}
-  .home-scroll-column{
-    display:flex!important;flex-direction:column!important;order:1!important;
-    width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
-    max-height:none!important;margin:0!important;padding:14px 13px 0!important;
-    border:0!important;background:var(--micon-bg)!important;overflow:visible!important;
-    box-sizing:border-box!important;
-  }
-  .home-scroll-column>.grid, .home-scroll-column .grid, .grid{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    gap:12px!important;width:100%!important;min-width:0!important;height:auto!important;
-    min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;
-    overflow:visible!important;background:transparent!important;
-  }
-  #importSection, #transposeSection{
-    display:flex!important;flex-direction:column!important;position:relative!important;
-    box-sizing:border-box!important;width:100%!important;min-width:0!important;height:auto!important;
-    min-height:0!important;max-height:none!important;margin:0!important;padding:16px!important;
-    gap:10px!important;border:1px solid var(--micon-line)!important;border-radius:19px!important;
-    background:var(--micon-card)!important;color:var(--micon-ink)!important;
-    box-shadow:0 5px 18px rgba(22,39,67,.055)!important;overflow:visible!important;
-  }
-  #importSection h3, #transposeSection h3{
-    display:block!important;margin:0!important;padding:0!important;color:var(--micon-ink)!important;
-    font-size:14px!important;line-height:1.35!important;font-weight:800!important;letter-spacing:-.01em!important;
-  }
-  #importSection>.sub, #transposeSection>.sub{
-    display:block!important;margin:-5px 0 2px!important;padding:0!important;
-    color:var(--micon-muted)!important;font-size:11px!important;line-height:1.5!important;
-  }
-  #importSection .filemeta{
-    display:flex!important;order:initial!important;box-sizing:border-box!important;
-    width:100%!important;height:auto!important;min-height:58px!important;margin:0!important;
-    padding:10px 12px!important;gap:10px!important;align-items:center!important;
-    border:1px solid var(--micon-line)!important;border-radius:14px!important;
-    background:#fbfcff!important;color:var(--micon-ink)!important;
-    box-shadow:inset 0 1px 2px rgba(15,23,42,.025)!important;
-  }
-  #importSection .fileIcon{
-    display:grid!important;place-items:center!important;flex:0 0 34px!important;
-    width:34px!important;height:34px!important;margin:0!important;padding:0!important;
-    border:0!important;border-radius:11px!important;background:var(--micon-blue-soft)!important;
-    color:var(--micon-blue)!important;font-size:21px!important;
-  }
-  #importSection .filetext{display:block!important;flex:1!important;min-width:0!important}
-  #importSection .filetext b{
-    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
-    white-space:nowrap!important;color:var(--micon-ink)!important;font-size:11px!important;
-    line-height:1.4!important;font-weight:750!important;
-  }
-  #importSection .filetext small{
-    display:block!important;margin-top:3px!important;color:var(--micon-muted)!important;
-    font-size:9px!important;line-height:1.3!important;
-  }
-  #importSection .status{display:block!important;margin-top:3px!important;color:#94a3b8!important;font-size:9px!important}
-  #transposeSection .drop{
-    display:flex!important;box-sizing:border-box!important;width:100%!important;min-height:58px!important;
-    align-items:center!important;justify-content:center!important;margin:0!important;padding:10px!important;
-    border:1px dashed #b8c9e3!important;border-radius:14px!important;
-    background:#f8fbff!important;color:var(--micon-blue)!important;text-align:center!important;
-  }
-  #transposeSection .drop>div{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:9px!important}
-  #transposeSection .drop .uploadIcon{
-    display:grid!important;place-items:center!important;flex:0 0 30px!important;
-    width:30px!important;height:30px!important;margin:0!important;border-radius:10px!important;
-    background:#eaf2ff!important;color:var(--micon-blue)!important;font-size:17px!important;
-  }
-  #transposeSection .drop strong{display:block!important;color:#1d4ed8!important;font-size:11px!important;font-weight:750!important}
-  #transposeSection .drop small{display:block!important;margin-top:2px!important;color:var(--micon-muted)!important;font-size:9px!important}
-  #transposeSection .keySelectWrap{
-    display:block!important;position:relative!important;width:100%!important;margin:0!important;
-  }
-  #transposeSection .keySelect{
-    display:block!important;box-sizing:border-box!important;width:100%!important;height:43px!important;
-    margin:0!important;padding:0 12px!important;border:1px solid var(--micon-line)!important;
-    border-radius:12px!important;background:#fff!important;color:var(--micon-ink)!important;
-    font-size:12px!important;font-weight:650!important;box-shadow:none!important;
-  }
-  #transposeSection .pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:clamp(42px,12vw,48px)!important;grid-auto-flow:row!important;
-    gap:8px!important;align-items:stretch!important;justify-content:stretch!important;
-    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0!important;
-    overflow:visible!important;
-  }
-  #transposeSection .pitch-compact-row>*{
-    display:flex!important;position:relative!important;float:none!important;grid-row:1!important;
-    min-width:0!important;max-width:100%!important;width:100%!important;height:100%!important;
-    min-height:0!important;max-height:none!important;margin:0!important;padding:3px!important;
-    box-sizing:border-box!important;align-items:center!important;justify-content:center!important;
-    border:1px solid var(--micon-line)!important;border-radius:13px!important;
-    background:#fff!important;color:var(--micon-ink)!important;
-    box-shadow:0 2px 7px rgba(22,39,67,.045)!important;overflow:hidden!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox{
-    grid-column:1!important;flex-direction:column!important;gap:3px!important;
-    background:var(--micon-blue-soft)!important;border-color:#dbeafe!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox small{
-    display:block!important;color:#64748b!important;font-size:8px!important;line-height:1!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox .note{
-    display:block!important;color:#1d4ed8!important;font-size:clamp(12px,3.7vw,16px)!important;
-    line-height:1.1!important;font-weight:850!important;text-transform:uppercase!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{
-    display:block!important;color:#64748b!important;font-size:7px!important;line-height:1!important;
-    white-space:nowrap!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone{
-    grid-column:2!important;flex-direction:column!important;gap:2px!important;
-    font-size:clamp(13px,4vw,16px)!important;font-weight:850!important;
-  }
-  #transposeSection .pitch-compact-row>.semitone small{
-    display:block!important;color:var(--micon-muted)!important;font-size:8px!important;font-weight:600!important;
-  }
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:3!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:4!important}
-  #transposeSection .pitch-compact-row>#downBtn, #transposeSection .pitch-compact-row>#upBtn{
-    font-size:25px!important;line-height:1!important;font-weight:500!important;
-    color:var(--micon-blue)!important;background:#fff!important;
-  }
-  #transposeSection .pitch-compact-row>#downBtn:disabled, #transposeSection .pitch-compact-row>#upBtn:disabled{color:#aab6c7!important;background:#f8fafc!important}
-  #transposeSection .stepper{
-    display:flex!important;box-sizing:border-box!important;width:100%!important;height:34px!important;
-    align-items:center!important;gap:8px!important;margin:0!important;padding:0 3px!important;
-    border:0!important;background:transparent!important;
-  }
-  #transposeSection .stepper .step{display:none!important}
-  #transposeSection .stepper .range{
-    display:block!important;flex:1!important;width:100%!important;min-width:0!important;
-    margin:0!important;accent-color:var(--micon-blue)!important;
-  }
-  #transposeSection .rangeLabels{
-    display:flex!important;justify-content:space-between!important;align-items:center!important;
-    margin:-6px 2px 0!important;padding:0!important;color:#94a3b8!important;font-size:9px!important;
-  }
-  #transposeSection .row{display:flex!important;align-items:center!important;gap:8px!important;margin:0!important}
-  #transposeSection .row .btn{display:inline-flex!important;align-items:center!important;justify-content:center!important}
-  #transposeSection .alert{display:block!important;min-height:0!important;margin:0!important}
-  #transposeSection .semitone:not(.pitch-compact-row .semitone){display:none!important}
-  #transposeSection .playrow{
-    display:block!important;width:100%!important;margin:0!important;padding:0!important;
-    border:0!important;background:transparent!important;
-  }
-  #transposeSection .playbtn, #transposeSection #playBtn{
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    box-sizing:border-box!important;width:100%!important;height:46px!important;margin:0!important;
-    border:0!important;border-radius:13px!important;background:var(--micon-blue)!important;
-    color:#fff!important;font-size:12px!important;font-weight:800!important;
-    box-shadow:0 4px 10px rgba(37,99,235,.18)!important;
-  }
-  #transposeSection .progress{
-    display:block!important;width:100%!important;height:5px!important;margin:12px 0 7px!important;
-    overflow:hidden!important;border-radius:99px!important;background:#e8edf5!important;
-  }
-  #transposeSection #progressBar{height:100%!important;border-radius:99px!important;background:var(--micon-blue)!important}
-  #transposeSection .playrow .row{
-    display:flex!important;justify-content:space-between!important;margin:0!important;
-    color:var(--micon-muted)!important;font-size:9px!important;
-  }
-  #transposeSection .hint{
-    display:block!important;margin:0!important;padding:10px 11px!important;
-    border-radius:11px!important;background:#f7f9fc!important;color:var(--micon-muted)!important;
-    font-size:9px!important;line-height:1.55!important;
-  }
-  #transposeSection .keySelectWrap, #transposeSection .stepper, #transposeSection .rangeLabels, #transposeSection .playrow, #transposeSection .hint{visibility:visible!important}
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  .mobile-fill{
-    display:block!important;box-sizing:border-box!important;width:100%!important;margin:12px 0 0!important;
-    padding:0!important;background:transparent!important;
-  }
-  .mobile-tip{
-    display:flex!important;align-items:flex-start!important;gap:10px!important;
-    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:14px!important;
-    border:1px solid #dbeafe!important;border-radius:15px!important;background:#eff6ff!important;
-    color:#1e3a8a!important;box-shadow:none!important;
-  }
-  .mobile-tip>span{font-size:17px!important;line-height:1.2!important;color:#2563eb!important}
-  .mobile-tip b{display:block!important;margin-bottom:3px!important;font-size:11px!important;font-weight:800!important}
-  .mobile-tip p{display:block!important;margin:0!important;color:#526784!important;font-size:10px!important;line-height:1.5!important}
-  .home-scroll-column .foot, #mainContent>.foot, .foot{
-    display:grid!important;grid-template-columns:1fr!important;gap:12px!important;
-    width:100%!important;margin:12px 0 0!important;padding:14px!important;
-    border:1px solid var(--micon-line)!important;border-radius:16px!important;
-    background:#fff!important;color:var(--micon-muted)!important;
-    box-shadow:0 3px 12px rgba(22,39,67,.035)!important;
-  }
-  .foot-section{display:block!important}
-  .foot-title{display:block!important;margin:0 0 5px!important;color:var(--micon-ink)!important;font-size:11px!important;font-weight:800!important}
-  .foot p, .foot li{color:var(--micon-muted)!important;font-size:9px!important;line-height:1.55!important}
-  .mobile-bottom-nav, .mobile-dock{display:none!important;visibility:hidden!important;pointer-events:none!important}
-  .mobile-profile-page{
-    display:none;position:fixed;inset:0;z-index:3000;background:#fff;color:#111827;
-    overflow-y:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
-  }
-  .mobile-profile-page.mobile-profile-page-open{display:block!important}
-  .mobile-profile-page .mobile-profile-page-header{display:flex;align-items:center;gap:14px;padding:4px 0 20px;border-bottom:1px solid var(--micon-line);margin-bottom:20px}
-  .mobile-profile-page .mobile-profile-back{width:42px;height:42px;border:1px solid var(--micon-line);border-radius:13px;background:#fff;color:var(--micon-ink);font-size:24px;line-height:1;cursor:pointer}
-  .mobile-profile-page .mobile-profile-page-title{font-size:20px;font-weight:800;color:var(--micon-ink)}
-  .mobile-profile-page #micon-profile-menu{display:block!important;position:static!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--micon-ink)!important}
-  .mobile-profile-page #micon-profile-detail{padding:18px!important;margin:0 0 18px!important;border:1px solid var(--micon-line)!important;border-radius:16px!important;background:#fff!important}
-  .mobile-profile-page #micon-profile-detail strong{font-size:17px!important;color:var(--micon-ink)!important}
-  .mobile-profile-page #micon-profile-detail small{font-size:13px!important;color:var(--micon-muted)!important}
-  .mobile-profile-page #micon-profile-logout{display:block!important;width:100%!important;padding:15px!important;border-radius:13px!important}
-  /* Semua efek interaksi tetap di dalam batas komponen. */
-  #importSection .filemeta:hover, #transposeSection .pitch-compact-row>*:hover, .mobile-clear-video:hover, #transposeSection .drop:hover, #transposeSection .keySelect:hover{
-    transform:none!important;outline:none!important;
-    box-shadow:inset 0 0 0 1px rgba(37,99,235,.10),0 2px 7px rgba(22,39,67,.05)!important;
-  }
-  #importSection .filemeta, #transposeSection .pitch-compact-row>*, .mobile-clear-video, #transposeSection .drop{
-    transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease!important;
-  }
-}
-@media screen and (max-width:360px){
-  .home-scroll-column{padding-left:10px!important;padding-right:10px!important}
-  #importSection, #transposeSection{padding:12px!important}
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:11px!important}
-  #transposeSection .pitch-compact-row>#downBtn, #transposeSection .pitch-compact-row>#upBtn{font-size:22px!important}
-}
-@media screen and (max-width:760px){
-  body:has(.home-layout) .top .desktop-nav{display:none!important}
-  body:has(.home-layout) .hero{display:none!important}
-}
-</style>
-<style id="micon-mobile-reference-layout">
-/* Mobile layout mengikuti referensi; seluruh aturan dibatasi ke layar ponsel. */
-@media screen and (max-width:760px){
-  html, body{background:#fff!important;color:#111827!important}
-  body{min-height:100dvh!important}
-  .wrap{padding:0 0 24px!important;background:#fff!important}
-  .top{
-    height:82px!important;min-height:82px!important;
-    padding:calc(10px + env(safe-area-inset-top)) 13px 10px!important;
-    gap:8px!important;background:#fff!important;border-bottom:1px solid #e5eaf2!important;
-    box-shadow:0 2px 8px rgba(15,23,42,.04)!important;
-  }
-  .top .brand{gap:7px!important}
-  .top .logo{width:40px!important;height:40px!important;flex-basis:40px!important;border-radius:13px!important;font-size:22px!important}
-  .top .brand h1{font-size:27px!important;font-weight:900!important;letter-spacing:-1px!important}
-  .top .brand-mic{color:#4c50d9!important}
-  .top .brand-on{color:#16a34a!important}
-  #micon-account-profile{margin-left:auto!important}
-  #micon-profile-trigger{width:42px!important;height:42px!important;max-width:42px!important;justify-content:center!important;border:1px solid #e2e8f0!important;padding:4px!important}
-  #micon-profile-avatar{width:32px!important;height:32px!important}
-  #mainContent{padding:0!important;margin:0!important;background:#fff!important}
-  #mainContent>.home-layout{
-    display:flex!important;flex-direction:column!important;gap:0!important;
-    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
-    margin:0!important;padding:0!important;background:#fff!important;overflow:visible!important;
-  }
-  #mainContent>.home-layout>.home-preview-column{
-    display:block!important;order:0!important;width:100%!important;height:auto!important;
-    min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;
-    background:#080b12!important;border:0!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #videoStage{
-    display:grid!important;position:relative!important;place-items:center!important;
-    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
-    aspect-ratio:1.55!important;margin:0!important;padding:0!important;overflow:hidden!important;
-    border:0!important;border-radius:0!important;background:#080b12!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #videoStage:empty:before{
-    content:"Video akan diputar disini"!important;position:absolute!important;inset:0!important;
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    color:#f3f4f6!important;background:#080b12!important;font-size:14px!important;font-weight:750!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #karaokeVideo{
-    width:100%!important;height:100%!important;aspect-ratio:1.55!important;object-fit:contain!important;
-    border:0!important;border-radius:0!important;background:#080b12!important;
-  }
-  #mainContent>.home-layout>.home-scroll-column{
-    display:flex!important;flex-direction:column!important;order:1!important;
-    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
-    margin:0!important;padding:0 15px 30px!important;gap:0!important;overflow:visible!important;
-    border:0!important;background:#fff!important;box-sizing:border-box!important;
-  }
-  #mainContent>.home-layout>.home-scroll-column>.grid, #mainContent>.home-layout>.home-scroll-column>.grid>.card, #mainContent>.home-layout>.home-scroll-column>.grid>#importSection, #mainContent>.home-layout>.home-scroll-column>.grid>#transposeSection{
-    display:contents!important;
-  }
-  #importSection h3, #importSection>.sub, #transposeSection h3, #transposeSection>.sub, #importSection .mobile-fill, #transposeSection .keySelectWrap, #transposeSection .stepper, #transposeSection .rangeLabels, #transposeSection .alert, #transposeSection .playrow, #transposeSection .hint{
-    display:none!important;
-  }
-  #importSection .filemeta{
-    order:1!important;display:flex!important;position:relative!important;
-    width:100%!important;height:66px!important;min-height:66px!important;margin:14px 0 12px!important;
-    padding:9px 12px!important;gap:10px!important;box-sizing:border-box!important;
-    border:1px solid #e1e8f2!important;border-radius:15px!important;background:#fbfcff!important;
-    box-shadow:0 2px 8px rgba(15,23,42,.035)!important;
-  }
-  #importSection .fileIcon{width:36px!important;height:36px!important;flex-basis:36px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important}
-  #importSection .filetext b{font-size:11px!important;color:#111827!important}
-  #importSection .filetext small{font-size:9px!important;color:#64748b!important}
-  #importSection .status{display:inline!important;margin-left:7px!important;font-size:9px!important;color:#94a3b8!important}
-  #transposeSection .drop{
-    order:2!important;display:flex!important;width:100%!important;height:60px!important;min-height:60px!important;
-    margin:0 0 13px!important;padding:7px 10px!important;box-sizing:border-box!important;
-    border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#2563eb!important;
-  }
-  #transposeSection .drop>div{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:9px!important}
-  #transposeSection .drop .uploadIcon{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;flex-basis:30px!important;margin:0!important;border-radius:10px!important;background:#eaf2ff!important;color:#2563eb!important;font-size:17px!important}
-  #transposeSection .drop strong{font-size:11px!important;color:#1d4ed8!important}
-  #transposeSection .drop small{display:inline!important;margin:0 0 0 2px!important;font-size:9px!important;color:#718096!important}
-  #transposeSection .pitch-compact-row{
-    order:3!important;display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:49px!important;gap:8px!important;width:100%!important;height:49px!important;
-    margin:0 0 15px!important;padding:0!important;
-  }
-  #transposeSection .pitch-compact-row>*{
-    display:flex!important;min-width:0!important;width:100%!important;height:49px!important;min-height:49px!important;
-    margin:0!important;padding:3px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;
-    border:1px solid #e1e8f2!important;border-radius:13px!important;background:#fff!important;
-    box-shadow:0 2px 7px rgba(15,23,42,.04)!important;
-  }
-  #transposeSection .pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:#eff6ff!important;border-color:#dbeafe!important}
-  #transposeSection .pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
-  #transposeSection .pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:1px!important;font-size:16px!important;font-weight:850!important}
-  #transposeSection .pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
-  #transposeSection .pitch-compact-row>#upBtn{grid-column:3!important;color:#ef233c!important;font-size:22px!important}
-  #transposeSection .pitch-compact-row>#downBtn{grid-column:4!important;color:#ef233c!important;font-size:22px!important}
-  #transposeSection .row{display:contents!important}
-  #transposeSection #clearBtn{
-    order:4!important;display:flex!important;align-items:center!important;justify-content:center!important;
-    width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 14px!important;padding:0 12px!important;
-    border:1px solid #e5eaf2!important;border-radius:13px!important;background:#f8fafc!important;
-    color:#9ca3af!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important;
-  }
-  #transposeSection #clearBtn:disabled{opacity:1!important}
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  .home-scroll-column .foot, #mainContent>.foot, .foot{display:none!important}
-  .home-scroll-column>.grid{gap:0!important}
-  .mobile-profile-page{z-index:3000!important}
-}
-@media screen and (max-width:360px){
-  #transposeSection .pitch-compact-row{gap:5px!important;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,.82fr))!important}
-  #transposeSection .pitch-compact-row>.noteBox .note{font-size:12px!important}
-}
-</style>
+
+
 <style id="micon-playlist-banner-single-rule">
 /* Banner playlist memenuhi lebar kotak playlist dengan tinggi tetap 65px. */
 @media screen and (max-width:760px){
@@ -752,7 +277,7 @@
 /* Logo header saja: proporsi asli dipertahankan pada desktop dan smartphone. */
 header.top .brand{display:flex!important;align-items:center!important;gap:0!important;min-width:0!important}
 header.top .brand .brand-logo{display:block!important;width:auto!important;height:42px!important;max-width:132px!important;max-height:42px!important;object-fit:contain!important;object-position:left center!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;flex:0 1 auto!important}
-@media(max-width:760px){header.top .brand .brand-logo{height:36px!important;max-height:36px!important;max-width:112px!important}}
+
 </style>
 
 <style id="micon-dock-profile-reference-style">
@@ -927,9 +452,85 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 }
 
 </style>
+<style id="micon-mobile-ui-single-style">
+/* Satu implementasi mobile untuk header, preview, kontrol nada, playlist, dan dock. */
+.mobile-header-download{display:none}
+@media screen and (max-width:760px){
+  :root{color-scheme:dark!important;--micon-bg:#06132d;--micon-video:#080b12;--micon-panel:#142b50;--micon-panel-line:#203b66;--micon-white:#f5f7ff;--micon-muted:#b8c8e2}
+  html,body{width:100%!important;min-width:0!important;min-height:100%!important;margin:0!important;padding:0!important;overflow-x:hidden!important;background:var(--micon-bg)!important;color:var(--micon-white)!important;color-scheme:dark!important}
+  body{overscroll-behavior-y:auto!important}
+  .wrap{display:block!important;width:100%!important;max-width:none!important;min-height:100dvh!important;height:auto!important;margin:0!important;padding:0 0 24px!important;overflow:visible!important;background:var(--micon-bg)!important}
+  #mainContent{display:block!important;width:100%!important;margin:0!important;padding:0!important;background:var(--micon-bg)!important}
+  #homeSection,.hero,.top .desktop-nav,.top .social-icons,#micon-account-profile{display:none!important}
+
+  /* Sticky header dan logo resmi. */
+  #micon-sticky-shell{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10000!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0 0 9px!important;overflow:hidden!important;box-sizing:border-box!important;isolation:isolate!important;background:var(--micon-bg)!important;border:0!important;box-shadow:0 5px 18px rgba(0,0,0,.22)!important}
+  #micon-sticky-shell>.top{display:flex!important;position:relative!important;inset:auto!important;z-index:auto!important;align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;width:100%!important;height:70px!important;min-height:70px!important;margin:0!important;padding:8px 12px!important;gap:8px!important;box-sizing:border-box!important;border:0!important;border-bottom:1px solid rgba(111,151,211,.12)!important;border-radius:0!important;background:linear-gradient(105deg,#07152f 0%,#0b1d3d 100%)!important;box-shadow:none!important;backdrop-filter:none!important}
+  #micon-sticky-shell>.top .brand{display:flex!important;align-items:center!important;flex:0 1 auto!important;min-width:0!important;margin:0!important;gap:0!important}
+  #micon-sticky-shell>.top .brand-logo{display:block!important;width:auto!important;height:36px!important;max-height:36px!important;max-width:min(112px,34vw)!important;object-fit:contain!important;object-position:left center!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+  #micon-sticky-shell>.top .mobile-header-download{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;gap:7px!important;height:48px!important;min-width:0!important;margin:0!important;padding:0 16px!important;border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#45d9ed 0%,#6879ff 100%)!important;color:#06132d!important;text-decoration:none!important;white-space:nowrap!important;font:800 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important;box-shadow:0 5px 16px rgba(57,125,255,.22)!important}
+  #micon-sticky-shell>.top .mobile-header-download span{font-size:17px!important;line-height:1!important}
+
+  /* Video 16:9, memenuhi lebar layar. */
+  #micon-sticky-shell>#videoStage{display:grid!important;position:relative!important;place-items:center!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:16/9!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:var(--micon-video)!important}
+  #micon-sticky-shell>#videoStage:empty:before{content:"Video akan diputar disini"!important;position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:14px!important;background:var(--micon-video)!important;color:var(--micon-white)!important;font:750 14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif!important;text-align:center!important;pointer-events:none!important}
+  #micon-sticky-shell>#videoStage>#karaokeVideo{display:block!important;width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9!important;object-fit:contain!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:var(--micon-video)!important}
+
+  /* Nada relatif, semitone, tombol turun, dan naik. */
+  #micon-sticky-shell>.pitch-compact-row{display:grid!important;grid-template-columns:minmax(0,1.15fr) repeat(3,minmax(0,.72fr))!important;grid-template-rows:44px!important;gap:10px!important;align-items:stretch!important;width:calc(100% - 32px)!important;height:44px!important;margin:16px 16px 0!important;padding:0!important;box-sizing:border-box!important}
+  #micon-sticky-shell>.pitch-compact-row>*{display:flex!important;position:relative!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:3px!important;align-items:center!important;justify-content:center!important;border:1px solid var(--micon-panel-line)!important;border-radius:0!important;background:var(--micon-panel)!important;color:var(--micon-white)!important;box-shadow:none!important;overflow:hidden!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:var(--micon-panel)!important;border-color:var(--micon-panel-line)!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox small,#micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc,#micon-sticky-shell>.pitch-compact-row>.semitone small{color:#d5e0f2!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#fff!important;font-weight:850!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox small{font-size:8px!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc{font-size:7px!important}
+  #micon-sticky-shell>.pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:2px!important;color:#fff!important;font-size:16px!important;font-weight:850!important}
+  #micon-sticky-shell>.pitch-compact-row>.semitone small{font-size:8px!important}
+  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-column:3!important}
+  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-column:4!important}
+  #micon-sticky-shell>.pitch-compact-row>#downBtn,#micon-sticky-shell>.pitch-compact-row>#upBtn{color:#fff!important;background:var(--micon-panel)!important;font-size:22px!important;font-weight:700!important}
+
+  /* Isi di bawah area sticky; tidak ada panel kosong dari grid lama. */
+  .micon-reference-stack{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;min-width:0!important;margin:0!important;padding:calc(56.25vw + 139px) 16px 96px!important;gap:0!important;box-sizing:border-box!important;background:var(--micon-bg)!important;color:var(--micon-white)!important}
+  .micon-reference-stack>.filemeta,.micon-reference-stack>#dropZone,.micon-reference-stack .mobile-fill,.micon-reference-stack .mobile-tip,.micon-reference-stack .mobile-ad-banner,.micon-reference-stack>.foot{display:none!important}
+  #mainContent>.home-layout{display:none!important}
+  .micon-reference-stack .mobile-playlist-panel{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--micon-white)!important;box-shadow:none!important}
+  .micon-reference-stack .mobile-playlist-panel>.mobile-playlist-import,.micon-reference-stack .mobile-playlist-panel>#clearBtn{display:flex!important;position:static!important;align-items:center!important;justify-content:center!important;order:initial!important;width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0 0 10px!important;padding:0 12px!important;border:0!important;border-radius:0!important;background:var(--micon-panel)!important;color:#fff!important;font:600 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important;box-shadow:none!important;opacity:1!important}
+  .micon-reference-stack .mobile-playlist-heading{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:102px!important;height:30px!important;min-height:30px!important;margin:4px 0 7px!important;padding:0 10px!important;border:0!important;border-radius:0!important;background:var(--micon-panel)!important;color:#fff!important;font:500 12px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important}
+  .micon-reference-stack .mobile-playlist-list{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;min-width:0!important;gap:8px!important;margin:0!important;padding:0!important;background:transparent!important;list-style:none!important}
+  .micon-reference-stack .mobile-playlist-item{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;margin:0!important;padding:6px 10px!important;border:0!important;border-radius:0!important;background:var(--micon-panel)!important;color:#f5f7ff!important;text-align:left!important;box-shadow:none!important}
+  .micon-reference-stack .mobile-playlist-item.active{background:#1a355f!important}
+  .micon-reference-stack .mobile-playlist-icon{display:grid!important;place-items:center!important;flex:0 0 28px!important;width:28px!important;height:28px!important;border-radius:8px!important;background:#203b66!important;color:#dceaff!important;font-size:16px!important}
+  .micon-reference-stack .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
+  .micon-reference-stack .mobile-playlist-copy strong{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#fff!important;font-size:10px!important;line-height:1.4!important;font-weight:800!important}
+  .micon-reference-stack .mobile-playlist-copy small{display:block!important;margin-top:2px!important;color:#a9c5ef!important;font-size:8px!important;line-height:1.3!important}
+  .micon-reference-stack .mobile-playlist-empty{display:block!important;box-sizing:border-box!important;width:100%!important;height:103px!important;min-height:103px!important;margin:0!important;padding:0!important;overflow:hidden!important;color:transparent!important;font-size:0!important;background:repeating-linear-gradient(to bottom,#142b50 0,#142b50 29px,transparent 29px,transparent 37px)!important}
+  .micon-reference-stack .mobile-playlist-picker{display:none!important}
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner{display:block!important;position:relative!important;box-sizing:border-box!important;width:100%!important;height:65px!important;min-height:65px!important;max-height:65px!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:var(--micon-panel)!important;contain:strict!important;isolation:isolate!important}
+  .micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner>a,.micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner img,.micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner video,.micon-reference-stack .mobile-playlist-list>.mobile-playlist-ad-banner iframe{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:fill!important;object-position:center!important;margin:0!important;padding:0!important;border:0!important;border-radius:inherit!important}
+
+  /* Dock tunggal lima kolom dengan warna navy seperti referensi. */
+  body>#micon-floating-dock{position:fixed!important;z-index:25000!important;left:24px!important;right:24px!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;display:grid!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;gap:0!important;min-height:62px!important;margin:0!important;padding:10px 5px!important;border:1px solid #203a63!important;border-radius:0!important;background:rgba(13,32,64,.97)!important;color:#e5edfb!important;box-shadow:0 8px 24px rgba(0,0,0,.28)!important;backdrop-filter:blur(14px)!important}
+  body>#micon-floating-dock .micon-dock-action{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;width:100%!important;min-width:0!important;min-height:40px!important;margin:0!important;padding:2px 3px!important;border:0!important;border-right:1px solid #29436a!important;border-radius:0!important;background:transparent!important;color:#e5edfb!important;font:500 9px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif!important;cursor:pointer!important;pointer-events:auto!important;-webkit-tap-highlight-color:transparent!important}
+  body>#micon-floating-dock .micon-dock-action:last-child{border-right:0!important}
+  body>#micon-floating-dock .micon-dock-action.active{background:rgba(69,217,237,.08)!important;color:#fff!important}
+  body>#micon-floating-dock .micon-dock-action:active{transform:scale(.96)!important}
+  body>#micon-floating-dock .micon-dock-icon{display:grid!important;place-items:center!important;width:25px!important;height:24px!important;border-radius:0!important;background:transparent!important;color:#e2ecff!important}
+  body>#micon-floating-dock .micon-dock-icon svg{display:block!important;width:19px!important;height:19px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+
+  /* Elemen utilitas lama tetap tersembunyi, tanpa menghapus mesin kontrolnya. */
+  #importSection>h3,#importSection>.sub,#transposeSection>h3,#transposeSection>.sub,#transposeSection .keySelectWrap,#transposeSection .stepper,#transposeSection .rangeLabels,#transposeSection .alert,#transposeSection .playrow,#transposeSection .hint,.mobile-bottom-nav,.mobile-dock{display:none!important}
+}
+@media screen and (max-width:360px){
+  .micon-reference-stack{padding-left:12px!important;padding-right:12px!important}
+  #micon-sticky-shell>.top .mobile-header-download{height:44px!important;padding:0 12px!important;font-size:12px!important}
+  #micon-sticky-shell>.pitch-compact-row{gap:6px!important;width:calc(100% - 24px)!important;margin-left:12px!important;margin-right:12px!important}
+}
+@media screen and (min-width:761px){.mobile-header-download,#micon-sticky-shell,body>#micon-floating-dock{display:none!important}}
+</style>
 </head>
 <body><main class="wrap">
-<header class="top"><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MiCon"></div><a class="mobile-header-download app-download-link" href="#appDownloadSection" aria-label="Download aplikasi MicOn">Download miCon <span aria-hidden="true">↗</span></a><nav class="desktop-nav" aria-label="Navigasi utama"><span class="nav-link" data-page="homePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>Home</span><span class="nav-link" data-page="karaokePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>Karaoke</span><span class="nav-link" data-page="youtubePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Video YouTube</span><span class="nav-link" data-page="packagePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"/></svg></span>Perpanjang Paket</span><a class="nav-link app-download-link" href="https://www.mediafire.com/file/xckca3h7zr0afof/micon.apk/file" target="_blank" rel="noopener noreferrer" aria-label="Download Aplikasi MicOn"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Aplikasi MicOn</a><span class="social-icons" aria-label="Media sosial"><span class="social-icon whatsapp" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.4 9.8c-.4-.8-.8-.8-1.2-.8h-1c-.4 0-.9.2-1.4.7s-1.8 1.8-1.8 4.3 1.9 5 2.2 5.4c.3.3 3.7 5.9 9.1 7.4 4.5 1.3 5.4 1 6.4.9 1-.1 3.2-1.3 3.7-2.6.5-1.3.5-2.4.3-2.6-.2-.2-.5-.3-1.1-.6s-3.2-1.6-3.7-1.8c-.5-.2-.9-.3-1.2.3-.4.5-1.4 1.8-1.7 2.2-.3.4-.6.4-1.1.1-.5-.3-2.3-.9-4.3-2.7-1.6-1.4-2.7-3.1-3-3.6-.3-.5 0-.8.2-1.1.2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9-.1-.3-1.1-2.8-1.5-3.8Z" fill="currentColor" transform="translate(1 0) scale(.82)"/></svg></span><span class="social-icon tiktok" title="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 6.7a5.1 5.1 0 0 1-3.9-4.6V1.5h-3.8v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.1a7 7 0 1 0 5.8 6.9V8.4a8.7 8.7 0 0 0 4.9 1.5V6.8c-.3 0-.7 0-1-.1Z" fill="currentColor"/></svg></span><span class="social-icon facebook" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.47h-2.8v8.38C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/></svg></span></span></nav><div class="pill">IMPORT VIDEO · LOKAL</div>
+<header class="top"><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MiCon"></div><a class="mobile-header-download" href="https://www.mediafire.com/file/xckca3h7zr0afof/micon.apk/file" target="_blank" rel="noopener noreferrer" aria-label="Download aplikasi MicOn">Download miCon <span aria-hidden="true">↗</span></a><nav class="desktop-nav" aria-label="Navigasi utama"><span class="nav-link" data-page="homePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>Home</span><span class="nav-link" data-page="karaokePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>Karaoke</span><span class="nav-link" data-page="youtubePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Download Video YouTube</span><span class="nav-link" data-page="packagePage"><span class="nav-ico"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"/></svg></span>Perpanjang Paket</span><a class="nav-link app-download-link" href="https://www.mediafire.com/file/xckca3h7zr0afof/micon.apk/file" target="_blank" rel="noopener noreferrer" aria-label="Download Aplikasi MicOn"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>Aplikasi MicOn</a><span class="social-icons" aria-label="Media sosial"><span class="social-icon whatsapp" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.4 9.8c-.4-.8-.8-.8-1.2-.8h-1c-.4 0-.9.2-1.4.7s-1.8 1.8-1.8 4.3 1.9 5 2.2 5.4c.3.3 3.7 5.9 9.1 7.4 4.5 1.3 5.4 1 6.4.9 1-.1 3.2-1.3 3.7-2.6.5-1.3.5-2.4.3-2.6-.2-.2-.5-.3-1.1-.6s-3.2-1.6-3.7-1.8c-.5-.2-.9-.3-1.2.3-.4.5-1.4 1.8-1.7 2.2-.3.4-.6.4-1.1.1-.5-.3-2.3-.9-4.3-2.7-1.6-1.4-2.7-3.1-3-3.6-.3-.5 0-.8.2-1.1.2-.2.5-.6.8-.9.3-.3.4-.5.5-.8.2-.3.1-.6 0-.9-.1-.3-1.1-2.8-1.5-3.8Z" fill="currentColor" transform="translate(1 0) scale(.82)"/></svg></span><span class="social-icon tiktok" title="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 6.7a5.1 5.1 0 0 1-3.9-4.6V1.5h-3.8v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.1a7 7 0 1 0 5.8 6.9V8.4a8.7 8.7 0 0 0 4.9 1.5V6.8c-.3 0-.7 0-1-.1Z" fill="currentColor"/></svg></span><span class="social-icon facebook" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.47h-2.8v8.38C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/></svg></span></span></nav><div class="pill">IMPORT VIDEO · LOKAL</div>
 <div id="micon-account-profile">
   <button id="micon-profile-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Profil akun">
     <span id="micon-profile-avatar">M</span><span id="micon-profile-name">Akun</span><span id="micon-profile-chevron">▾</span>
@@ -1065,27 +666,197 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 </nav>
 <div class="more-sheet" id="moreSheet" aria-hidden="true"><button type="button" class="sheet-close" id="closeMore">Tutup ✕</button><button type="button" class="sheet-link" id="settingsShortcut">⚙️ Pengaturan Supabase</button><div class="sheet-note">Transpose Karaoke<br><small>Import musik · Atur nada · Putar karaoke</small></div></div>
 
-<script>
-/* Struktur tunggal Beranda mobile: preview kiri terpisah dari scroll kanan. */
+<script id="micon-mobile-ui-single-controller">
+/* Pengendali tunggal antarmuka mobile MicOn.
+   Tahap awal menyiapkan .home-layout sebelum engine playlist berjalan.
+   Tahap akhir memindahkan header, video, kontrol, playlist, profil, dan dock satu kali.
+   Tidak menyentuh mesin audio, transpose, sinkronisasi, autentikasi, maupun data playlist. */
 (function(){
-  if(!window.matchMedia('(max-width:760px)').matches) return;
+  'use strict';
+  const mobileQuery=window.matchMedia('(max-width:760px)');
+  if(!mobileQuery.matches)return;
+
   const main=document.getElementById('mainContent');
-  const grid=main&&main.querySelector('.grid');
+  const grid=main&&main.querySelector(':scope > .grid');
   const importSection=document.getElementById('importSection');
   const transpose=document.getElementById('transposeSection');
   const videoStage=document.getElementById('videoStage');
+  const footer=main&&main.querySelector(':scope > .foot');
   const mobileFill=importSection&&importSection.querySelector('.mobile-fill');
-  const footer=main&&main.querySelector('.foot');
-  if(!main||!grid||!importSection||!transpose||!videoStage||!footer) return;
-  const layout=document.createElement('div'); layout.className='home-layout';
-  const preview=document.createElement('section'); preview.className='home-preview-column'; preview.setAttribute('aria-label','Preview video');
-  const scroll=document.createElement('section'); scroll.className='home-scroll-column'; scroll.setAttribute('aria-label','Kontrol nada dan informasi');
-  main.insertBefore(layout,grid);
-  layout.append(preview,scroll);
-  preview.appendChild(videoStage);
-  scroll.appendChild(grid);
-  if(mobileFill) scroll.appendChild(mobileFill);
-  scroll.appendChild(footer);
+
+  /* Wadah layout dibuat lebih dahulu karena engine playlist mengambil scroll-column. */
+  if(main&&grid&&importSection&&transpose&&videoStage&&footer&&!main.querySelector(':scope > .home-layout')){
+    const layout=document.createElement('div');layout.className='home-layout';
+    const preview=document.createElement('section');preview.className='home-preview-column';
+    preview.setAttribute('aria-label','Preview video');
+    const scroll=document.createElement('section');scroll.className='home-scroll-column';
+    scroll.setAttribute('aria-label','Kontrol nada dan playlist');
+    main.insertBefore(layout,grid);
+    layout.append(preview,scroll);
+    preview.appendChild(videoStage);
+    scroll.appendChild(grid);
+    if(mobileFill)scroll.appendChild(mobileFill);
+    scroll.appendChild(footer);
+  }
+
+  function createProfilePage(){
+    const profile=document.querySelector('.profile-dock');
+    const profileMenu=document.getElementById('micon-profile-menu');
+    const profileTrigger=document.getElementById('micon-profile-trigger');
+    if(!profile||!profileMenu||document.querySelector('.mobile-profile-page'))return;
+
+    const page=document.createElement('section');
+    page.className='mobile-profile-page';
+    page.setAttribute('aria-label','Halaman profil');
+    page.innerHTML='<div class="mdp-brand"><img src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MicOn"></div><div class="mdp-user"><div class="mdp-avatar" id="mdp-avatar">M</div><div class="mdp-name" id="mdp-name">Akun MicOn</div></div><div class="mdp-options"><div class="mdp-row mdp-mode-row"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h9M17 18h3"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg></span><span>Mode Tampilan</span><div class="mdp-theme"><button type="button" data-micon-theme="light" class="selected">Light</button><button type="button" data-micon-theme="night">Night</button></div></div><button type="button" class="mdp-row" data-micon-info="Panduan MicOn"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 5.5V22M8 7h8M8 11h8"/></svg></span><span>Panduan MicOn</span></button><button type="button" class="mdp-row" data-micon-info="Kebijakan Privasi"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Kebijakan Privasi</span></button><button type="button" class="mdp-row" data-micon-info="Chat Admin Micon"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg></span><span>Chat Admin Micon</span></button><div class="mdp-logout-slot"></div></div><button type="button" class="mobile-profile-back" aria-label="Kembali">‹</button>';
+    document.body.appendChild(page);
+
+    const logout=profileMenu.querySelector('#micon-profile-logout');
+    if(logout){
+      logout.className='mdp-row mdp-logout';
+      logout.innerHTML='<span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></span><span>Log Out</span>';
+      page.querySelector('.mdp-logout-slot').appendChild(logout);
+    }
+    profileMenu.classList.remove('open','mobile-profile-open');
+    const syncIdentity=()=>{
+      const full=document.getElementById('micon-profile-fullname');
+      const avatar=document.getElementById('micon-profile-avatar');
+      const name=(full&&full.textContent.trim())||'Akun MicOn';
+      const target=page.querySelector('#mdp-name');
+      const face=page.querySelector('#mdp-avatar');
+      if(target)target.textContent=name;
+      if(face){const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part.charAt(0).toUpperCase()).join('');face.textContent=initials||(avatar?avatar.textContent:'M');}
+    };
+    syncIdentity();
+    page.querySelectorAll('[data-micon-theme]').forEach(button=>button.addEventListener('click',()=>{
+      const night=button.dataset.miconTheme==='night';
+      page.classList.toggle('mdp-night',night);
+      page.querySelectorAll('[data-micon-theme]').forEach(item=>item.classList.toggle('selected',item===button));
+    }));
+    page.querySelectorAll('[data-micon-info]').forEach(button=>button.addEventListener('click',()=>alert(button.dataset.miconInfo+' belum dihubungkan.')));
+    const close=()=>{
+      page.classList.remove('mobile-profile-page-open');
+      profile.setAttribute('aria-expanded','false');
+      if(profileTrigger)profileTrigger.setAttribute('aria-expanded','false');
+    };
+    window.MicOnCloseDockProfile=close;
+    profile.addEventListener('click',event=>{
+      syncIdentity();event.preventDefault();event.stopPropagation();
+      page.classList.add('mobile-profile-page-open');
+      profile.setAttribute('aria-expanded','true');
+      if(profileTrigger)profileTrigger.setAttribute('aria-expanded','true');
+    });
+    page.querySelector('.mobile-profile-back').addEventListener('click',close);
+  }
+
+  function createDock(main,pitch){
+    let dock=document.getElementById('micon-floating-dock');
+    if(dock)return dock;
+    dock=document.createElement('nav');
+    dock.id='micon-floating-dock';
+    dock.setAttribute('aria-label','Menu utama');
+    dock.innerHTML='<button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button><button type="button" class="micon-dock-action" data-action="app"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 7h6M10 17h4"/></svg></span><span>App</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
+    document.body.appendChild(dock);
+    dock.addEventListener('click',event=>{
+      const button=event.target.closest('[data-action]');
+      if(!button)return;
+      const action=button.dataset.action;
+      if(action!=='profile'&&typeof window.MicOnCloseDockProfile==='function')window.MicOnCloseDockProfile();
+      const youtube=document.getElementById('youtubeSection');
+      const shell=document.getElementById('micon-sticky-shell');
+      if(action==='transpose'||action==='upload'){
+        if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
+        if(shell)shell.style.removeProperty('display');
+        main.classList.remove('hidden');main.style.removeProperty('display');
+        if(action==='transpose'&&pitch)pitch.scrollIntoView({behavior:'smooth',block:'start'});
+      }else if(action==='download'){
+        main.classList.add('hidden');main.style.setProperty('display','none','important');
+        if(shell)shell.style.setProperty('display','none','important');
+        if(youtube){youtube.classList.add('active');youtube.style.setProperty('display','block','important');}
+        window.scrollTo({top:0,behavior:'smooth'});
+      }else if(action==='app'){
+        if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
+        if(shell)shell.style.removeProperty('display');
+        if(typeof window.MicOnShowAppDownload==='function')window.MicOnShowAppDownload();
+      }else if(action==='profile'){
+        if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
+        if(shell)shell.style.removeProperty('display');
+        main.classList.remove('hidden');main.style.removeProperty('display');
+        const profileButton=document.querySelector('.profile-dock');
+        if(profileButton)profileButton.click();
+      }
+      dock.querySelectorAll('.micon-dock-action').forEach(item=>item.classList.toggle('active',item===button));
+    });
+    return dock;
+  }
+
+  function finishMobileUI(){
+    if(!mobileQuery.matches)return;
+    const wrap=document.querySelector('body > .wrap');
+    const header=wrap&&wrap.querySelector(':scope > .top');
+    const main=document.getElementById('mainContent');
+    const layout=main&&main.querySelector(':scope > .home-layout');
+    const preview=layout&&layout.querySelector(':scope > .home-preview-column');
+    const scroll=layout&&layout.querySelector(':scope > .home-scroll-column');
+    const grid=scroll&&scroll.querySelector(':scope > .grid');
+    const importSection=document.getElementById('importSection');
+    const transpose=document.getElementById('transposeSection');
+    const video=document.getElementById('videoStage');
+    const file=importSection&&importSection.querySelector('.filemeta');
+    const drop=document.getElementById('dropZone');
+    if(!wrap||!header||!main||!layout||!preview||!scroll||!grid||!importSection||!transpose||!video||!file||!drop){
+      console.error('MicOn mobile UI: struktur utama belum lengkap.');return;
+    }
+
+    /* Buat baris pitch compact tepat satu kali. */
+    let pitch=transpose.querySelector('.pitch-compact-row');
+    if(!pitch){
+      const note=transpose.querySelector('.noteBox');
+      const semi=transpose.querySelector('.semitone');
+      const up=transpose.querySelector('#upBtn');
+      const down=transpose.querySelector('#downBtn');
+      if(!note||!semi||!up||!down){console.error('MicOn mobile UI: kontrol nada tidak lengkap.');return;}
+      pitch=document.createElement('div');pitch.className='pitch-compact-row';
+      const keyWrap=transpose.querySelector('.keySelectWrap');
+      transpose.insertBefore(pitch,keyWrap||note);
+      pitch.append(note,semi,up,down);
+    }
+
+    const fileIcon=importSection.querySelector('.fileIcon');
+    if(fileIcon){fileIcon.textContent='♫';fileIcon.setAttribute('aria-label','Ikon musik');}
+    const footer=scroll.querySelector('.foot');
+    if(footer){
+      if(!footer.parentNode.querySelector(':scope > .mobile-ad-banner')){
+        const banner=document.createElement('div');banner.className='mobile-ad-banner';
+        banner.textContent='Banner Iklan GIF, JPG, PNG (dikontrol dari Superadmin)';
+        footer.parentNode.insertBefore(banner,footer);
+      }
+      const titles=footer.querySelectorAll('.foot-title');
+      if(titles[0])titles[0].textContent='Tentang';
+      if(titles[1])titles[1].textContent='Panduan';
+    }
+
+    const panel=scroll.querySelector('.mobile-playlist-panel');
+    const clear=document.getElementById('clearBtn');
+    if(!panel||!clear){console.error('MicOn mobile UI: panel playlist belum tersedia.');return;}
+    let stack=main.querySelector(':scope > .micon-reference-stack');
+    if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
+    stack.append(file,drop,panel);
+    const addPlaylist=panel.querySelector('.mobile-playlist-import');
+    if(addPlaylist){
+      clear.textContent='Hapus Video';
+      addPlaylist.insertAdjacentElement('beforebegin',clear);
+    }
+
+    let shell=document.getElementById('micon-sticky-shell');
+    if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
+    shell.append(header,video,pitch);
+    createDock(main,pitch);
+    createProfilePage();
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',finishMobileUI,{once:true});
+  else finishMobileUI();
 })();
 </script>
 <script>
@@ -1909,61 +1680,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
   showHome();
 })();
 </script>
-<script id="mobile-reference-layout">
-(function(){
- if(!window.matchMedia('(max-width:760px)').matches)return;
- const trans=document.getElementById('transposeSection');
- const note=trans&&trans.querySelector('.noteBox');
- const semi=trans&&trans.querySelector('.semitone');
- const stepper=trans&&trans.querySelector('.stepper');
- if(trans&&note&&semi&&stepper){
-   const compact=document.createElement('div');compact.className='pitch-compact-row';
-   trans.insertBefore(compact,trans.querySelector('.keySelectWrap'));
-   compact.append(note,semi);
-   compact.append(trans.querySelector('#upBtn'),trans.querySelector('#downBtn'));
- }
- const fileIcon=document.querySelector('#importSection .fileIcon');
- if(fileIcon){fileIcon.textContent='♫';fileIcon.setAttribute('aria-label','Ikon musik');}
- const banner=document.createElement('div');banner.className='mobile-ad-banner';banner.textContent='Banner Iklan Gif , Jpg, png (dikontrol dari superadmin)';
- const footer=document.querySelector('.home-scroll-column .foot');
- if(footer){footer.parentNode.insertBefore(banner,footer);const titles=footer.querySelectorAll('.foot-title');if(titles[0])titles[0].textContent='Tentang';if(titles[1])titles[1].textContent='Panduan';}
- const upload=document.querySelector('[data-upload-video]');
- if(upload)upload.addEventListener('click',()=>document.getElementById('videoFile')?.click());
- const profile=document.querySelector('.profile-dock');
- const profileMenu=document.getElementById('micon-profile-menu');
- const profileTrigger=document.getElementById('micon-profile-trigger');
- if(profile&&profileMenu){
-   const profilePage=document.createElement('section');
-   profilePage.className='mobile-profile-page';
-   profilePage.setAttribute('aria-label','Halaman profil');
-   profilePage.innerHTML='<div class="mdp-brand"><img src="https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/micon%20logo.png" alt="MicOn"></div><div class="mdp-user"><div class="mdp-avatar" id="mdp-avatar">M</div><div class="mdp-name" id="mdp-name">Akun MicOn</div></div><div class="mdp-options"><div class="mdp-row mdp-mode-row"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h9M17 18h3"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg></span><span>Mode Tampilan</span><div class="mdp-theme"><button type="button" data-micon-theme="light" class="selected">Light</button><button type="button" data-micon-theme="night">Night</button></div></div><button type="button" class="mdp-row" data-micon-info="Panduan MicOn"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 5.5V22M8 7h8M8 11h8"/></svg></span><span>Panduan MicOn</span></button><button type="button" class="mdp-row" data-micon-info="Kebijakan Privasi"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Kebijakan Privasi</span></button><button type="button" class="mdp-row" data-micon-info="Chat Admin Micon"><span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg></span><span>Chat Admin Micon</span></button><div class="mdp-logout-slot"></div></div><button type="button" class="mobile-profile-back" aria-label="Kembali">‹</button>';
-   document.body.appendChild(profilePage);
-   const logoutButton=profileMenu.querySelector('#micon-profile-logout');
-   if(logoutButton){logoutButton.className='mdp-row mdp-logout';logoutButton.innerHTML='<span class="mdp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></span><span>Log Out</span>';profilePage.querySelector('.mdp-logout-slot').appendChild(logoutButton);}
-   profileMenu.classList.remove('open','mobile-profile-open');
-   const syncProfileIdentity=()=>{const full=document.getElementById('micon-profile-fullname');const avatar=document.getElementById('micon-profile-avatar');const name=(full&&full.textContent.trim())||'Akun MicOn';const target=profilePage.querySelector('#mdp-name');const face=profilePage.querySelector('#mdp-avatar');if(target)target.textContent=name;if(face){const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part.charAt(0).toUpperCase()).join('');face.textContent=initials||(avatar?avatar.textContent:'M');}};
-   syncProfileIdentity();
-   profilePage.querySelectorAll('[data-micon-theme]').forEach(button=>button.addEventListener('click',()=>{const night=button.dataset.miconTheme==='night';profilePage.classList.toggle('mdp-night',night);profilePage.querySelectorAll('[data-micon-theme]').forEach(item=>item.classList.toggle('selected',item===button));}));
-   profilePage.querySelectorAll('[data-micon-info]').forEach(button=>button.addEventListener('click',()=>{const label=button.dataset.miconInfo;alert(label+' belum dihubungkan.');}));
-   const back=profilePage.querySelector('.mobile-profile-back');
-   const closeProfilePage=()=>{
-     profilePage.classList.remove('mobile-profile-page-open');
-     profile.setAttribute('aria-expanded','false');
-     if(profileTrigger)profileTrigger.setAttribute('aria-expanded','false');
-   };
-   window.MicOnCloseDockProfile=closeProfilePage;
-   profile.addEventListener('click',event=>{
-     syncProfileIdentity();
-     event.preventDefault();
-     event.stopPropagation();
-     profilePage.classList.add('mobile-profile-page-open');
-     profile.setAttribute('aria-expanded','true');
-     if(profileTrigger)profileTrigger.setAttribute('aria-expanded','true');
-   });
-   back.addEventListener('click',closeProfilePage);
- }
-})();
-</script>
+
 
 <style id="micon-subscription-gate-style">
 #micon-subscription-gate{
@@ -3179,152 +2896,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       frame.setAttribute('scrolling','no');
       frame.setAttribute('aria-label',name);
       frame.style.cssText='display:block;width:100%;height:65px;min-height:65px;max-height:65px;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
-      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'
-<style id="micon-mobile-reference-redesign-final">
-/* Redesign mobile berdasarkan foto referensi. Semua aturan dibatasi max-width 760px. */
-.mobile-header-download{display:none!important}
-@media screen and (max-width:760px){
- html,body{background:#06132d!important;color:#f5f7ff!important;color-scheme:dark!important}
- body,.wrap,#mainContent{background:#06132d!important;color:#f5f7ff!important}
- .wrap{padding:0 0 18px!important}
- #micon-sticky-shell{
-   display:flex!important;flex-direction:column!important;width:100%!important;
-   margin:0!important;padding:0!important;background:#06132d!important;
- }
- #micon-sticky-shell>header.top{
-   order:0!important;position:relative!important;top:auto!important;
-   display:flex!important;align-items:center!important;justify-content:space-between!important;
-   width:100%!important;height:70px!important;min-height:70px!important;
-   margin:0!important;padding:8px 12px!important;gap:10px!important;
-   background:linear-gradient(105deg,#07152f,#0d2044)!important;
-   border:0!important;border-bottom:1px solid #1a2b4c!important;
-   box-shadow:0 4px 14px rgba(0,0,0,.2)!important;
- }
- #micon-sticky-shell>header.top .brand{display:flex!important;align-items:center!important;min-width:0!important;margin:0!important}
- #micon-sticky-shell>header.top .brand-logo{
-   display:block!important;width:auto!important;height:36px!important;max-width:112px!important;
-   max-height:36px!important;object-fit:contain!important;object-position:left center!important;
- }
- #micon-sticky-shell>header.top .mobile-header-download{
-   display:inline-flex!important;align-items:center!important;justify-content:center!important;
-   gap:7px!important;flex:none!important;height:48px!important;padding:0 16px!important;
-   border:0!important;border-radius:14px!important;
-   background:linear-gradient(110deg,#43d9ed,#6977ff)!important;
-   color:#06132d!important;text-decoration:none!important;
-   font:800 13px/1 system-ui,sans-serif!important;white-space:nowrap!important;
-   box-shadow:0 4px 14px rgba(60,125,255,.22)!important;
- }
- #micon-sticky-shell>header.top .mobile-header-download span{font-size:17px!important}
- #micon-sticky-shell>header.top #micon-account-profile{display:none!important}
- #micon-sticky-shell>#videoStage{
-   order:1!important;display:grid!important;position:relative!important;place-items:center!important;
-   width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
-   aspect-ratio:1.77!important;margin:0!important;padding:0!important;overflow:hidden!important;
-   border:0!important;border-radius:0!important;background:#080b12!important;
- }
- #micon-sticky-shell>#videoStage:empty:before{
-   content:"Video akan diputar disini"!important;position:absolute!important;inset:0!important;
-   display:flex!important;align-items:center!important;justify-content:center!important;
-   background:#080b12!important;color:#f2f5fb!important;
-   font:750 14px/1.4 system-ui,sans-serif!important;text-align:center!important;
- }
- #micon-sticky-shell>#videoStage #karaokeVideo{
-   display:block!important;width:100%!important;height:100%!important;max-height:none!important;
-   aspect-ratio:1.77!important;object-fit:contain!important;background:#080b12!important;
-   border:0!important;border-radius:0!important;
- }
- #micon-sticky-shell>.pitch-compact-row{
-   order:2!important;display:grid!important;
-   grid-template-columns:minmax(0,1.05fr) repeat(3,minmax(0,.62fr))!important;
-   grid-template-rows:44px!important;gap:11px!important;
-   width:100%!important;height:61px!important;margin:0!important;padding:16px 16px 0!important;
-   box-sizing:border-box!important;background:#06132d!important;
- }
- #micon-sticky-shell>.pitch-compact-row>*{
-   display:flex!important;align-items:center!important;justify-content:center!important;
-   width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;
-   margin:0!important;padding:3px!important;border:0!important;border-radius:0!important;
-   background:#142b50!important;color:#fff!important;box-shadow:none!important;
- }
- #micon-sticky-shell>.pitch-compact-row>.noteBox{grid-column:1!important;background:#142b50!important}
- #micon-sticky-shell>.pitch-compact-row>.noteBox small,
- #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc,
- #micon-sticky-shell>.pitch-compact-row>.semitone small{color:#d7e2f4!important}
- #micon-sticky-shell>.pitch-compact-row>.noteBox .note,
- #micon-sticky-shell>.pitch-compact-row>.semitone{color:#fff!important}
- #micon-sticky-shell>.pitch-compact-row>#downBtn,
- #micon-sticky-shell>.pitch-compact-row>#upBtn{
-   color:#fff!important;background:#142b50!important;font-size:22px!important;
- }
- .micon-reference-stack{
-   display:flex!important;flex-direction:column!important;align-items:stretch!important;
-   width:100%!important;margin:0!important;padding:10px 16px 92px!important;gap:0!important;
-   background:#06132d!important;box-sizing:border-box!important;
- }
- .micon-reference-stack>.filemeta,.micon-reference-stack>#dropZone,
- .micon-reference-stack .mobile-fill,.micon-reference-stack .mobile-tip,
- .micon-reference-stack .mobile-ad-banner,.micon-reference-stack .foot{display:none!important}
- .micon-reference-stack .mobile-playlist-panel{
-   display:flex!important;flex-direction:column!important;gap:0!important;
-   width:100%!important;margin:0!important;padding:0!important;
-   background:#06132d!important;color:#fff!important;
- }
- .micon-reference-stack .mobile-playlist-import{
-   order:2!important;display:flex!important;align-items:center!important;justify-content:center!important;
-   width:100%!important;height:44px!important;min-height:44px!important;margin:10px 0 11px!important;
-   padding:0 12px!important;border:0!important;border-radius:0!important;
-   background:#142b50!important;color:#fff!important;font-size:13px!important;font-weight:500!important;
-   box-shadow:none!important;
- }
- .micon-reference-stack #clearBtn{
-   order:1!important;display:flex!important;align-items:center!important;justify-content:center!important;
-   width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 10px!important;
-   padding:0 12px!important;border:0!important;border-radius:0!important;
-   background:#142b50!important;color:#fff!important;font-size:13px!important;font-weight:500!important;
-   box-shadow:none!important;opacity:1!important;
- }
- .micon-reference-stack #clearBtn:disabled{background:#142b50!important;color:#fff!important;opacity:1!important}
- .micon-reference-stack .mobile-playlist-heading{
-   order:3!important;display:flex!important;align-items:center!important;justify-content:center!important;
-   width:102px!important;height:30px!important;min-height:30px!important;margin:3px 0 7px!important;
-   padding:0 10px!important;border:0!important;border-radius:0!important;
-   background:#142b50!important;color:#fff!important;font-size:12px!important;font-weight:500!important;
- }
- .micon-reference-stack .mobile-playlist-list{
-   order:4!important;display:flex!important;flex-direction:column!important;gap:8px!important;
-   width:100%!important;margin:0!important;padding:0!important;background:#06132d!important;
- }
- .micon-reference-stack .mobile-playlist-item,
- .micon-reference-stack .mobile-playlist-empty{
-   display:flex!important;align-items:center!important;width:100%!important;height:42px!important;
-   min-height:42px!important;margin:0!important;padding:7px 10px!important;
-   border:0!important;border-radius:0!important;background:#142b50!important;color:#fff!important;
-   box-shadow:none!important;
- }
- .micon-reference-stack .mobile-playlist-item.active{background:#1a355f!important}
- .micon-reference-stack .mobile-playlist-copy strong{color:#fff!important}
- .micon-reference-stack .mobile-playlist-copy small{color:#b9c9e2!important}
- #micon-floating-dock{
-   position:fixed!important;z-index:6000!important;left:24px!important;right:24px!important;
-   bottom:calc(16px + env(safe-area-inset-bottom))!important;
-   display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
-   gap:0!important;min-height:62px!important;padding:8px 5px!important;
-   border:0!important;border-radius:0!important;background:#10264a!important;
-   box-shadow:0 8px 24px rgba(0,0,0,.3)!important;backdrop-filter:none!important;
- }
- #micon-floating-dock .micon-dock-action{
-   display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
-   gap:4px!important;height:44px!important;min-width:0!important;padding:2px!important;
-   border:0!important;border-right:1px solid #29436a!important;border-radius:0!important;
-   background:transparent!important;color:#e5edfb!important;font:500 9px/1.15 system-ui,sans-serif!important;
- }
- #micon-floating-dock .micon-dock-action:last-child{border-right:0!important}
- #micon-floating-dock .micon-dock-icon{width:23px!important;height:22px!important;background:transparent!important;color:#e5edfb!important}
- #micon-floating-dock .micon-dock-icon svg{width:18px!important;height:18px!important}
-}
-</style>
-
-</body></html>';
+      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
     };
@@ -3363,45 +2935,6 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 
 
-<style id="micon-reference-exact-final">
-@media(max-width:760px){
- html, body{width:100%!important;min-width:0!important;background:#fff!important;color:#111827!important;overflow-x:hidden!important}
- .wrap{width:100%!important;max-width:none!important;margin:0!important;padding:0 0 30px!important;background:#fff!important}
- .top{height:82px!important;min-height:82px!important;padding:calc(10px + env(safe-area-inset-top)) 13px 10px!important;margin:0!important;gap:8px!important;background:#fff!important;border-bottom:1px solid #e5eaf2!important;box-shadow:0 1px 5px rgba(15,23,42,.05)!important}
- .top .brand{gap:7px!important}.top .logo{width:40px!important;height:40px!important;flex:0 0 40px!important;border-radius:13px!important;background:#2864ed!important;color:#fff!important;font-size:22px!important}
- .top .brand h1{font-size:27px!important;font-weight:900!important;letter-spacing:-1px!important;color:#4c50d9!important}
- .top .brand-mic{color:#4c50d9!important}.top .brand-on{color:#16a34a!important}
- #micon-account-profile{margin-left:auto!important}#micon-profile-trigger{width:42px!important;height:42px!important;max-width:42px!important;padding:4px!important;justify-content:center!important}
- #mainContent{margin:0!important;padding:0!important;background:#fff!important}
- #mainContent>.home-layout{display:block!important;width:100%!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;background:#fff!important;overflow:visible!important}
- #mainContent>.home-layout>.home-preview-column, #mainContent>.home-layout>.home-scroll-column{display:contents!important}
- #mainContent>.home-layout>.home-scroll-column>.grid{display:contents!important}
- #mainContent>.home-layout>.home-scroll-column>.foot{display:none!important}
- #homeSection{display:none!important}
- .micon-reference-stack{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;margin:0!important;padding:0 15px 30px!important;gap:0!important;background:#fff!important;box-sizing:border-box!important}
- .micon-reference-stack .filemeta{order:1!important;display:flex!important;width:100%!important;height:66px!important;min-height:66px!important;margin:14px 0 12px!important;padding:9px 12px!important;gap:10px!important;align-items:center!important;border:1px solid #e1e8f2!important;border-radius:15px!important;background:#fbfcff!important;box-shadow:0 2px 8px rgba(15,23,42,.035)!important}
- .micon-reference-stack .fileIcon{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important}
- .micon-reference-stack .filetext b{font-size:11px!important;color:#111827!important}.micon-reference-stack .filetext small{font-size:9px!important;color:#64748b!important}.micon-reference-stack .status{display:inline!important;margin-left:7px!important;font-size:9px!important;color:#94a3b8!important}
- .micon-reference-stack #dropZone{order:2!important;display:flex!important;width:100%!important;height:60px!important;min-height:60px!important;margin:0 0 13px!important;padding:7px 10px!important;align-items:center!important;justify-content:center!important;border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#2563eb!important}
- .micon-reference-stack #dropZone>div{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:9px!important}
- .micon-reference-stack #dropZone .uploadIcon{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;flex:0 0 30px!important;margin:0!important;border-radius:10px!important;background:#eaf2ff!important;color:#2563eb!important;font-size:17px!important}
- .micon-reference-stack #dropZone strong{font-size:11px!important;color:#1d4ed8!important}.micon-reference-stack #dropZone small{display:inline!important;margin:0 0 0 2px!important;font-size:9px!important;color:#718096!important}
- .micon-reference-stack #clearBtn{order:4!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 14px!important;padding:0 12px!important;border:1px solid #e5eaf2!important;border-radius:13px!important;background:#f8fafc!important;color:#9ca3af!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important}
- .micon-reference-stack #clearBtn:disabled{opacity:1!important}
- 
- 
- 
- 
- 
- 
- 
- 
- 
- #importSection, #transposeSection{display:contents!important}
- #importSection>h3, #importSection>.sub, #transposeSection>h3, #transposeSection>.sub, #transposeSection .keySelectWrap, #transposeSection .stepper, #transposeSection .rangeLabels, #transposeSection .alert, #transposeSection .playrow, #transposeSection .hint, .mobile-fill, .mobile-tip, .mobile-ad-banner, .foot, .mobile-dock, .mobile-bottom-nav{display:none!important}
-}
-
-</style>
 
 
 
@@ -3411,183 +2944,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 
 
-<script id="micon-mobile-structure-single-js">
-(function(){
-  function install(){
-    if(!window.matchMedia('(max-width:760px)').matches)return;
-    const wrap=document.querySelector('body > .wrap');
-    const header=wrap&&wrap.querySelector(':scope > .top');
-    const main=document.getElementById('mainContent');
-    const layout=main&&main.querySelector(':scope > .home-layout');
-    const preview=layout&&layout.querySelector(':scope > .home-preview-column');
-    const scroll=layout&&layout.querySelector(':scope > .home-scroll-column');
-    const grid=scroll&&scroll.querySelector(':scope > .grid');
-    const importSection=document.getElementById('importSection');
-    const transpose=document.getElementById('transposeSection');
-    const video=document.getElementById('videoStage');
-    const file=importSection&&importSection.querySelector('.filemeta');
-    const drop=document.getElementById('dropZone');
-    const pitch=transpose&&transpose.querySelector('.pitch-compact-row');
-    const clear=document.getElementById('clearBtn');
-    const panel=scroll&&scroll.querySelector('.mobile-playlist-panel');
-    if(!wrap||!header||!main||!layout||!preview||!scroll||!grid||!importSection||!transpose||!video||!file||!drop||!pitch||!clear||!panel){
-      console.error('MicOn mobile structure: elemen wajib belum tersedia.');return;
-    }
-    /* Satu kali susun kontrol di kolom scroll; video dikeluarkan dari area scroll. */
-    let stack=main.querySelector(':scope > .micon-reference-stack');
-    if(!stack){stack=document.createElement('div');stack.className='micon-reference-stack';main.insertBefore(stack,layout);}
-    stack.append(file,drop,panel);
-    /* Tombol hapus tetap tepat di bawah Tambah Playlist pada tampilan smartphone. */
-    const addPlaylist=panel.querySelector('.mobile-playlist-import');
-    if(addPlaylist)addPlaylist.insertAdjacentElement('afterend',clear);
-    /* Satu wadah sticky sebagai saudara mainContent, bukan anak elemen yang ikut scroll. */
-    let shell=document.getElementById('micon-sticky-shell');
-    if(!shell){shell=document.createElement('div');shell.id='micon-sticky-shell';wrap.insertBefore(shell,main);}
-    shell.append(header,video,pitch);
-    /* Dock dibuat tepat satu kali. */
-    let dock=document.getElementById('micon-floating-dock');
-    if(!dock){
-      dock=document.createElement('nav');dock.id='micon-floating-dock';dock.setAttribute('aria-label','Menu utama');
-      dock.innerHTML='<button type="button" class="micon-dock-action" data-action="transpose"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Transpose</span></button><button type="button" class="micon-dock-action" data-action="upload"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><span>Upload</span></button><button type="button" class="micon-dock-action" data-action="download"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg></span><span>Download</span></button><button type="button" class="micon-dock-action" data-action="app"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 7h6M10 17h4"/></svg></span><span>App</span></button><button type="button" class="micon-dock-action" data-action="profile"><span class="micon-dock-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Profil</span></button>';
-      document.body.appendChild(dock);
-      dock.addEventListener('click',function(event){
-        const button=event.target.closest('[data-action]');if(!button)return;
-        const action=button.dataset.action;if(action!=='profile'&&typeof window.MicOnCloseDockProfile==='function')window.MicOnCloseDockProfile();const youtube=document.getElementById('youtubeSection');
-        const stickyShell=document.getElementById('micon-sticky-shell');
-        if(action==='transpose'||action==='upload'){
-          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
-          if(stickyShell)stickyShell.style.removeProperty('display');
-          main.classList.remove('hidden');main.style.removeProperty('display');
-          if(action==='transpose')pitch.scrollIntoView({behavior:'smooth',block:'start'});
-        }else if(action==='download'){
-          /* Iframe downloader hanya aktif pada menu Download; preview karaoke disembunyikan. */
-          main.classList.add('hidden');main.style.setProperty('display','none','important');
-          if(stickyShell)stickyShell.style.setProperty('display','none','important');
-          if(youtube){youtube.classList.add('active');youtube.style.setProperty('display','block','important');}
-          window.scrollTo({top:0,behavior:'smooth'});
-        }else if(action==='app'){
-          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
-          if(stickyShell)stickyShell.style.removeProperty('display');
-          if(typeof window.MicOnShowAppDownload==='function')window.MicOnShowAppDownload();
-        }else if(action==='profile'){
-          if(youtube){youtube.classList.remove('active');youtube.style.removeProperty('display');}
-          if(stickyShell)stickyShell.style.removeProperty('display');
-          main.classList.remove('hidden');main.style.removeProperty('display');
-          const profileButton=document.querySelector('.profile-dock');
-          if(profileButton)profileButton.click();
-        }
-        dock.querySelectorAll('.micon-dock-action').forEach(el=>el.classList.toggle('active',el===button));
-      });
-    }
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
-})();
-</script>
 
-<style id="micon-mobile-fixed-preview-controls-single">
-@media screen and (max-width:760px){
-  /* Susunan mobile mengikuti foto: video, kontrol nada, hapus, tambah, playlist, dock. */
-  /* Preview dan kontrol nada dikunci ke viewport; hanya konten di bawahnya yang bergulir. */
-  #micon-sticky-shell{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10000!important;
-    box-sizing:border-box!important;width:100%!important;max-width:100%!important;margin:0!important;
-    padding:0 0 10px!important;overflow:hidden!important;background:#fff!important;
-    border-bottom:1px solid #e5eaf2!important;
-    box-shadow:0 3px 10px rgba(15,23,42,.06)!important;isolation:isolate!important;
-    touch-action:pan-x!important;overscroll-behavior:none!important;
-  }
-  #micon-sticky-shell>.top{display:none!important}
-  #micon-sticky-shell>#videoStage{
-    display:grid!important;position:relative!important;place-items:center!important;
-    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
-    aspect-ratio:16/9!important;margin:0!important;padding:0!important;overflow:hidden!important;
-    border:0!important;border-radius:0!important;background:#080b12!important;touch-action:pan-x!important;
-  }
-  #micon-sticky-shell>#videoStage:empty:before{
-    content:"Video akan diputar disini"!important;position:absolute!important;inset:0!important;
-    display:flex!important;align-items:center!important;justify-content:center!important;
-    background:#080b12!important;color:#f3f4f6!important;font-size:14px!important;font-weight:750!important;
-  }
-  #micon-sticky-shell>#videoStage>#karaokeVideo{
-    display:block!important;width:100%!important;height:100%!important;max-height:none!important;
-    aspect-ratio:16/9!important;object-fit:contain!important;margin:0!important;padding:0!important;
-    border:0!important;border-radius:0!important;background:#080b12!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row{
-    display:grid!important;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(0,.82fr))!important;
-    grid-template-rows:46px!important;gap:7px!important;align-items:stretch!important;
-    box-sizing:border-box!important;width:calc(100% - 24px)!important;height:46px!important;
-    margin:10px 12px 0!important;padding:0!important;touch-action:pan-x!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>*{
-    display:flex!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
-    width:100%!important;height:46px!important;min-height:46px!important;margin:0!important;padding:3px!important;
-    align-items:center!important;justify-content:center!important;border:1px solid #e5e7eb!important;
-    border-radius:12px!important;background:#fff!important;color:#111827!important;
-    box-shadow:0 2px 8px rgba(15,23,42,.045)!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.noteBox{
-    grid-column:1!important;flex-direction:column!important;gap:2px!important;
-    background:#eff6ff!important;border-color:#dbeafe!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.noteBox small{font-size:8px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#1d4ed8!important;font-weight:900!important}
-  #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc{font-size:7px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>.semitone{
-    grid-column:2!important;flex-direction:column!important;gap:2px!important;font-size:16px!important;font-weight:850!important;
-  }
-  #micon-sticky-shell>.pitch-compact-row>.semitone small{font-size:8px!important;color:#64748b!important}
-  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-column:3!important;color:#dc3545!important;font-size:22px!important}
-  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-column:4!important;color:#dc3545!important;font-size:22px!important}
-  .micon-reference-stack{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    width:100%!important;margin:0!important;padding:calc(56.25vw + 67px) 12px 75px!important;gap:0!important;
-    background:#fff!important;box-sizing:border-box!important;
-  }
-  .micon-reference-stack>.filemeta, .micon-reference-stack>#dropZone, .micon-reference-stack .mobile-fill, .micon-reference-stack .mobile-tip, .micon-reference-stack .mobile-ad-banner, .micon-reference-stack .foot{display:none!important}
-  .micon-reference-stack>#clearBtn{
-    order:2!important;display:flex!important;align-items:center!important;justify-content:center!important;
-    width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 13px!important;
-    padding:0 12px!important;border:0!important;border-radius:13px!important;
-    background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:800!important;
-    box-shadow:0 4px 9px rgba(37,99,235,.10)!important;opacity:1!important;
-  }
-  .micon-reference-stack>#clearBtn:disabled{opacity:1!important;background:#9bb7f5!important;color:#fff!important}
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  #micon-floating-dock{
-    position:fixed!important;z-index:6000!important;left:12px!important;right:12px!important;
-    bottom:calc(8px + env(safe-area-inset-bottom))!important;display:grid!important;
-    grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;gap:2px!important;
-    min-height:61px!important;padding:6px 7px!important;border:1px solid #e3eaf4!important;
-    border-radius:20px!important;background:rgba(255,255,255,.98)!important;
-    box-shadow:0 8px 28px rgba(24,42,70,.16)!important;backdrop-filter:blur(16px)!important;
-  }
-  #micon-floating-dock .micon-dock-action{
-    display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
-    gap:3px!important;width:100%!important;min-width:0!important;height:47px!important;padding:3px 2px!important;
-    border:0!important;border-radius:13px!important;background:transparent!important;color:#64748b!important;
-    font:700 10px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif!important;
-  }
-  #micon-floating-dock .micon-dock-action.active{background:#eff6ff!important;color:#2563eb!important}
-  #micon-floating-dock .micon-dock-icon{display:grid!important;place-items:center!important;width:24px!important;height:24px!important}
-  #micon-floating-dock .micon-dock-icon svg{display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
-  #mainContent{padding:0!important;margin:0!important;background:#fff!important}
-  #homeSection, #importSection>h3, #importSection>.sub, #transposeSection>h3, #transposeSection>.sub, #transposeSection .keySelectWrap, #transposeSection .stepper, #transposeSection .rangeLabels, #transposeSection .alert, #transposeSection .playrow, #transposeSection .hint, .mobile-bottom-nav, .mobile-dock{display:none!important}
-}
-@media(max-width:360px){#micon-sticky-shell>.pitch-compact-row{gap:5px!important}}
-@media(min-width:761px){#micon-sticky-shell, #micon-floating-dock{display:none!important}}
-</style>
+
+
+
 
 
 
@@ -3707,40 +3067,10 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 .desktop-playlist-copy small{display:block;color:#64748b;font-size:9px;line-height:1.3}
 .desktop-playlist-add{flex:0 0 auto;width:100%;height:42px;margin-top:auto;border:0;border-radius:11px;background:#9ca3af;color:#fff;font:750 11px system-ui;cursor:pointer}
 .desktop-playlist-empty{padding:15px 8px;text-align:center;color:#94a3b8;font-size:11px}
-@media(max-width:760px){
- .mobile-playlist-panel{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
- .mobile-playlist-import{order:0!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 7px!important;padding:0 12px!important;border:0!important;border-radius:13px!important;background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:800!important;box-shadow:0 4px 9px rgba(37,99,235,.10)!important}
- .mobile-playlist-panel>#clearBtn{order:1!important;display:flex!important;align-items:center!important;justify-content:center!important;position:static!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0 0 7px!important;padding:0 12px!important;border:0!important;border-radius:13px!important;background:#9bb7f5!important;color:#fff!important;font-size:13px!important;font-weight:800!important;box-shadow:0 4px 9px rgba(37,99,235,.10)!important}
- .mobile-playlist-heading{order:2!important}
- .mobile-playlist-list{order:3!important}
- .mobile-playlist-picker{order:4!important}
- .mobile-playlist-heading{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;height:29px!important;min-height:29px!important;margin:0 0 4px!important;padding:0!important;border-top:1px solid #e5e7eb!important;border-bottom:1px solid #e5e7eb!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:800!important}
- .mobile-playlist-list{display:flex!important;flex-direction:column!important;gap:8px!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important;list-style:none!important;counter-reset:none!important}
- .mobile-playlist-item{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;height:56px!important;min-height:56px!important;margin:0!important;padding:8px 10px!important;border:1px dashed #b8cbea!important;border-radius:14px!important;background:#f8fbff!important;color:#111827!important;text-align:left!important;box-shadow:none!important;list-style:none!important;counter-increment:none!important}
- .mobile-playlist-item.active{border-color:#93c5fd!important;background:#f1f7ff!important}
- .mobile-playlist-icon{display:grid!important;place-items:center!important;flex:0 0 33px!important;width:33px!important;height:33px!important;border-radius:10px!important;background:#edf3ff!important;color:#2563eb!important;font-size:19px!important}
- .mobile-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
- .mobile-playlist-copy strong{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#111827!important;font-size:10px!important;line-height:1.4!important;font-weight:800!important}
- .mobile-playlist-copy small{display:block!important;margin-top:3px!important;color:#16834a!important;font-size:8px!important;line-height:1.3!important}
- .mobile-playlist-empty{display:block!important;padding:17px 10px!important;text-align:center!important;color:#94a3b8!important;font-size:10px!important}
- .mobile-playlist-picker,.desktop-playlist-picker{display:none!important}
-}
+
 </style>
 
-<style id="micon-floating-dock-persistent-fix">
-@media screen and (max-width:760px){
-  body>#micon-floating-dock{
-    display:grid!important;visibility:visible!important;opacity:1!important;
-    pointer-events:auto!important;position:fixed!important;
-    z-index:25000!important;
-  }
-  body:has(#youtubeSection.active)>#micon-floating-dock,
-  body:has(#appDownloadSection.active)>#micon-floating-dock{
-    display:grid!important;visibility:visible!important;opacity:1!important;
-    pointer-events:auto!important;z-index:25000!important;
-  }
-}
-</style>
+
 <script id="micon-floating-dock-persistent-guard">
 (function(){
   const mobile=()=>window.matchMedia('(max-width:760px)').matches;
@@ -3772,63 +3102,9 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 
 
-<style id="micon-mobile-dock-color-icons">
-@media screen and (max-width:760px){
-  #micon-floating-dock .micon-dock-action{
-    color:#64748b!important;
-    transition:background .18s ease,color .18s ease,transform .18s ease!important;
-  }
-  #micon-floating-dock .micon-dock-icon{
-    width:30px!important;height:30px!important;border-radius:11px!important;
-    display:grid!important;place-items:center!important;
-    transition:background .18s ease,box-shadow .18s ease!important;
-  }
-  #micon-floating-dock .micon-dock-icon svg{
-    width:20px!important;height:20px!important;stroke-width:2.1!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(1) .micon-dock-icon{
-    color:#7c3aed!important;background:#f1eaff!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(2) .micon-dock-icon{
-    color:#0284c7!important;background:#e0f2fe!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(3) .micon-dock-icon{
-    color:#059669!important;background:#dcfce7!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(4) .micon-dock-icon{
-    color:#ea580c!important;background:#ffedd5!important;
-  }
-  #micon-floating-dock .micon-dock-action:nth-child(5) .micon-dock-icon{
-    color:#db2777!important;background:#fce7f3!important;
-  }
-  #micon-floating-dock .micon-dock-action.active{
-    background:#f8fafc!important;color:#172033!important;
-  }
-  #micon-floating-dock .micon-dock-action:active{transform:scale(.96)!important}
-  #micon-floating-dock .micon-dock-action span:last-child{
-    font-size:9px!important;font-weight:750!important;letter-spacing:-.1px!important;
-  }
-}
-</style>
 
-<style id="micon-dock-app-hover-click-final-fix">
-@media screen and (max-width:760px){
-  #micon-floating-dock .micon-dock-action{
-    cursor:pointer!important;pointer-events:auto!important;
-    -webkit-tap-highlight-color:transparent!important;
-    transition:background .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease!important;
-  }
-  #micon-floating-dock .micon-dock-action:hover,
-  #micon-floating-dock .micon-dock-action:focus-visible{
-    background:#eff6ff!important;color:#2563eb!important;
-    box-shadow:inset 0 0 0 1px rgba(37,99,235,.12)!important;
-    outline:none!important;
-  }
-  #micon-floating-dock .micon-dock-action:active{
-    background:#dbeafe!important;color:#1d4ed8!important;transform:scale(.95)!important;
-  }
-}
-</style>
+
+
 
 <style id="micon-subscription-inline-in-transpose-final">
 /* Desktop tetap menampilkan pesan langganan di kolom transpose. */
