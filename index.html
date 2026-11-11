@@ -10,10 +10,10 @@
     *{box-sizing:border-box}
     html,body{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;background:#fff}
     #micon-frame{display:block;width:100%;height:100%;height:100dvh;border:0;margin:0;padding:0;background:#fff;position:relative;z-index:1}
-    #micon-startup{position:fixed;inset:0;z-index:2;background:#fff;display:grid;place-items:center;transition:opacity .18s ease,visibility .18s ease}
-    #micon-startup::after{content:"";width:38px;height:38px;border:4px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:miconStartupSpin .8s linear infinite}
+    #micon-startup{position:fixed;inset:0;z-index:2;background:#006bc8 url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20desktop.png") center/cover no-repeat;display:grid;place-items:end center;transition:opacity .18s ease,visibility .18s ease}
+    #micon-startup::after{content:"Sedang Menyiapkan Sistem Mohon Tunggu";color:#fff;text-align:center;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 8px #001b36;margin:0 15px 7vh}
     #micon-startup.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
-    @keyframes miconStartupSpin{to{transform:rotate(360deg)}}
+    @media(max-width:760px){#micon-startup{background-image:url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20mobile.png")}}
   </style>
    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8719595290097938"
      crossorigin="anonymous"></script>
@@ -25,10 +25,23 @@
     // Tutup lapisan awal setelah dokumen iframe selesai dimuat.
     // micon.html tetap menjalankan pengaman autentikasinya sendiri.
     const startupLayer = document.getElementById("micon-startup");
-    document.getElementById("micon-frame").addEventListener("load", () => {
+    const frame = document.getElementById("micon-frame");
+    let finished = false;
+    function finishStartup(){
+      if(finished) return;
+      finished = true;
       startupLayer?.classList.add("is-hidden");
       window.setTimeout(() => startupLayer?.remove(), 250);
-    }, { once: true });
+    }
+    window.addEventListener("message", event => {
+      if(event.source === frame.contentWindow && event.origin === location.origin && event.data === "micon-auth-ready") finishStartup();
+    });
+    frame.addEventListener("load", () => {
+      try {
+        // Login memiliki splash screen sendiri; jangan tutupi halaman login.
+        if(frame.contentWindow.location.pathname.endsWith("/login.html")) finishStartup();
+      } catch (_) {}
+    });
   </script>
 </body>
 </html>
