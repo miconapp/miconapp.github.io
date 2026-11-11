@@ -15,7 +15,7 @@ html.micon-auth-check body{visibility:hidden}
 <script>
 document.documentElement.classList.add('micon-auth-check');
 // Memberi tahu index.html hanya setelah pengaman autentikasi dilepas.
-new MutationObserver((observer) => {
+new MutationObserver((mutations, observer) => {
   if (!document.documentElement.classList.contains('micon-auth-check')) {
     observer.disconnect();
     if (window.parent !== window) window.parent.postMessage('micon-auth-ready', location.origin);
