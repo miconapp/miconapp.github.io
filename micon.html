@@ -2492,7 +2492,14 @@ try {
   window.__miconPlaylistHasNext=index<playlist.length-1;
   render();
   try{
-   if(typeof DataTransfer!=='undefined'){
+   /* Android WebView sering menerima FileList dari DataTransfer tetapi tidak
+      meneruskan objek File dengan konsisten ke pemutar pada pergantian item.
+      Untuk mobile, kirim objek File playlist langsung melalui override yang
+      dibaca handler videoFile. Desktop tetap memakai FileList seperti semula. */
+   if(mobile){
+    window.__miconPlaylistFileOverride=playlist[index].file;
+    videoInput.value='';
+   }else if(typeof DataTransfer!=='undefined'){
     const transfer=new DataTransfer();transfer.items.add(playlist[index].file);
     videoInput.files=transfer.files;
    }else{
@@ -2650,10 +2657,22 @@ try {
   picker.value='';
   importFiles(files);
  });
+ let advancing=false;
  window.__miconPlaylistAdvance=()=>{
+  if(advancing)return;
   const next=currentIndex+1;
-  if(next<playlist.length)loadItem(next);
-  else{window.__miconPlaylistHasNext=false;window.__miconPlaylistActive=false;}
+  if(next<playlist.length){
+   advancing=true;
+   /* Jangan hapus elemen video tepat di dalam event ended. Beri browser satu
+      giliran menyelesaikan event media, lalu muat file berikutnya dari antrean. */
+   Promise.resolve().then(()=>{
+    try{loadItem(next);}
+    finally{advancing=false;}
+   });
+  }else{
+   window.__miconPlaylistHasNext=false;window.__miconPlaylistActive=false;
+   playlistIsPlaying=false;render();
+  }
  };
 
  /* Upload dock pada desktop dan floating dock smartphone masuk ke antrean
