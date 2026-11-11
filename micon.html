@@ -477,18 +477,18 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
   #micon-sticky-shell>#videoStage>#karaokeVideo{display:block!important;width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9!important;object-fit:contain!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:var(--micon-video)!important}
 
   /* Nada relatif, semitone, tombol turun, dan naik. */
-  #micon-sticky-shell>.pitch-compact-row{display:grid!important;grid-template-columns:minmax(0,1.15fr) repeat(3,minmax(0,.72fr))!important;grid-template-rows:44px!important;gap:10px!important;align-items:stretch!important;width:calc(100% - 32px)!important;height:44px!important;margin:16px 16px 0!important;padding:0!important;box-sizing:border-box!important}
+  #micon-sticky-shell>.pitch-compact-row{display:grid!important;grid-template-columns:minmax(0,1.15fr) repeat(3,minmax(0,.72fr))!important;grid-template-areas:"note semitone down up"!important;grid-template-rows:44px!important;gap:10px!important;align-items:stretch!important;width:calc(100% - 32px)!important;height:44px!important;margin:16px 16px 0!important;padding:0!important;box-sizing:border-box!important}
   #micon-sticky-shell>.pitch-compact-row>*{display:flex!important;position:relative!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:3px!important;align-items:center!important;justify-content:center!important;border:1px solid var(--micon-panel-line)!important;border-radius:0!important;background:var(--micon-panel)!important;color:var(--micon-white)!important;box-shadow:none!important;overflow:hidden!important}
-  #micon-sticky-shell>.pitch-compact-row>.noteBox{grid-column:1!important;flex-direction:column!important;gap:2px!important;background:var(--micon-panel)!important;border-color:var(--micon-panel-line)!important}
+  #micon-sticky-shell>.pitch-compact-row>.noteBox{grid-area:note!important;flex-direction:column!important;gap:2px!important;background:var(--micon-panel)!important;border-color:var(--micon-panel-line)!important}
   #micon-sticky-shell>.pitch-compact-row>.noteBox small,#micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc,#micon-sticky-shell>.pitch-compact-row>.semitone small{color:#d5e0f2!important}
   #micon-sticky-shell>.pitch-compact-row>.noteBox .note{font-size:15px!important;line-height:1.1!important;color:#fff!important;font-weight:850!important}
   #micon-sticky-shell>.pitch-compact-row>.noteBox small{font-size:8px!important}
   #micon-sticky-shell>.pitch-compact-row>.noteBox #noteDesc{font-size:7px!important}
-  #micon-sticky-shell>.pitch-compact-row>.semitone{grid-column:2!important;flex-direction:column!important;gap:2px!important;color:#fff!important;font-size:16px!important;font-weight:850!important}
+  #micon-sticky-shell>.pitch-compact-row>.semitone{grid-area:semitone!important;flex-direction:column!important;gap:2px!important;color:#fff!important;font-size:16px!important;font-weight:850!important}
   #micon-sticky-shell>.pitch-compact-row>.semitone small{font-size:8px!important}
-  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-column:3!important}
-  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-column:4!important}
-  #micon-sticky-shell>.pitch-compact-row>#downBtn,#micon-sticky-shell>.pitch-compact-row>#upBtn{color:#fff!important;background:var(--micon-panel)!important;font-size:22px!important;font-weight:700!important}
+  #micon-sticky-shell>.pitch-compact-row>#downBtn{grid-area:down!important}
+  #micon-sticky-shell>.pitch-compact-row>#upBtn{grid-area:up!important}
+  #micon-sticky-shell>.pitch-compact-row>#downBtn,#micon-sticky-shell>.pitch-compact-row>#upBtn{display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;-webkit-appearance:none!important;appearance:none!important;color:#fff!important;-webkit-text-fill-color:#fff!important;background:var(--micon-panel)!important;font-size:22px!important;line-height:1!important;font-weight:700!important;text-align:center!important}
 
   /* Isi di bawah area sticky; tidak ada panel kosong dari grid lama. */
   .micon-reference-stack{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;min-width:0!important;margin:0!important;padding:calc(56.25vw + 139px) 16px 96px!important;gap:0!important;box-sizing:border-box!important;background:var(--micon-bg)!important;color:var(--micon-white)!important}
@@ -808,19 +808,22 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
       console.error('MicOn mobile UI: struktur utama belum lengkap.');return;
     }
 
-    /* Buat baris pitch compact tepat satu kali. */
+    /* Buat dan normalkan satu baris pitch: Nada, Semitone, Turun, Naik. */
     let pitch=transpose.querySelector('.pitch-compact-row');
+    const note=transpose.querySelector('.noteBox');
+    const semi=transpose.querySelector('.semitone');
+    const down=transpose.querySelector('#downBtn');
+    const up=transpose.querySelector('#upBtn');
+    if(!note||!semi||!up||!down){console.error('MicOn mobile UI: kontrol nada tidak lengkap.');return;}
     if(!pitch){
-      const note=transpose.querySelector('.noteBox');
-      const semi=transpose.querySelector('.semitone');
-      const up=transpose.querySelector('#upBtn');
-      const down=transpose.querySelector('#downBtn');
-      if(!note||!semi||!up||!down){console.error('MicOn mobile UI: kontrol nada tidak lengkap.');return;}
       pitch=document.createElement('div');pitch.className='pitch-compact-row';
       const keyWrap=transpose.querySelector('.keySelectWrap');
       transpose.insertBefore(pitch,keyWrap||note);
-      pitch.append(note,semi,up,down);
     }
+    /* Urutan DOM dibuat sama dengan urutan visual supaya tombol minus tidak tertinggal. */
+    pitch.append(note,semi,down,up);
+    down.textContent='−';
+    up.textContent='+';
 
     const fileIcon=importSection.querySelector('.fileIcon');
     if(fileIcon){fileIcon.textContent='♫';fileIcon.setAttribute('aria-label','Ikon musik');}
