@@ -2191,13 +2191,6 @@ try {
         if (auth.currentUser?.uid !== user.uid) return;
 
         const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
-        console.info("[MicOn realtime] Snapshot diterima:", {
-          path: profileRef.path,
-          fromCache: profileSnap.metadata.fromCache,
-          planId: profile.subscription?.planId || null,
-          status: profile.subscription?.status || "none",
-          expiresAt: profile.subscription?.expiresAt || null
-        });
         // Setiap perubahan subscription pada Pengguna/{UID} langsung diproses,
         // tanpa reload dan tanpa mengambil profil dari cache selain snapshot awal.
         renderSubscriptionGate(profile, user, phoneFromInternalEmail);
