@@ -2663,12 +2663,19 @@ try {
   const next=currentIndex+1;
   if(next<playlist.length){
    advancing=true;
-   /* Jangan hapus elemen video tepat di dalam event ended. Beri browser satu
-      giliran menyelesaikan event media, lalu muat file berikutnya dari antrean. */
-   Promise.resolve().then(()=>{
-    try{loadItem(next);}
-    finally{advancing=false;}
-   });
+   /* WebView Android masih dapat menyelesaikan teardown decoder setelah event
+      ended. Microtask terlalu cepat: video lama dapat dilepas saat decoder
+      masih mengirim frame terakhir, sehingga item berikutnya tampil rusak.
+      Tunggu satu jeda task media, lalu muat file berikutnya dari File asli
+      yang tersimpan di antrean playlist. */
+   window.setTimeout(()=>{
+    try{
+     if(next<playlist.length && currentIndex<next)loadItem(next);
+    }catch(error){
+     console.error('MicOn Playlist gagal berpindah ke file berikutnya:',error);
+     alert('File berikutnya gagal dimuat: '+(error.message||error));
+    }finally{advancing=false;}
+   },450);
   }else{
    window.__miconPlaylistHasNext=false;window.__miconPlaylistActive=false;
    playlistIsPlaying=false;render();
