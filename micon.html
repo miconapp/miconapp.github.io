@@ -3354,5 +3354,44 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 </style>
 
+
+<style id="micon-subscription-lock-full-white-mobile">
+/* Ketika akses terkunci, latar halaman mobile putih sampai bawah viewport. */
+@media screen and (max-width:760px){
+  html:has(body.micon-subscription-mobile-active){
+    min-height:100%!important;
+    background:#fff!important;
+    color-scheme:light!important;
+  }
+  body.micon-subscription-mobile-active{
+    min-height:100vh!important;
+    min-height:100dvh!important;
+    height:auto!important;
+    background:#fff!important;
+    color-scheme:light!important;
+  }
+  body.micon-subscription-mobile-active>.wrap{
+    min-height:100vh!important;
+    min-height:100dvh!important;
+    height:auto!important;
+    background:#fff!important;
+  }
+  body.micon-subscription-mobile-active #mainContent,
+  body.micon-subscription-mobile-active .micon-reference-stack{
+    min-height:100vh!important;
+    min-height:100dvh!important;
+    height:auto!important;
+    background:#fff!important;
+  }
+  body.micon-subscription-mobile-active .micon-reference-stack{
+    box-sizing:border-box!important;
+    padding-bottom:max(28px,env(safe-area-inset-bottom))!important;
+  }
+  body.micon-subscription-mobile-active #micon-sticky-shell{
+    background:#fff!important;
+  }
+}
+</style>
+
 </body>
 </html>
