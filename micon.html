@@ -8,11 +8,20 @@
 <style id="micon-auth-gate-style">
 html.micon-auth-check{background:#fff!important}
 html.micon-auth-check body{visibility:hidden}
-html.micon-auth-check::before{content:"";position:fixed;inset:0;z-index:2147483647;background:#fff;display:block}
-html.micon-auth-check::after{content:"";position:fixed;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border:4px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;z-index:2147483647;animation:miconInitialLoading .8s linear infinite}
-@keyframes miconInitialLoading{to{transform:rotate(360deg)}}
+html.micon-auth-check::before{content:"";position:fixed;inset:0;z-index:2147483647;background:#006bc8 url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20desktop.png") center/cover no-repeat;display:block}
+html.micon-auth-check::after{content:"Sedang Menyiapkan Sistem Mohon Tunggu";position:fixed;left:0;right:0;bottom:7%;text-align:center;padding:0 14px;color:#fff;font:700 11px/1.5 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 8px #001b36;z-index:2147483647}
+@media(max-width:760px){html.micon-auth-check::before{background-image:url("https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Splash%20Screen%20mobile.png")}}
 </style>
-<script>document.documentElement.classList.add('micon-auth-check');</script>
+<script>
+document.documentElement.classList.add('micon-auth-check');
+// Memberi tahu index.html hanya setelah pengaman autentikasi dilepas.
+new MutationObserver((observer) => {
+  if (!document.documentElement.classList.contains('micon-auth-check')) {
+    observer.disconnect();
+    if (window.parent !== window) window.parent.postMessage('micon-auth-ready', location.origin);
+  }
+}).observe(document.documentElement, {attributes:true,attributeFilter:['class']});
+</script>
 
 
 <style>
