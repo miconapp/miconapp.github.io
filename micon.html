@@ -2925,7 +2925,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       const url=String(config?.url||"").trim();
       const active=config?.enabled===true&&!!url;
       const allowedPlacement=["home","home-bottom","all"].includes(String(config?.placement||"home"));
-      const visible=active&&allowedPlacement;
+      const visible=active&&(banner.id==="micon-gate-banner"||allowedPlacement);
       banner.classList.toggle('is-configured',visible);
       if(!visible){
         banner.dataset.miconBannerSignature="";
@@ -3206,14 +3206,17 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   }
   body.micon-subscription-mobile-active #micon-subscription-gate.show{display:block!important}
   body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner{
-    display:none!important;position:relative!important;box-sizing:border-box!important;
-    width:calc(100% + 30px)!important;height:65px!important;min-height:65px!important;max-height:65px!important;
+    display:none!important;position:relative!important;flex:none!important;box-sizing:border-box!important;
+    width:calc(100% + 30px)!important;min-width:calc(100% + 30px)!important;max-width:calc(100% + 30px)!important;
+    height:65px!important;min-height:65px!important;max-height:65px!important;
     margin:0 -15px 10px!important;padding:0!important;overflow:hidden!important;
     border:0!important;border-radius:0!important;background:#f1f5f9!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner.is-configured{display:block!important}
   body.micon-subscription-mobile-active #micon-subscription-gate .micon-gate-banner iframe{
-    display:block!important;width:100%!important;height:65px!important;min-height:65px!important;max-height:65px!important;border:0!important;
+    display:block!important;position:absolute!important;inset:0!important;
+    width:100%!important;height:65px!important;min-height:65px!important;max-height:65px!important;
+    margin:0!important;padding:0!important;border:0!important;overflow:hidden!important;
   }
   body.micon-subscription-mobile-active #micon-subscription-gate .msg-card{
     display:block!important;width:100%!important;max-width:none!important;max-height:none!important;
