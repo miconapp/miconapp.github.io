@@ -867,65 +867,97 @@
 </style>
 
 <style id="mobile-floating-ellipse-dock">
-/* Dock mobile mengambang berbentuk elips — hanya mengubah navigasi mobile. */
-@media (max-width:600px){
-  .side{
-    position:fixed;
-    inset:auto auto 14px 50%;
-    transform:translateX(-50%);
-    width:max-content;
-    max-width:calc(100vw - 24px);
-    height:auto;
-    padding:7px 10px;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:999px;
-    background:#111c31;
-    box-shadow:0 10px 30px rgba(15,27,48,.28);
-    z-index:50;
+/* Dock mobile kapsul elips mengambang — override final khusus navigasi mobile. */
+@media screen and (max-width:600px){
+  #app > aside.side{
+    position:fixed !important;
+    inset:auto auto 14px 50% !important;
+    left:50% !important;
+    right:auto !important;
+    bottom:14px !important;
+    top:auto !important;
+    transform:translateX(-50%) !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:max-content !important;
+    max-width:calc(100vw - 24px) !important;
+    height:auto !important;
+    min-height:0 !important;
+    padding:7px 9px !important;
+    margin:0 !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    border-radius:999px !important;
+    background:#111c31 !important;
+    box-shadow:0 12px 32px rgba(15,27,48,.32) !important;
+    z-index:999 !important;
   }
-  .side nav{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:5px;
-    width:max-content;
-    max-width:100%;
+  #app > aside.side nav{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:5px !important;
+    width:auto !important;
+    max-width:100% !important;
+    margin:0 !important;
   }
-  .side nav button{
-    flex:0 1 76px;
-    min-width:58px;
-    min-height:54px;
-    padding:5px 7px;
-    gap:3px;
-    border:0;
-    border-radius:999px;
-    background:transparent;
-    color:#9aa8bd;
-    box-shadow:none;
-    transform:none;
+  #app > aside.side nav button{
+    display:flex !important;
+    flex:0 0 auto !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:68px !important;
+    min-width:0 !important;
+    min-height:52px !important;
+    height:52px !important;
+    padding:4px 5px !important;
+    gap:2px !important;
+    border:0 !important;
+    border-radius:999px !important;
+    background:transparent !important;
+    color:#9aa8bd !important;
+    box-shadow:none !important;
+    transform:none !important;
   }
-  .side nav button .nav-icon{
-    width:30px;
-    height:30px;
-    border-radius:10px;
-    background:transparent;
-    font-size:initial;
+  #app > aside.side nav button .nav-icon{
+    display:grid !important;
+    place-items:center !important;
+    width:29px !important;
+    height:29px !important;
+    margin:0 !important;
+    border-radius:9px !important;
+    background:transparent !important;
+    color:inherit !important;
   }
-  .side nav button .nav-icon svg{width:21px;height:21px}
-  .side nav button .nav-label{
-    max-width:100%;
-    font-size:9px;
-    line-height:1.1;
-    white-space:nowrap;
+  #app > aside.side nav button .nav-icon svg{
+    display:block !important;
+    width:21px !important;
+    height:21px !important;
   }
-  .side nav button.active{
-    background:#eaf1ff;
-    color:#245bd5;
-    box-shadow:0 3px 10px rgba(0,0,0,.12);
+  #app > aside.side nav button .nav-label{
+    display:block !important;
+    max-width:100% !important;
+    margin:0 !important;
+    color:inherit !important;
+    font-size:9px !important;
+    line-height:1.1 !important;
+    white-space:nowrap !important;
   }
-  .side nav button.active .nav-icon{background:transparent;box-shadow:none}
-  .side nav button:hover{transform:none}
-  .main{margin:0 0 88px}
+  #app > aside.side nav button.active{
+    background:#eaf1ff !important;
+    color:#245bd5 !important;
+    box-shadow:0 3px 10px rgba(0,0,0,.14) !important;
+  }
+  #app > aside.side nav button.active .nav-icon{
+    background:transparent !important;
+    color:inherit !important;
+    box-shadow:none !important;
+  }
+  #app > aside.side nav button:hover{transform:none !important}
+  #app .main{margin:0 0 88px !important}
 }
 </style>
 
