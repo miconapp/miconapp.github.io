@@ -19,7 +19,7 @@
 </head>
 <body>
   <div id="micon-startup" role="status" aria-label="Memuat MicOn"></div>
-  <iframe id="micon-frame" title="MicOn" src="./micon.html" allow="autoplay; fullscreen"></iframe>
+  <iframe id="micon-frame" title="MicOn" src="./micon.html" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-modals allow-pointer-lock allow-presentation" allow="autoplay; fullscreen; clipboard-read; clipboard-write"></iframe>
   <script>
     // Tutup lapisan awal setelah dokumen iframe selesai dimuat.
     // micon.html tetap menjalankan pengaman autentikasinya sendiri.
