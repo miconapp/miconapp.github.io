@@ -1826,7 +1826,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
 <script type="module" id="micon-firebase-session-guard">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsoHofWuEfD2gwMNgfsad0KXxYlMMxw0w",
@@ -2068,78 +2068,71 @@ try {
   }
 
   async function initializeUserProfile(user, profileRef, phoneFromInternalEmail) {
-    if (auth.currentUser?.uid !== user.uid) return;
+    if (!user || auth.currentUser?.uid !== user.uid) return null;
 
-    // Trial dan paket berbayar menulis field subscription yang sama.
-    // Gunakan transaksi dan baca ulang dokumen TERBARU sebelum memberi trial,
-    // sehingga inisialisasi trial yang tertunda tidak dapat menimpa paket admin.
-    const freeTrialDurationMs = 7 * 24 * 60 * 60 * 1000;
-    const authCreatedAtMs = Date.parse(user.metadata?.creationTime || "");
-    const hasValidAuthCreationTime = Number.isFinite(authCreatedAtMs) && authCreatedAtMs > 0;
+    // Satu jalur inisialisasi untuk setiap UID. Transaksi membaca dokumen
+    // terbaru agar trial tidak menimpa paket yang mungkin sudah dipasang admin.
+    const trialMs = 7 * 24 * 60 * 60 * 1000;
+    const createdMs = Date.parse(user.metadata?.creationTime || "");
+    const validCreatedAt = Number.isFinite(createdMs) && createdMs > 0;
+    const signupIso = validCreatedAt ? new Date(createdMs).toISOString() : null;
     const nowMs = Date.now();
-    const signupIso = hasValidAuthCreationTime ? new Date(authCreatedAtMs).toISOString() : null;
 
-    await runTransaction(db, async transaction => {
-      if (auth.currentUser?.uid !== user.uid) return;
+    return await runTransaction(db, async transaction => {
+      if (auth.currentUser?.uid !== user.uid) return null;
 
-      // Jangan gunakan profileData/profileExists dari snapshot awal karena
-      // nilainya mungkin sudah basi saat transaksi dijalankan.
-      const latestSnapshot = await transaction.get(profileRef);
-      const latestProfile = latestSnapshot.exists() ? (latestSnapshot.data() || {}) : null;
+      const snapshot = await transaction.get(profileRef);
+      const current = snapshot.exists() ? (snapshot.data() || {}) : null;
 
-      if (!latestSnapshot.exists()) {
-        const newProfile = {
+      if (!snapshot.exists()) {
+        const profile = {
           Nama: user.displayName || "Pengguna MicOn",
-          NomorHp: phoneFromInternalEmail,
+          NomorHp: phoneFromInternalEmail || user.phoneNumber || "",
           role: "Pengguna",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         };
 
-        if (hasValidAuthCreationTime && authCreatedAtMs + freeTrialDurationMs > nowMs) {
-          newProfile.subscription = {
+        // Trial dihitung dari waktu pendaftaran Firebase Auth, bukan dari
+        // waktu pertama kali halaman utama dibuka. Trial hanya ditulis sekali.
+        if (validCreatedAt && createdMs + trialMs > nowMs) {
+          profile.subscription = {
             planId: "gratis7hari",
             planName: "Gratis 7 Hari",
             status: "active",
             startAt: signupIso,
-            expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
+            expiresAt: new Date(createdMs + trialMs).toISOString(),
             paidManually: false,
             source: "free_trial",
             updatedAt: new Date(nowMs).toISOString(),
             updatedBy: "system"
           };
-          newProfile.freeTrialGrantedAt = signupIso;
+          profile.freeTrialGrantedAt = signupIso;
         }
 
-        transaction.set(profileRef, newProfile);
-        return;
+        transaction.set(profileRef, profile);
+        return profile;
       }
 
-      const role = String(latestProfile.role || "Pengguna").trim().toLowerCase();
-      const currentSubscription = latestProfile.subscription;
-      const hasExistingSubscription = !!currentSubscription &&
-        typeof currentSubscription === "object" &&
-        Object.keys(currentSubscription).length > 0;
-
-      // Trial hanya boleh diberikan sekali untuk akun baru.
-      // Marker penghapusan paket bersifat permanen agar paket yang dihapus
-      // oleh Superadmin tidak pernah berubah menjadi trial gratis lagi.
-      const eligibleForTrial = role !== "superadmin" &&
-        !hasExistingSubscription &&
-        !latestProfile.freeTrialGrantedAt &&
-        !latestProfile.freeTrialCheckedAt &&
-        !latestProfile.subscriptionRemovedAt &&
-        hasValidAuthCreationTime &&
-        authCreatedAtMs + freeTrialDurationMs > nowMs;
+      const role = String(current.role || "Pengguna").trim().toLowerCase();
+      const existingSub = current.subscription;
+      const hasSubscription = !!existingSub && typeof existingSub === "object" &&
+        Object.keys(existingSub).length > 0;
+      const canGrantTrial = role !== "superadmin" &&
+        !hasSubscription &&
+        !current.freeTrialGrantedAt &&
+        !current.freeTrialCheckedAt &&
+        !current.subscriptionRemovedAt &&
+        validCreatedAt && createdMs + trialMs > nowMs;
 
       const updates = {};
-      if (eligibleForTrial) {
+      if (canGrantTrial) {
         updates.subscription = {
           planId: "gratis7hari",
           planName: "Gratis 7 Hari",
           status: "active",
           startAt: signupIso,
-          expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
+          expiresAt: new Date(createdMs + trialMs).toISOString(),
           paidManually: false,
           source: "free_trial",
           updatedAt: new Date(nowMs).toISOString(),
@@ -2147,112 +2140,76 @@ try {
         };
         updates.freeTrialGrantedAt = signupIso;
       }
-
-      if (!String(latestProfile.Nama || "").trim() && user.displayName) {
-        updates.Nama = user.displayName;
-      }
-      if (!String(latestProfile.NomorHp || "").trim() && phoneFromInternalEmail) {
-        updates.NomorHp = phoneFromInternalEmail;
-      }
+      if (!String(current.Nama || "").trim() && user.displayName) updates.Nama = user.displayName;
+      if (!String(current.NomorHp || "").trim() && phoneFromInternalEmail) updates.NomorHp = phoneFromInternalEmail;
 
       if (Object.keys(updates).length) {
         updates.updatedAt = serverTimestamp();
-        // Perubahan trial hanya dapat commit bila dokumen yang dibaca transaksi
-        // belum berubah. Bila Superadmin menulis paket saat bersamaan, Firestore
-        // mengulang transaksi dan pengecekan akan melihat paket terbaru.
         transaction.update(profileRef, updates);
       }
+      return { ...current, ...updates };
     });
   }
 
-  onAuthStateChanged(auth, user => {
+  let activeProfileUid = null;
+  onAuthStateChanged(auth, async user => {
     if (stopUserProfileListener) {
       stopUserProfileListener();
       stopUserProfileListener = null;
     }
     clearSubscriptionExpiryTimer();
-    initializingProfileForUid = null;
+    activeProfileUid = user?.uid || null;
 
     if (!user) {
       window.location.replace(LOGIN_URL);
       return;
     }
 
-    // Dokumen langganan selalu menggunakan ID dokumen = Firebase Auth UID.
-    // Path ini harus sama persis dengan target dokumen yang ditulis Superadmin.
-    const profileRef = doc(db, "Pengguna", String(user.uid));
+    const profileRef = doc(db, "Pengguna", user.uid);
     const internalPhone = user.email ? user.email.split("@")[0] : "";
-    const phoneFromInternalEmail = /^62\\d{8,13}$/.test(internalPhone)
+    const phoneFromInternalEmail = /^62\d{8,13}$/.test(internalPhone)
       ? "0" + internalPhone.slice(2)
       : (user.phoneNumber || "");
 
-    // LISTENER DIPASANG TERLEBIH DAHULU. Dengan demikian, pembukaan/penghapusan
-    // paket oleh Superadmin selalu didengar meskipun proses inisialisasi profil
-    // memerlukan waktu atau gagal pada langkah berikutnya.
-    console.info("[MicOn realtime] Mendengarkan dokumen:", profileRef.path, "UID:", user.uid);
-    stopUserProfileListener = onSnapshot(
-      profileRef,
-      { includeMetadataChanges: true },
-      profileSnap => {
-        if (auth.currentUser?.uid !== user.uid) return;
+    try {
+      // Buat/cek profil lebih dahulu. Listener realtime baru dipasang setelah
+      // transaksi berhasil, sehingga tidak ada dua jalur pembuatan profil.
+      const initializedProfile = await initializeUserProfile(user, profileRef, phoneFromInternalEmail);
+      if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
+      if (initializedProfile) renderSubscriptionGate(initializedProfile, user, phoneFromInternalEmail);
+      document.documentElement.classList.remove("micon-auth-check");
 
-        const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
-        // Setiap perubahan subscription pada Pengguna/{UID} langsung diproses,
-        // tanpa reload dan tanpa mengambil profil dari cache selain snapshot awal.
-        renderSubscriptionGate(profile, user, phoneFromInternalEmail);
-
-        // Inisialisasi profil/trial hanya dijalankan sekali setelah snapshot
-        // server diterima, bukan dari cache lokal yang mungkin belum mutakhir.
-        if (!profileSnap.metadata.fromCache && initializingProfileForUid !== user.uid) {
-          initializingProfileForUid = user.uid;
-          initializeUserProfile(
-            user,
-            profileRef,
-            phoneFromInternalEmail
-          ).then(() => {
-            if (auth.currentUser?.uid === user.uid) {
-              document.documentElement.classList.remove("micon-auth-check");
-            }
-          }).catch(profileError => {
-            console.error("MicOn user profile initialization failed:", profileError);
-            if (auth.currentUser?.uid !== user.uid) return;
-            const errorCode = profileError?.code || "unknown";
-            const errorMessage = profileError?.message || String(profileError || "Kesalahan tidak diketahui");
-            document.documentElement.classList.remove("micon-auth-check");
-            alert(
-              "Profil akun belum dapat dibuat atau diperbarui di Firestore Pengguna. " +
-              "Detail: " + errorCode + " — " + errorMessage +
-              ". Periksa izin read/create/update pada Firestore Rules untuk Pengguna/UID akun ini."
-            );
-          });
+      stopUserProfileListener = onSnapshot(
+        profileRef,
+        profileSnap => {
+          if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
+          const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
+          renderSubscriptionGate(profile, user, phoneFromInternalEmail);
+        },
+        listenerError => {
+          console.error("MicOn subscription listener failed:", listenerError);
+          if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
+          document.documentElement.classList.remove("micon-auth-check");
+          const code = listenerError?.code || "unknown";
+          alert(
+            "Data langganan MicOn tidak dapat dibaca dari Firestore Pengguna. " +
+            "Detail: " + code + " — " + (listenerError?.message || String(listenerError)) +
+            ". Pastikan Firestore Rules mengizinkan pengguna membaca dokumen Pengguna dengan ID UID miliknya sendiri."
+          );
         }
-      },
-      error => {
-        console.error("MicOn Firebase subscription realtime listener failed:", error);
-        if (auth.currentUser?.uid !== user.uid) return;
-
-        // Fail closed untuk akun pengguna ketika listener tidak dapat membaca
-        // status terbaru; role Superadmin tetap mengikuti pengecualian sistem.
-        const fallbackProfile = latestSubscriptionProfile || {};
-        const fallbackRole = String(fallbackProfile.role || "Pengguna").trim().toLowerCase();
-        renderSubscriptionGate(
-          fallbackRole === "superadmin"
-            ? fallbackProfile
-            : { ...fallbackProfile, subscription: { status: "inactive" } },
-          user,
-          phoneFromInternalEmail
-        );
-
-        document.documentElement.classList.remove("micon-auth-check");
-        const errorCode = error?.code || "unknown";
-        const errorMessage = error?.message || String(error || "Kesalahan tidak diketahui");
-        alert(
-          "Listener realtime langganan MicOn gagal. Detail: " +
-          errorCode + " — " + errorMessage +
-          ". Periksa koneksi dan izin read pada Firestore Rules untuk Pengguna/UID akun ini."
-        );
-      }
-    );
+      );
+    } catch (profileError) {
+      console.error("MicOn profile initialization failed:", profileError);
+      if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
+      document.documentElement.classList.remove("micon-auth-check");
+      const code = profileError?.code || "unknown";
+      const message = profileError?.message || String(profileError || "Kesalahan tidak diketahui");
+      alert(
+        "Profil akun MicOn gagal dibuat/diperbarui di Firestore Pengguna. " +
+        "Detail: " + code + " — " + message +
+        ". Firestore Rules wajib mengizinkan read dan create/update hanya untuk Pengguna/{UID} milik akun yang sedang login."
+      );
+    }
   });
 } catch (error) {
   console.error("MicOn Firebase initialization failed:", error);
