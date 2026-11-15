@@ -3212,7 +3212,16 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   function setDownloadTarget(){if(downloadButton){downloadButton.href=mobileQuery.matches?downloadButton.dataset.downloadMobile:downloadButton.dataset.downloadDesktop;}}
   setDownloadTarget();
   if(mobileQuery.addEventListener)mobileQuery.addEventListener('change',setDownloadTarget);else if(mobileQuery.addListener)mobileQuery.addListener(setDownloadTarget);
-  document.querySelectorAll('.app-download-link,.app-download-mobile').forEach(link=>link.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();setDownloadTarget();show();}));
+  /* Delegasi klik agar tombol Download di header tetap berfungsi meski header
+     dipindahkan ke sticky shell pada tampilan mobile. */
+  document.addEventListener('click',function(e){
+    const link=e.target.closest('.mobile-header-download,.app-download-link,.app-download-mobile');
+    if(!link)return;
+    e.preventDefault();
+    e.stopPropagation();
+    setDownloadTarget();
+    show();
+  });
   document.addEventListener('click',function(e){
     /* Klik App ditangani oleh satu handler utama milik dock. Jangan hentikan
        propagasi di fase capture karena itu membuat handler dock tidak pernah jalan. */
@@ -3250,6 +3259,18 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   .micon-play-content{padding:18px 17px 42px}.micon-play-back{margin:0 0 17px}.micon-play-hero{grid-template-columns:minmax(0,1fr) 112px;gap:12px;padding:0 0 24px;align-items:start}.micon-play-info h1{font-size:31px;margin-bottom:4px}.micon-play-developer{font-size:13px;margin-bottom:13px}.micon-play-tags{flex-wrap:wrap;gap:7px;font-size:10px;margin-bottom:15px}.micon-play-actions{gap:10px}.micon-play-download{width:100%;min-width:0;height:44px;font-size:14px}.micon-play-share, .micon-play-wishlist{font-size:11px;gap:5px;padding:7px 2px}.micon-play-share span, .micon-play-wishlist span{font-size:18px}.micon-play-device-note{font-size:10px;line-height:1.4;margin-top:12px;align-items:flex-start}.micon-play-device-note span{font-size:15px}.micon-play-icon{width:108px;height:108px;border-radius:22%;box-shadow:0 5px 14px #00000018}
   .micon-play-details{grid-template-columns:1fr;gap:20px;padding-top:17px}.micon-play-details h2{font-size:18px;margin-bottom:9px}.micon-play-description>p{font-size:12px;line-height:1.7}.micon-play-feature-grid{grid-template-columns:1fr;gap:8px;margin-top:15px}.micon-play-feature-grid article{padding:11px}.micon-play-feature-grid strong{font-size:12px}.micon-play-feature-grid small{font-size:10px}.feature-symbol{width:32px;height:32px}.micon-play-about{padding:14px}.micon-play-about h2{font-size:16px}.micon-play-footnote{font-size:10px;margin-top:18px}
 }
+</style>
+
+<style id="micon-app-download-click-fix">
+/* Pastikan tombol unduh pada halaman App menerima klik dan membuka tautan APK. */
+#appDownloadSection .micon-play-download{
+  position:relative!important;
+  z-index:5!important;
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  -webkit-tap-highlight-color:transparent;
+}
+#appDownloadSection .micon-play-actions{position:relative;z-index:4}
 </style>
 
 <style id="micon-download-only-hide-preview">
