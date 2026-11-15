@@ -593,11 +593,11 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
  <div id="mainContent">
 <section class="hero" id="homeSection"><h2>Nyanyi di nada<br><span>yang paling nyaman.</span></h2><p>Import musik, naikkan atau turunkan nada hingga 6 semitone, lalu putar untuk latihan karaoke.</p></section>
 <div class="grid">
-<section class="card" id="importSection"><h3>01 · Import musik</h3><p class="sub">Pilih video MP4 dari perangkat kamu.</p>
+<section class="card" id="importSection"><h3>01 · Import musik</h3><p class="sub">Pilih file MP3 atau MP4 dari penyimpanan perangkat kamu.</p>
 <div id="videoStage" class="videoStage"></div><section class="mobile-fill" aria-label="Tips karaoke"><div class="mobile-tip"><span>✦</span><div><b>Tips vokal</b><p>Atur nada sedikit demi sedikit sampai lagu terasa pas dengan jangkauan suaramu.</p></div></div></section>
 <div class="filemeta"><div class="fileIcon" aria-hidden="true">♫</div><div class="filetext"><b id="fileName">Belum ada lagu dipilih</b><small id="fileSize">File audio akan tampil di sini</small><div class="status" id="fileStatus">Menunggu file</div></div></div>
 </section>
-<section class="card transposeCard" id="transposeSection"><label class="drop" id="dropZone" for="videoFile" role="button" tabindex="0"><div><div class="uploadIcon">⬆</div><strong>Tekan untuk pilih video MP4</strong><small>MP4 · pilih video baru untuk mengganti video</small></div></label><input id="videoFile" type="file" accept="video/*,.mp4,.m4v,.webm,.mov,.3gp" hidden><h3>02 · Transpose nada video</h3><p class="sub">Ubah nada audio video saat diputar.</p>
+<section class="card transposeCard" id="transposeSection"><label class="drop" id="dropZone" for="videoFile" role="button" tabindex="0"><div><div class="uploadIcon">⬆</div><strong>Tekan untuk pilih MP3 atau MP4</strong><small>MP3 · MP4 · pilih file baru untuk mengganti lagu</small></div></label><input id="videoFile" type="file" accept="audio/mpeg,audio/mp3,video/mp4,video/*,.mp3,.mp4,.m4v,.webm,.mov,.3gp" hidden><h3>02 · Transpose nada video</h3><p class="sub">Ubah nada audio video saat diputar.</p>
 <label class="keySelectWrap" aria-label="Pilih Tangga Nada">
   <select id="keySelect" class="keySelect">
     <option value="">Pilih Tangga Nada</option>
@@ -1155,6 +1155,7 @@ async function setupVideo(){
  if(video){video.pause();disconnectVideoAudio(video);video.removeAttribute('src');video.load();video.remove();}
  video=document.createElement('video');
  video.id='karaokeVideo';video.controls=true;video.playsInline=true;
+ video.dataset.mediaKind=(file&&/\.mp3$/i.test(file.name))?'audio':'video';
  if(isMobilePlaybackTarget()){video.volume=1;video.muted=false;}
  video.preload=isMobilePlaybackTarget()?'auto':'metadata';
  video.style.cssText='display:block;width:100%;max-height:52vh;object-fit:contain;background:#000;border-radius:16px;margin:12px 0';
@@ -1181,13 +1182,13 @@ async function setupVideo(){
  });
  video.addEventListener('loadedmetadata',()=>{
   $('duration').textContent=fmt(video.duration);
-  $('fileStatus').textContent='Video siap diputar';
+  $('fileStatus').textContent='File siap diputar';
   $('playBtn').disabled=false;
  });
  video.addEventListener('canplay',()=>{
   if(video&&video.isConnected){
    $('playBtn').disabled=false;
-   if($('fileStatus').textContent==='Memuat video…')$('fileStatus').textContent='Video siap diputar';
+   if($('fileStatus').textContent==='Memuat video…')$('fileStatus').textContent='File siap diputar';
   }
  });
  video.addEventListener('timeupdate',showTime);
@@ -1358,9 +1359,9 @@ async function clearVideo(){
  if(url){URL.revokeObjectURL(url);url=null;}
  file=null;playing=false;
  $('videoFile').value='';
- $('fileName').textContent='Belum ada video dipilih';
- $('fileSize').textContent='Pilih file MP4 dari perangkat';
- $('fileStatus').textContent='Menunggu video';
+ $('fileName').textContent='Belum ada file dipilih';
+ $('fileSize').textContent='Pilih file MP3 atau MP4 dari perangkat';
+ $('fileStatus').textContent='Menunggu file';
  $('clearBtn').disabled=true;$('playBtn').disabled=true;
  $('playBtn').textContent='▶ Putar video';
  $('duration').textContent='00:00';$('currentTime').textContent='00:00';
@@ -1395,7 +1396,7 @@ $('videoFile').addEventListener('change',async event=>{
     const bufferTask=waitForMobileVideoBuffer(activeVideo).catch(()=>false);
     Promise.all([audioReadyPromise,adTask,bufferTask]).then(async([audioReady,adPassed,bufferReady])=>{
      if(activeVideo!==video||!activeVideo.isConnected)return;
-     if(!adPassed||!bufferReady){$('fileStatus').textContent='Video siap · tekan Putar';return;}
+     if(!adPassed||!bufferReady){$('fileStatus').textContent='File siap · tekan Putar';return;}
      if(audioReady&&activeVideo.__miconAudioGraph){
       if(audioContext&&audioContext.state!=='running')try{await audioContext.resume();}catch(_){}
       configurePitchControls(true);
@@ -1405,9 +1406,9 @@ $('videoFile').addEventListener('change',async event=>{
      }
      window.__miconAdForFileDone=true;window.__miconAdAuthorized=true;
      try{await activeVideo.play();$('fileStatus').textContent='Video sedang diputar';}
-     catch(playError){$('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';}
+     catch(playError){$('playBtn').disabled=false;$('fileStatus').textContent='File siap · tekan Putar';}
     }).catch(error=>{
-     $('playBtn').disabled=false;$('fileStatus').textContent='Video siap · tekan Putar';
+     $('playBtn').disabled=false;$('fileStatus').textContent='File siap · tekan Putar';
      msg('Video lokal berhasil dimuat; audio sedang disiapkan: '+(error.message||error),true);
     }).finally(()=>{window.__miconOpeningAdRunning=false;});
    },{once:true});
@@ -1429,8 +1430,8 @@ $('videoFile').addEventListener('change',async event=>{
   }
   return;
  }
- if(!(/\.mp4$/i.test(selectedFile.name)||selectedFile.type==='video/mp4'||selectedFile.type==='application/mp4')){
-  msg('Pilih file video MP4.',true);picker.value='';return;
+ if(!(/\.(mp3|mp4)$/i.test(selectedFile.name)||selectedFile.type==='video/mp4'||selectedFile.type==='application/mp4'||selectedFile.type==='audio/mpeg'||selectedFile.type==='audio/mp3')){
+  msg('Pilih file MP3 atau MP4.',true);picker.value='';return;
  }
  try{
   await clearVideo();
@@ -1445,7 +1446,7 @@ $('videoFile').addEventListener('change',async event=>{
   window.__miconEndAdShown=false;window.__miconOpeningAdRunning=false;window.__miconOpeningAdPromise=null;
   url=URL.createObjectURL(masterFile);
   $('fileName').textContent=selectedFile.name;
-  $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video/mp4');
+  $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||(/\.mp3$/i.test(selectedFile.name)?'audio/mpeg':'video/mp4'));
   $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
   const isMobileImport=window.matchMedia('(max-width:760px)').matches;
   if(isMobileImport){
@@ -1481,7 +1482,7 @@ $('videoFile').addEventListener('change',async event=>{
      }
      if(loadedVideo!==video||!loadedVideo.isConnected)return;
      window.__miconAdForFileDone=true;
-     $('fileStatus').textContent='Video siap diputar';
+     $('fileStatus').textContent='File siap diputar';
      loadedVideo.currentTime=0;window.__miconAdAuthorized=true;
      try{await loadedVideo.play();}
      catch(playError){
@@ -1826,7 +1827,7 @@ html:has(#youtubeSection.active)::-webkit-scrollbar, body:has(#youtubeSection.ac
 <script type="module" id="micon-firebase-session-guard">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsoHofWuEfD2gwMNgfsad0KXxYlMMxw0w",
@@ -2068,71 +2069,78 @@ try {
   }
 
   async function initializeUserProfile(user, profileRef, phoneFromInternalEmail) {
-    if (!user || auth.currentUser?.uid !== user.uid) return null;
+    if (auth.currentUser?.uid !== user.uid) return;
 
-    // Satu jalur inisialisasi untuk setiap UID. Transaksi membaca dokumen
-    // terbaru agar trial tidak menimpa paket yang mungkin sudah dipasang admin.
-    const trialMs = 7 * 24 * 60 * 60 * 1000;
-    const createdMs = Date.parse(user.metadata?.creationTime || "");
-    const validCreatedAt = Number.isFinite(createdMs) && createdMs > 0;
-    const signupIso = validCreatedAt ? new Date(createdMs).toISOString() : null;
+    // Trial dan paket berbayar menulis field subscription yang sama.
+    // Gunakan transaksi dan baca ulang dokumen TERBARU sebelum memberi trial,
+    // sehingga inisialisasi trial yang tertunda tidak dapat menimpa paket admin.
+    const freeTrialDurationMs = 7 * 24 * 60 * 60 * 1000;
+    const authCreatedAtMs = Date.parse(user.metadata?.creationTime || "");
+    const hasValidAuthCreationTime = Number.isFinite(authCreatedAtMs) && authCreatedAtMs > 0;
     const nowMs = Date.now();
+    const signupIso = hasValidAuthCreationTime ? new Date(authCreatedAtMs).toISOString() : null;
 
-    return await runTransaction(db, async transaction => {
-      if (auth.currentUser?.uid !== user.uid) return null;
+    await runTransaction(db, async transaction => {
+      if (auth.currentUser?.uid !== user.uid) return;
 
-      const snapshot = await transaction.get(profileRef);
-      const current = snapshot.exists() ? (snapshot.data() || {}) : null;
+      // Jangan gunakan profileData/profileExists dari snapshot awal karena
+      // nilainya mungkin sudah basi saat transaksi dijalankan.
+      const latestSnapshot = await transaction.get(profileRef);
+      const latestProfile = latestSnapshot.exists() ? (latestSnapshot.data() || {}) : null;
 
-      if (!snapshot.exists()) {
-        const profile = {
+      if (!latestSnapshot.exists()) {
+        const newProfile = {
           Nama: user.displayName || "Pengguna MicOn",
-          NomorHp: phoneFromInternalEmail || user.phoneNumber || "",
+          NomorHp: phoneFromInternalEmail,
           role: "Pengguna",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         };
 
-        // Trial dihitung dari waktu pendaftaran Firebase Auth, bukan dari
-        // waktu pertama kali halaman utama dibuka. Trial hanya ditulis sekali.
-        if (validCreatedAt && createdMs + trialMs > nowMs) {
-          profile.subscription = {
+        if (hasValidAuthCreationTime && authCreatedAtMs + freeTrialDurationMs > nowMs) {
+          newProfile.subscription = {
             planId: "gratis7hari",
             planName: "Gratis 7 Hari",
             status: "active",
             startAt: signupIso,
-            expiresAt: new Date(createdMs + trialMs).toISOString(),
+            expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
             paidManually: false,
             source: "free_trial",
             updatedAt: new Date(nowMs).toISOString(),
             updatedBy: "system"
           };
-          profile.freeTrialGrantedAt = signupIso;
+          newProfile.freeTrialGrantedAt = signupIso;
         }
 
-        transaction.set(profileRef, profile);
-        return profile;
+        transaction.set(profileRef, newProfile);
+        return;
       }
 
-      const role = String(current.role || "Pengguna").trim().toLowerCase();
-      const existingSub = current.subscription;
-      const hasSubscription = !!existingSub && typeof existingSub === "object" &&
-        Object.keys(existingSub).length > 0;
-      const canGrantTrial = role !== "superadmin" &&
-        !hasSubscription &&
-        !current.freeTrialGrantedAt &&
-        !current.freeTrialCheckedAt &&
-        !current.subscriptionRemovedAt &&
-        validCreatedAt && createdMs + trialMs > nowMs;
+      const role = String(latestProfile.role || "Pengguna").trim().toLowerCase();
+      const currentSubscription = latestProfile.subscription;
+      const hasExistingSubscription = !!currentSubscription &&
+        typeof currentSubscription === "object" &&
+        Object.keys(currentSubscription).length > 0;
+
+      // Trial hanya boleh diberikan sekali untuk akun baru.
+      // Marker penghapusan paket bersifat permanen agar paket yang dihapus
+      // oleh Superadmin tidak pernah berubah menjadi trial gratis lagi.
+      const eligibleForTrial = role !== "superadmin" &&
+        !hasExistingSubscription &&
+        !latestProfile.freeTrialGrantedAt &&
+        !latestProfile.freeTrialCheckedAt &&
+        !latestProfile.subscriptionRemovedAt &&
+        hasValidAuthCreationTime &&
+        authCreatedAtMs + freeTrialDurationMs > nowMs;
 
       const updates = {};
-      if (canGrantTrial) {
+      if (eligibleForTrial) {
         updates.subscription = {
           planId: "gratis7hari",
           planName: "Gratis 7 Hari",
           status: "active",
           startAt: signupIso,
-          expiresAt: new Date(createdMs + trialMs).toISOString(),
+          expiresAt: new Date(authCreatedAtMs + freeTrialDurationMs).toISOString(),
           paidManually: false,
           source: "free_trial",
           updatedAt: new Date(nowMs).toISOString(),
@@ -2140,76 +2148,112 @@ try {
         };
         updates.freeTrialGrantedAt = signupIso;
       }
-      if (!String(current.Nama || "").trim() && user.displayName) updates.Nama = user.displayName;
-      if (!String(current.NomorHp || "").trim() && phoneFromInternalEmail) updates.NomorHp = phoneFromInternalEmail;
+
+      if (!String(latestProfile.Nama || "").trim() && user.displayName) {
+        updates.Nama = user.displayName;
+      }
+      if (!String(latestProfile.NomorHp || "").trim() && phoneFromInternalEmail) {
+        updates.NomorHp = phoneFromInternalEmail;
+      }
 
       if (Object.keys(updates).length) {
         updates.updatedAt = serverTimestamp();
+        // Perubahan trial hanya dapat commit bila dokumen yang dibaca transaksi
+        // belum berubah. Bila Superadmin menulis paket saat bersamaan, Firestore
+        // mengulang transaksi dan pengecekan akan melihat paket terbaru.
         transaction.update(profileRef, updates);
       }
-      return { ...current, ...updates };
     });
   }
 
-  let activeProfileUid = null;
-  onAuthStateChanged(auth, async user => {
+  onAuthStateChanged(auth, user => {
     if (stopUserProfileListener) {
       stopUserProfileListener();
       stopUserProfileListener = null;
     }
     clearSubscriptionExpiryTimer();
-    activeProfileUid = user?.uid || null;
+    initializingProfileForUid = null;
 
     if (!user) {
       window.location.replace(LOGIN_URL);
       return;
     }
 
-    const profileRef = doc(db, "Pengguna", user.uid);
+    // Dokumen langganan selalu menggunakan ID dokumen = Firebase Auth UID.
+    // Path ini harus sama persis dengan target dokumen yang ditulis Superadmin.
+    const profileRef = doc(db, "Pengguna", String(user.uid));
     const internalPhone = user.email ? user.email.split("@")[0] : "";
-    const phoneFromInternalEmail = /^62\d{8,13}$/.test(internalPhone)
+    const phoneFromInternalEmail = /^62\\d{8,13}$/.test(internalPhone)
       ? "0" + internalPhone.slice(2)
       : (user.phoneNumber || "");
 
-    try {
-      // Buat/cek profil lebih dahulu. Listener realtime baru dipasang setelah
-      // transaksi berhasil, sehingga tidak ada dua jalur pembuatan profil.
-      const initializedProfile = await initializeUserProfile(user, profileRef, phoneFromInternalEmail);
-      if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
-      if (initializedProfile) renderSubscriptionGate(initializedProfile, user, phoneFromInternalEmail);
-      document.documentElement.classList.remove("micon-auth-check");
+    // LISTENER DIPASANG TERLEBIH DAHULU. Dengan demikian, pembukaan/penghapusan
+    // paket oleh Superadmin selalu didengar meskipun proses inisialisasi profil
+    // memerlukan waktu atau gagal pada langkah berikutnya.
+    console.info("[MicOn realtime] Mendengarkan dokumen:", profileRef.path, "UID:", user.uid);
+    stopUserProfileListener = onSnapshot(
+      profileRef,
+      { includeMetadataChanges: true },
+      profileSnap => {
+        if (auth.currentUser?.uid !== user.uid) return;
 
-      stopUserProfileListener = onSnapshot(
-        profileRef,
-        profileSnap => {
-          if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
-          const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
-          renderSubscriptionGate(profile, user, phoneFromInternalEmail);
-        },
-        listenerError => {
-          console.error("MicOn subscription listener failed:", listenerError);
-          if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
-          document.documentElement.classList.remove("micon-auth-check");
-          const code = listenerError?.code || "unknown";
-          alert(
-            "Data langganan MicOn tidak dapat dibaca dari Firestore Pengguna. " +
-            "Detail: " + code + " — " + (listenerError?.message || String(listenerError)) +
-            ". Pastikan Firestore Rules mengizinkan pengguna membaca dokumen Pengguna dengan ID UID miliknya sendiri."
-          );
+        const profile = profileSnap.exists() ? (profileSnap.data() || {}) : {};
+        // Setiap perubahan subscription pada Pengguna/{UID} langsung diproses,
+        // tanpa reload dan tanpa mengambil profil dari cache selain snapshot awal.
+        renderSubscriptionGate(profile, user, phoneFromInternalEmail);
+
+        // Inisialisasi profil/trial hanya dijalankan sekali setelah snapshot
+        // server diterima, bukan dari cache lokal yang mungkin belum mutakhir.
+        if (!profileSnap.metadata.fromCache && initializingProfileForUid !== user.uid) {
+          initializingProfileForUid = user.uid;
+          initializeUserProfile(
+            user,
+            profileRef,
+            phoneFromInternalEmail
+          ).then(() => {
+            if (auth.currentUser?.uid === user.uid) {
+              document.documentElement.classList.remove("micon-auth-check");
+            }
+          }).catch(profileError => {
+            console.error("MicOn user profile initialization failed:", profileError);
+            if (auth.currentUser?.uid !== user.uid) return;
+            const errorCode = profileError?.code || "unknown";
+            const errorMessage = profileError?.message || String(profileError || "Kesalahan tidak diketahui");
+            document.documentElement.classList.remove("micon-auth-check");
+            alert(
+              "Profil akun belum dapat dibuat atau diperbarui di Firestore Pengguna. " +
+              "Detail: " + errorCode + " — " + errorMessage +
+              ". Periksa izin read/create/update pada Firestore Rules untuk Pengguna/UID akun ini."
+            );
+          });
         }
-      );
-    } catch (profileError) {
-      console.error("MicOn profile initialization failed:", profileError);
-      if (auth.currentUser?.uid !== user.uid || activeProfileUid !== user.uid) return;
-      document.documentElement.classList.remove("micon-auth-check");
-      const code = profileError?.code || "unknown";
-      const message = profileError?.message || String(profileError || "Kesalahan tidak diketahui");
-      alert(
-        "Profil akun MicOn gagal dibuat/diperbarui di Firestore Pengguna. " +
-        "Detail: " + code + " — " + message +
-        ". Firestore Rules wajib mengizinkan read dan create/update hanya untuk Pengguna/{UID} milik akun yang sedang login."
-      );
-    }
+      },
+      error => {
+        console.error("MicOn Firebase subscription realtime listener failed:", error);
+        if (auth.currentUser?.uid !== user.uid) return;
+
+        // Fail closed untuk akun pengguna ketika listener tidak dapat membaca
+        // status terbaru; role Superadmin tetap mengikuti pengecualian sistem.
+        const fallbackProfile = latestSubscriptionProfile || {};
+        const fallbackRole = String(fallbackProfile.role || "Pengguna").trim().toLowerCase();
+        renderSubscriptionGate(
+          fallbackRole === "superadmin"
+            ? fallbackProfile
+            : { ...fallbackProfile, subscription: { status: "inactive" } },
+          user,
+          phoneFromInternalEmail
+        );
+
+        document.documentElement.classList.remove("micon-auth-check");
+        const errorCode = error?.code || "unknown";
+        const errorMessage = error?.message || String(error || "Kesalahan tidak diketahui");
+        alert(
+          "Listener realtime langganan MicOn gagal. Detail: " +
+          errorCode + " — " + errorMessage +
+          ". Periksa koneksi dan izin read pada Firestore Rules untuk Pengguna/UID akun ini."
+        );
+      }
+    );
   });
 } catch (error) {
   console.error("MicOn Firebase initialization failed:", error);
@@ -2342,7 +2386,7 @@ try {
 
  function makePicker(){
   picker=document.createElement('input');
-  picker.type='file';picker.accept='video/*,.mp4,.m4v,.webm,.mov,.3gp';
+  picker.type='file';picker.accept='audio/mpeg,audio/mp3,video/mp4,video/*,.mp3,.mp4,.m4v,.webm,.mov,.3gp';
   picker.multiple=true;picker.hidden=true;picker.setAttribute('aria-label','Pilih video untuk playlist');
   picker.className=mobile?'mobile-playlist-picker':'desktop-playlist-picker';
  }
@@ -2351,13 +2395,14 @@ try {
   panel.className='mobile-playlist-panel';panel.setAttribute('aria-label','Playlist video');
   addButton=document.createElement('button');addButton.type='button';
   addButton.className='mobile-playlist-import';addButton.textContent='Tambah Playlist';
+  const folderButton=document.createElement('button');folderButton.type='button';folderButton.textContent='Pilih Folder Lokal';folderButton.className='mobile-playlist-import';folderButton.style.marginTop='7px';folderButton.hidden=typeof window.showDirectoryPicker!=='function';folderButton.addEventListener('click',chooseMasterFolder);
   const headingRow=document.createElement('div');headingRow.className='mobile-playlist-head-row';
   const heading=document.createElement('div');heading.className='mobile-playlist-heading';heading.textContent='Playlist';
   const durationBox=document.createElement('div');durationBox.className='mobile-package-duration';
   durationBox.innerHTML='<span class=\"mobile-package-duration-title\">Durasi Paket</span><strong id=\"micon-package-countdown\">Memuat...</strong>';
   headingRow.append(heading,durationBox);
   list=document.createElement('div');list.className='mobile-playlist-list';
-  makePicker();panel.append(addButton,headingRow,list,picker);
+  makePicker();panel.append(addButton,folderButton,headingRow,list,picker);
   grid.insertAdjacentElement('afterend',panel);
   return panel;
  }
@@ -2375,8 +2420,9 @@ try {
   playlistView.hidden=true;
   list=document.createElement('div');list.className='desktop-playlist-list';
   addButton=document.createElement('button');addButton.type='button';
-  addButton.className='desktop-playlist-add';addButton.textContent='TAMBAH VIDEO';
-  makePicker();playlistView.append(list,addButton,picker);
+  addButton.className='desktop-playlist-add';addButton.textContent='TAMBAH MP3 / MP4';
+  const folderButton=document.createElement('button');folderButton.type='button';folderButton.textContent='Pilih Folder Lokal';folderButton.className='desktop-playlist-add';folderButton.style.marginTop='7px';folderButton.hidden=typeof window.showDirectoryPicker!=='function';folderButton.addEventListener('click',chooseMasterFolder);
+  makePicker();playlistView.append(list,addButton,folderButton,picker);
   const importSection=document.getElementById('importSection');
   const filemeta=importSection&&importSection.querySelector('.filemeta');
   const controls=[
@@ -2495,7 +2541,7 @@ try {
    if(!file)return;
    const suppliedName=item&&item.file?item.displayName:'';
    const rawName=String(suppliedName||file.name||file.webkitRelativePath&&file.webkitRelativePath.split('/').pop()||'Video tanpa nama');
-   if(!(file.type||'').startsWith('video/')&&!/\.(mp4|m4v|webm|mov|3gp)$/i.test(rawName))return;
+   if(!(file.type||'').startsWith('video/')&&!(file.type||'').startsWith('audio/')&&!/\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(rawName))return;
    const key=fileKey(file);
    if(!playlist.some(entry=>entry.key===key))playlist.push({file,key,displayName:rawName});
   });
@@ -2525,12 +2571,13 @@ try {
    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
    if(bytes.length)chunks.push(bytes);
    const read=Number(result.bytesRead||bytes.length);
-   if(read<=0)throw new Error('Pembacaan video terhenti: '+name);
+   if(read<=0)throw new Error('Pembacaan file terhenti: '+name);
+   if(read!==bytes.length)throw new Error('Data file tidak utuh saat dibaca: '+name);
    offset+=read;
   }
   const ext=(name.split('.').pop()||'').toLowerCase();
   const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
-   ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
+   ({mp3:'audio/mpeg',mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'application/octet-stream');
   return new File(chunks,name,{type:mime,lastModified:Date.now()});
  }
 
@@ -2541,7 +2588,8 @@ try {
    try{
     const handles=await window.showOpenFilePicker({
      multiple:true,
-     types:[{description:'File video',accept:{
+     types:[{description:'File MP3 dan MP4',accept:{
+      'audio/mpeg':['.mp3'],
       'video/mp4':['.mp4'],
       'video/x-m4v':['.m4v'],
       'video/webm':['.webm'],
@@ -2577,7 +2625,7 @@ try {
    let firstError=null;
    while(true){
     let selection;
-    try{selection=await fs.pickFile('video/*');}
+    try{selection=await fs.pickFile('*/*');}
     catch(error){firstError=error;break;}
     if(!selection||!selection.ok){
      if(selection&&selection.error==='cancelled')break;
@@ -2587,8 +2635,8 @@ try {
     }
     try{
      const name=String(selection.name||'').trim();
-     if(!/\.(mp4|m4v|webm|mov|3gp)$/i.test(name)){
-      throw new Error('File bukan video yang didukung: '+(name||'tanpa nama'));
+     if(!/\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(name)){
+      throw new Error('Pilih file MP3 atau video yang didukung: '+(name||'tanpa nama')) ;
      }
      const file=await fileFromWebToApkFS(selection,fs);
      picked.push({file,displayName:name});
@@ -2654,16 +2702,16 @@ try {
  async function readMasterFolder(handle){
   const found=[];
   for await(const entry of handle.values()){
-   if(entry.kind!=='file'||! /\.(mp4|m4v|webm|mov|3gp)$/i.test(entry.name))continue;
+   if(entry.kind!=='file'||! /\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(entry.name))continue;
    const item=await entry.getFile();found.push({file:item,displayName:entry.name});
   }
   found.sort((a,b)=>a.displayName.localeCompare(b.displayName,undefined,{numeric:true,sensitivity:'base'}));
   if(found.length)importFiles(found);
-  else if(!playlist.length)msg('Folder Master belum berisi file video yang didukung.',true);
+  else if(!playlist.length)msg('Folder Master belum berisi file MP3 atau MP4 yang didukung.',true);
   return found.length;
  }
  async function restoreMasterFolder(){
-  if(!mobile||typeof window.showDirectoryPicker!=='function')return;
+  if(typeof window.showDirectoryPicker!=='function')return;
   try{
    const handle=await getMasterHandle();if(!handle)return;
    const permission=await handle.queryPermission({mode:'read'});
@@ -2671,7 +2719,6 @@ try {
   }catch(error){console.warn('MicOn: folder Master belum dapat dibaca otomatis:',error);}
  }
  async function chooseMasterFolder(){
-  if(!mobile)return false;
   if(typeof window.showDirectoryPicker!=='function')return false;
   try{
    const handle=await window.showDirectoryPicker({id:'micon-master-folder',mode:'read'});
@@ -2679,7 +2726,7 @@ try {
    if(permission!=='granted')throw new Error('Izin membaca folder Master belum diberikan.');
    await saveMasterHandle(handle);
    const count=await readMasterFolder(handle);
-   msg(count+' video dari folder Master berhasil dimuat.');
+   msg(count+' file MP3/MP4 dari folder Master berhasil dimuat.');
    return true;
   }catch(error){
    if(error&&error.name==='AbortError')return true;
@@ -2688,11 +2735,8 @@ try {
    return true;
   }
  }
- if(mobile){
-  /* Jangan cegat klik Tambah Playlist: biarkan handler utama membuka pemilih video.
-     Folder Master yang sudah diizinkan tetap dipulihkan otomatis saat aplikasi dibuka. */
-  restoreMasterFolder();
- }
+ /* Folder lokal yang sebelumnya sudah diberi izin dipulihkan otomatis saat aplikasi dibuka. */
+ restoreMasterFolder();
  let advancing=false;
  window.__miconPlaylistAdvance=()=>{
   if(advancing)return;
