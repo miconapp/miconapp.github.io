@@ -1310,23 +1310,44 @@ function loadUsers(force = false){
     stopUsers();
     stopUsers = null;
   }
+
+  // Kosongkan daftar lama saat listener baru dimulai. Menu Paket hanya
+  // menampilkan dokumen yang sudah dikonfirmasi ada pada snapshot server.
+  users = [];
+  renderUsers();
+  metrics();
+
   const usersCollection = collection(db, "Pengguna");
-  stopUsers = onSnapshot(usersCollection, snapshot => {
-    // __docId tidak dapat ditimpa field uid milik dokumen.
-    users = snapshot.docs.map(documentSnapshot => ({
-      ...(documentSnapshot.data() || {}),
-      __docId: documentSnapshot.id
-    }));
+  stopUsers = onSnapshot(usersCollection, {includeMetadataChanges:true}, snapshot => {
+    const connection = $("connection");
+
+    // Snapshot cache belum membuktikan dokumen masih ada di Firestore.
+    // Sembunyikan seluruh daftar sampai snapshot server diterima.
+    if (snapshot.metadata?.fromCache) {
+      users = [];
+      renderUsers();
+      metrics();
+      if (connection) connection.textContent = "Memverifikasi data pengguna di Firestore…";
+      return;
+    }
+
+    // Sumber tunggal daftar Paket adalah dokumen yang benar-benar ada
+    // pada koleksi Pengguna di Firestore. Dokumen yang dihapus otomatis hilang.
+    users = snapshot.docs
+      .filter(documentSnapshot => documentSnapshot.exists())
+      .map(documentSnapshot => ({
+        ...(documentSnapshot.data() || {}),
+        __docId: documentSnapshot.id
+      }));
+
     renderUsers();
     metrics();
-    const connection = $("connection");
     if (connection) {
-      connection.textContent = "Realtime Firestore aktif · " + users.length + " akun" +
-        (snapshot.metadata?.fromCache ? " · cache" : " · server");
+      connection.textContent = "Realtime Firestore aktif · " + users.length + " akun · server";
     }
     console.debug("MicOn Pengguna snapshot", {
       projectId: "rekapinyu-storage",
-      documentIds: snapshot.docs.map(documentSnapshot => documentSnapshot.id)
+      documentIds: users.map(user => user.__docId)
     });
   }, error => {
     stopUsers = null;
