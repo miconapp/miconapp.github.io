@@ -2395,14 +2395,13 @@ try {
   panel.className='mobile-playlist-panel';panel.setAttribute('aria-label','Playlist video');
   addButton=document.createElement('button');addButton.type='button';
   addButton.className='mobile-playlist-import';addButton.textContent='Tambah Playlist';
-  const folderButton=document.createElement('button');folderButton.type='button';folderButton.textContent='Pilih Folder Lokal';folderButton.className='mobile-playlist-import';folderButton.style.marginTop='7px';folderButton.hidden=typeof window.showDirectoryPicker!=='function';folderButton.addEventListener('click',chooseMasterFolder);
   const headingRow=document.createElement('div');headingRow.className='mobile-playlist-head-row';
   const heading=document.createElement('div');heading.className='mobile-playlist-heading';heading.textContent='Playlist';
   const durationBox=document.createElement('div');durationBox.className='mobile-package-duration';
   durationBox.innerHTML='<span class=\"mobile-package-duration-title\">Durasi Paket</span><strong id=\"micon-package-countdown\">Memuat...</strong>';
   headingRow.append(heading,durationBox);
   list=document.createElement('div');list.className='mobile-playlist-list';
-  makePicker();panel.append(addButton,folderButton,headingRow,list,picker);
+  makePicker();panel.append(addButton,headingRow,list,picker);
   grid.insertAdjacentElement('afterend',panel);
   return panel;
  }
@@ -2421,8 +2420,7 @@ try {
   list=document.createElement('div');list.className='desktop-playlist-list';
   addButton=document.createElement('button');addButton.type='button';
   addButton.className='desktop-playlist-add';addButton.textContent='TAMBAH MP3 / MP4';
-  const folderButton=document.createElement('button');folderButton.type='button';folderButton.textContent='Pilih Folder Lokal';folderButton.className='desktop-playlist-add';folderButton.style.marginTop='7px';folderButton.hidden=typeof window.showDirectoryPicker!=='function';folderButton.addEventListener('click',chooseMasterFolder);
-  makePicker();playlistView.append(list,addButton,folderButton,picker);
+  makePicker();playlistView.append(list,addButton,picker);
   const importSection=document.getElementById('importSection');
   const filemeta=importSection&&importSection.querySelector('.filemeta');
   const controls=[
