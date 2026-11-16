@@ -2942,6 +2942,14 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     if(done)done(true);
   }
   function updateClock(){
+    /* Durasi iklan mengikuti waktu video yang benar-benar sudah diputar.
+       Ketika jaringan buffering/stalled, currentTime tidak bertambah sehingga
+       hitungan tidak menghabiskan durasi iklan sebelum video selesai diputar. */
+    const mediaTime=Number(adVideo.currentTime);
+    if(Number.isFinite(mediaTime)&&mediaTime>elapsed)elapsed=mediaTime;
+    /* Jika sumber iklan benar-benar error, tetap gunakan batas waktu agar
+       overlay tidak mengunci pemutaran video utama selamanya. */
+    else if(adVideo.error)elapsed+=1;
     const remaining=Math.max(0,activeDuration-elapsed);
     if(elapsed>=activeSkipAfter){
       skip.disabled=false;
@@ -2950,9 +2958,8 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       skip.disabled=true;
       skip.textContent="Lewati dalam "+Math.ceil(activeSkipAfter-elapsed);
     }
-    count.textContent="Iklan selesai otomatis dalam "+remaining+" detik, Video akan diputar otomatis";
+    count.textContent="Iklan selesai otomatis dalam "+Math.ceil(remaining)+" detik, Video akan diputar otomatis";
     if(remaining<=0)finishAd();
-    elapsed++;
   }
   async function loadAdConfig(){
     if(!db)db=getFirestore(getApp());
@@ -3063,6 +3070,9 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       errorBox.style.display="block";
     });
   });
+  /* Perbarui label segera saat posisi video berubah; interval satu detik
+     tetap menjadi cadangan untuk browser yang jarang mengirim timeupdate. */
+  adVideo.addEventListener("timeupdate",updateClock);
   adVideo.addEventListener("ended",finishAd);
   adVideo.addEventListener("error",()=>{
     if(!showing)return;
