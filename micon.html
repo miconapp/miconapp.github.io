@@ -2321,8 +2321,17 @@ try {
   .desktop-transpose-view .filetext b{font-size:10px;line-height:1.25}
   .desktop-transpose-view .filetext small{font-size:8px}
   .desktop-transpose-view .status{display:inline;font-size:9px;margin-left:5px}
-  .desktop-transpose-view .keySelectWrap{display:block;width:100%;margin:0 0 8px}
-  .desktop-transpose-view .keySelect{height:40px}
+  .desktop-transpose-view .desktop-ad-banner{
+    display:block;box-sizing:border-box;width:477.59px;max-width:100%;
+    height:55px;min-height:55px;max-height:55px;flex:0 0 55px;
+    margin:0;padding:0;overflow:hidden;border:0;border-radius:8px;
+    background:#f1f5f9;contain:strict;isolation:isolate;
+  }
+  .desktop-transpose-view .desktop-ad-banner:not(.is-configured){background:transparent}
+  .desktop-transpose-view .desktop-ad-banner iframe{
+    display:block;width:100%;height:100%;min-height:0;max-height:100%;
+    border:0;border-radius:inherit;background:transparent;
+  }
   .desktop-transpose-view .noteBox{
     height:112px!important;min-height:112px;margin:0 0 12px!important;padding:10px!important;
     border:1px solid #d8e2f0;background:#f8fafc;border-radius:17px;
@@ -2423,9 +2432,13 @@ try {
   makePicker();playlistView.append(list,addButton,picker);
   const importSection=document.getElementById('importSection');
   const filemeta=importSection&&importSection.querySelector('.filemeta');
+  const desktopBanner=document.createElement('div');
+  desktopBanner.id='micon-desktop-ad-banner';
+  desktopBanner.className='desktop-ad-banner';
+  desktopBanner.setAttribute('aria-label','Banner iklan dari Superadmin');
   const controls=[
    document.getElementById('dropZone'),filemeta,
-   transpose.querySelector('.keySelectWrap'),transpose.querySelector('.noteBox'),
+   desktopBanner,transpose.querySelector('.noteBox'),
    transpose.querySelector('.stepper'),transpose.querySelector('.rangeLabels'),
    transpose.querySelector('.row'),transpose.querySelector('#alert'),videoInput
   ];
@@ -3061,7 +3074,9 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
      dan banner pada layar kunci langganan. Tidak ada koleksi atau listener duplikat. */
   function connectBannerGambar(){
     const homeBanner=document.querySelector('.mobile-ad-banner');
+    const desktopBanner=document.getElementById('micon-desktop-ad-banner');
     if(homeBanner){homeBanner.classList.remove('is-configured');homeBanner.replaceChildren();}
+    if(desktopBanner){desktopBanner.classList.remove('is-configured');desktopBanner.replaceChildren();}
     if(!db)db=getFirestore(getApp());
     let latestBannerConfig=null;
     const escapeAttribute=value=>String(value||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -3099,7 +3114,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       frame.setAttribute('referrerpolicy','no-referrer');
       frame.setAttribute('scrolling','no');
       frame.setAttribute('aria-label',name);
-      frame.style.cssText='display:block;width:100%;height:65px;min-height:65px;max-height:65px;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
+      frame.style.cssText='display:block;width:100%;height:100%;min-height:0;max-height:100%;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
       frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:fill;object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
@@ -3115,6 +3130,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       const root=snapshot.exists()?snapshot.data():{};
       latestBannerConfig=root.banner||{};
       renderBannerTarget(homeBanner,latestBannerConfig);
+      renderBannerTarget(desktopBanner,latestBannerConfig);
       renderBannerTarget(document.getElementById('micon-gate-banner'),latestBannerConfig);
     },error=>console.warn("MicOn Banner Gambar config could not be loaded:",error));
   }
