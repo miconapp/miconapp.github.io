@@ -3104,7 +3104,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       const clickUrl=escapeAttribute(destination);
       const title=escapeAttribute(name);
       // Banner desktop menjaga rasio asli gambar; banner mobile tetap mengikuti perilaku sebelumnya.
-      const imageFit=banner.id==="micon-desktop-ad-banner"?"contain":"fill";
+      const imageFit=banner.id==="micon-desktop-ad-banner"?"cover":"fill";
       const clickMarkup=destination
         ? '<a href="'+clickUrl+'" target="_blank" rel="noopener noreferrer" aria-label="'+title+'">'
         : '';
