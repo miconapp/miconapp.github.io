@@ -2615,32 +2615,47 @@ try {
 
  async function fileFromWebToApkFS(selection,fs){
   const name=String(selection.name||'Video tanpa nama').trim();
-  const uri=selection.uri;
-  if(!uri)throw new Error('Android tidak mengembalikan alamat file.');
+  /* SAF helper menerima URI content:// maupun path relatif dari folder yang
+     sudah diizinkan. Gunakan path relatif sebagai pilihan utama agar daftar
+     file tetap dapat dibaca pada bridge yang tidak menyertakan entry.uri. */
+  const source=String(selection.path||selection.uri||'');
+  if(!source)throw new Error('Android tidak mengembalikan jalur file: '+name);
   let size=Number(selection.size||0);
-  if(!size&&typeof fs.stat==='function'){
-   const info=fs.stat(uri);
-   if(info&&info.ok)size=Number(info.size||0);
+  let info=null;
+  if(typeof fs.stat==='function'){
+   info=fs.stat(source);
+   if(info&&info.ok){
+    const statSize=Number(info.size||info.length||0);
+    if(statSize>0)size=statSize;
+   }else if(!size){
+    throw new Error('Metadata file tidak dapat dibaca ('+(info&&info.error||'unknown')+'): '+name);
+   }
   }
   if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran file tidak terbaca: '+name);
-  const chunkSize=Math.max(65536,Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576);
+  const advertised=Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576;
+  const chunkSize=Math.max(65536,Math.min(advertised,4*1024*1024));
   const chunks=[];
   let offset=0;
   while(offset<size){
-   const result=fs.readBytes(uri,offset,Math.min(chunkSize,size-offset));
+   const result=fs.readBytes(source,offset,Math.min(chunkSize,size-offset));
    if(!result||!result.ok)throw new Error('Gagal membaca '+name+': '+(result&&result.error||'kesalahan file'));
    const binary=atob(result.base64||'');
    const bytes=new Uint8Array(binary.length);
    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-   if(bytes.length)chunks.push(bytes);
    const read=Number(result.bytesRead||bytes.length);
-   if(read<=0)throw new Error('Pembacaan file terhenti: '+name);
+   if(read<=0){
+    if(result.eof)break;
+    throw new Error('Pembacaan file terhenti: '+name);
+   }
    if(read!==bytes.length)throw new Error('Data file tidak utuh saat dibaca: '+name);
+   chunks.push(bytes);
    offset+=read;
+   if(result.eof)break;
   }
+  if(offset!==size)throw new Error('Video terbaca tidak lengkap ('+offset+' dari '+size+' byte): '+name);
   const ext=(name.split('.').pop()||'').toLowerCase();
   const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
-   ({mp3:'audio/mpeg',mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'application/octet-stream');
+   ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
   return new File(chunks,name,{type:mime,lastModified:Number(selection.lastModified||Date.now())});
  }
 
@@ -2650,21 +2665,26 @@ try {
   }
   const queue=[{path:'',display:''}];
   const picked=[];
+  let scanned=0;
   while(queue.length){
    const current=queue.shift();
-   const entries=fs.list(current.path)||[];
+   const rawEntries=fs.list(current.path);
+   const entries=Array.isArray(rawEntries)?rawEntries:[];
    for(const entry of entries){
+    if(!entry||!entry.name)continue;
+    scanned++;
     const relative=current.path?current.path+'/'+entry.name:entry.name;
     const display=current.display?current.display+'/'+entry.name:entry.name;
-    if(entry.isDirectory){
+    const isDirectory=entry.isDirectory===true||entry.isDirectory==='true';
+    if(isDirectory){
      queue.push({path:relative,display});
      continue;
     }
-    if(!/\.mp4$/i.test(entry.name||''))continue;
-    if(!entry.uri)continue;
+    if(!/\.mp4$/i.test(entry.name))continue;
     const file=await fileFromWebToApkFS({
      name:entry.name,
-     uri:entry.uri,
+     path:relative,
+     uri:entry.uri||'',
      size:Number(entry.length||0),
      mime:'video/mp4',
      lastModified:Number(entry.lastModified||Date.now())
@@ -2681,8 +2701,11 @@ try {
   const label=selectedNativeFolderName||'Folder dipilih';
   const buttonLabel=addButton&&addButton.querySelector('.micon-folder-label');
   if(buttonLabel)buttonLabel.textContent=label;
-  if(!picked.length)msg('Folder yang dipilih tidak berisi file MP4.',true);
-  else msg(picked.length+' video MP4 berhasil dibaca dari folder '+label+'.');
+  if(!picked.length){
+   msg(scanned?'Tidak ditemukan video MP4 di folder '+label+'.':'Folder '+label+' kosong atau tidak dapat dibaca.',true);
+  }else{
+   msg(picked.length+' video MP4 berhasil dimuat dari folder '+label+'.');
+  }
   return picked.length;
  }
  let selectedNativeFolderName='';
