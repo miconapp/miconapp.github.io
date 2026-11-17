@@ -2613,177 +2613,35 @@ try {
   if(before===0&&playlist.length>0&&currentIndex===-1)loadItem(0);
  }
 
- function nativeReadBytes(fs,source,offset,length){
-  if(fs&&typeof fs.readBytes==='function')return fs.readBytes(source,offset,length);
-  const bridge=window.WebToApk;
-  if(bridge&&typeof bridge.readFileBase64==='function'){
-   const raw=bridge.readFileBase64(source,offset,length);
-   if(typeof raw==='string'){
-    try{return JSON.parse(raw);}catch(error){throw new Error('Respons baca file Android tidak valid: '+error.message);}
-   }
-   return raw;
-  }
-  throw new Error('API pembaca video Android tidak tersedia.');
- }
-
  async function fileFromWebToApkFS(selection,fs){
   const name=String(selection.name||'Video tanpa nama').trim();
-  /* SAF mengembalikan URI per file dari list(). URI itu didukung langsung
-     oleh stat/readBytes; path relatif dicoba sebagai cadangan untuk build lama. */
-  const sources=[selection.uri,selection.path].filter((value,index,array)=>value&&array.indexOf(value)===index);
-  if(!sources.length)throw new Error('Android tidak memberikan URI atau jalur file: '+name);
-  let lastError=null;
-  for(const source of sources){
-   try{
-    let size=Number(selection.size||0);
-    if(typeof fs.stat==='function'){
-     const info=fs.stat(source);
-     if(info&&info.ok){
-      const statSize=Number(info.size||info.length||0);
-      if(statSize>0)size=statSize;
-     }else if(!size){
-      throw new Error('Metadata file tidak terbaca ('+(info&&info.error||'unknown')+').');
-     }
-    }
-    if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran file tidak terbaca.');
-    const advertised=Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576;
-    const chunkSize=Math.max(1,Math.min(advertised,1048576));
-    const chunks=[];
-    let offset=0;
-    while(offset<size){
-     const result=nativeReadBytes(fs,source,offset,Math.min(chunkSize,size-offset));
-     if(!result||!result.ok)throw new Error('Gagal membaca byte '+offset+': '+(result&&result.error||'kesalahan file'));
-     const binary=atob(result.base64||'');
-     const bytes=new Uint8Array(binary.length);
-     for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-     const read=Number(result.bytesRead||bytes.length);
-     if(read<=0){
-      if(result.eof)break;
-      throw new Error('Pembacaan file berhenti sebelum selesai.');
-     }
-     if(read!==bytes.length)throw new Error('Jumlah byte yang diterima tidak cocok.');
-     chunks.push(bytes);
-     offset+=read;
-     if(result.eof)break;
-    }
-    if(offset!==size)throw new Error('Video terbaca tidak lengkap ('+offset+' dari '+size+' byte).');
-    const ext=(name.split('.').pop()||'').toLowerCase();
-    const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
-     ({mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'video/mp4');
-    return new File(chunks,name,{type:mime,lastModified:Number(selection.lastModified||Date.now())});
-   }catch(error){lastError=error;}
+  const uri=selection.uri;
+  if(!uri)throw new Error('Android tidak mengembalikan alamat file.');
+  let size=Number(selection.size||0);
+  if(!size&&typeof fs.stat==='function'){
+   const info=fs.stat(uri);
+   if(info&&info.ok)size=Number(info.size||0);
   }
-  throw new Error((lastError&&lastError.message)||('Tidak dapat membaca '+name));
- }
-
- async function readNativePlaylistFolder(fs){
-  if(!fs||typeof fs.list!=='function')throw new Error('Fungsi daftar folder Android tidak tersedia.');
-  if(typeof fs.readBytes!=='function'&&!(window.WebToApk&&typeof window.WebToApk.readFileBase64==='function')){
-   throw new Error('Fungsi membaca isi video Android tidak tersedia pada APK ini.');
+  if(!Number.isFinite(size)||size<=0)throw new Error('Ukuran file tidak terbaca: '+name);
+  const chunkSize=Math.max(65536,Number(typeof fs.maxChunkSize==='function'&&fs.maxChunkSize())||1048576);
+  const chunks=[];
+  let offset=0;
+  while(offset<size){
+   const result=fs.readBytes(uri,offset,Math.min(chunkSize,size-offset));
+   if(!result||!result.ok)throw new Error('Gagal membaca '+name+': '+(result&&result.error||'kesalahan file'));
+   const binary=atob(result.base64||'');
+   const bytes=new Uint8Array(binary.length);
+   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+   if(bytes.length)chunks.push(bytes);
+   const read=Number(result.bytesRead||bytes.length);
+   if(read<=0)throw new Error('Pembacaan file terhenti: '+name);
+   if(read!==bytes.length)throw new Error('Data file tidak utuh saat dibaca: '+name);
+   offset+=read;
   }
-  const queue=[{path:'',display:''}];
-  const picked=[];
-  const failures=[];
-  let scanned=0;
-  let videoFound=0;
-  while(queue.length){
-   const current=queue.shift();
-   let rawEntries=fs.list(current.path);
-   if(typeof rawEntries==='string'){
-    try{rawEntries=JSON.parse(rawEntries);}catch(_){rawEntries=[];}
-   }
-   if(!Array.isArray(rawEntries))throw new Error('Android tidak mengembalikan daftar isi folder '+(current.display||'utama')+'.');
-   for(const entry of rawEntries){
-    if(!entry||!entry.name)continue;
-    scanned++;
-    const relative=current.path?current.path+'/'+entry.name:entry.name;
-    const display=current.display?current.display+'/'+entry.name:entry.name;
-    const isDirectory=entry.isDirectory===true||entry.isDirectory==='true'||entry.isDirectory===1||entry.mime==='vnd.android.document/directory';
-    if(isDirectory){
-     queue.push({path:relative,display});
-     continue;
-    }
-    if(!/\.mp4$/i.test(entry.name))continue;
-    videoFound++;
-    try{
-     const file=await fileFromWebToApkFS({
-      name:entry.name,
-      path:relative,
-      uri:entry.uri||'',
-      size:Number(entry.length||entry.size||0),
-      mime:entry.mime&&entry.mime!=='application/octet-stream'?entry.mime:'video/mp4',
-      lastModified:Number(entry.lastModified||Date.now())
-     },fs);
-     picked.push({file,displayName:display});
-    }catch(error){
-     failures.push(display+': '+(error&&error.message||error));
-    }
-    /* Beri WebView kesempatan memperbarui layar saat folder berisi banyak video. */
-    await new Promise(resolve=>setTimeout(resolve,0));
-   }
-  }
-  picked.sort((a,b)=>a.displayName.localeCompare(b.displayName,undefined,{numeric:true,sensitivity:'base'}));
-  playlist.splice(0,playlist.length);
-  currentIndex=-1;
-  playlistIsPlaying=false;
-  if(picked.length)importFiles(picked);
-  else render();
-  const label=selectedNativeFolderName||'Folder dipilih';
-  const buttonLabel=addButton&&addButton.querySelector('.micon-folder-label');
-  if(buttonLabel)buttonLabel.textContent=label;
-  if(picked.length){
-   msg(picked.length+' video MP4 berhasil dimuat dari folder '+label+(failures.length?'. '+failures.length+' file gagal dibaca.':''));
-  }else if(videoFound){
-   msg('Ditemukan '+videoFound+' video MP4, tetapi tidak dapat dibaca. '+(failures[0]||'Periksa izin dan akses folder.'),true);
-  }else{
-   msg(scanned?'Folder '+label+' berhasil dibaca, tetapi tidak ditemukan video MP4.':'Folder '+label+' kosong atau tidak dapat dibaca.',true);
-  }
-  return picked.length;
- }
- let selectedNativeFolderName='';
- function nativeFolderName(uri){
-  try{
-   const tree=String(uri||'').split('/tree/')[1]||'';
-   const decoded=decodeURIComponent(tree);
-   const finalPart=decoded.split(':').pop().split('/').filter(Boolean).pop();
-   return finalPart||'Folder dipilih';
-  }catch(_){return 'Folder dipilih';}
- }
- async function chooseMobileFolder(){
-  if(!mobile){openPlaylistPicker();return;}
-  const fs=window.WebToApkFS;
-  if(!fs||typeof fs.requestAccess!=='function'){
-   msg('Pemilih folder Android tidak tersedia. Pastikan APK menggunakan fitur Native Folder Access (SAF).',true);
-   return;
-  }
-  const result=await fs.requestAccess();
-  if(!result||!result.success){
-   const errors={
-    cancelled:'Pemilihan folder dibatalkan.',
-    busy:'Pemilih folder Android sedang terbuka.',
-    not_persisted:'Android tidak dapat menyimpan izin folder ini. Silakan pilih folder lain.',
-    disabled:'Native Folder Access (SAF) belum aktif pada APK ini.',
-    no_picker:'Pemilih folder tidak tersedia pada perangkat ini.',
-    foreign_origin:'Akses folder hanya tersedia dari halaman aplikasi MicOn.'
-   };
-   if(result&&result.error==='cancelled')return;
-   msg(errors[result&&result.error]||'Folder tidak berhasil dipilih.',true);
-   return;
-  }
-  selectedNativeFolderName=nativeFolderName(result.folderUri);
-  await readNativePlaylistFolder(fs);
- }
- async function restoreNativePlaylistFolder(){
-  if(!mobile)return;
-  const fs=window.WebToApkFS;
-  if(!fs||typeof fs.hasAccess!=='function'||!fs.hasAccess())return;
-  try{
-   const uri=typeof fs.getAccessUri==='function'?fs.getAccessUri():'';
-   selectedNativeFolderName=nativeFolderName(uri);
-   await readNativePlaylistFolder(fs);
-  }catch(error){
-   console.warn('MicOn: folder playlist tersimpan belum dapat dibaca:',error);
-  }
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
+   ({mp3:'audio/mpeg',mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'application/octet-stream');
+  return new File(chunks,name,{type:mime,lastModified:Date.now()});
  }
 
  async function openPlaylistPicker(){
@@ -2870,25 +2728,11 @@ try {
   picker.click();
  }
 
- window.MicOnChoosePlaylistFolder=chooseMobileFolder;
+ window.MicOnChoosePlaylistFolder=openPlaylistPicker;
  addButton.addEventListener('click',event=>{
   event.preventDefault();
-  if(mobile){
-   chooseMobileFolder().catch(error=>{
-    console.error('MicOn: pemilihan folder Android gagal:',error);
-    msg('Folder tidak dapat dibuka: '+(error.message||error),true);
-   });
-  }else openPlaylistPicker();
+  openPlaylistPicker();
  });
- if(mobile){
-  const restoreWhenReady=()=>{
-   if(window.WebToApkFS&&typeof window.WebToApkFS.hasAccess==='function'){
-    restoreNativePlaylistFolder();
-   }
-  };
-  if(document.readyState==='complete')restoreWhenReady();
-  else window.addEventListener('load',restoreWhenReady,{once:true});
- }
  picker.addEventListener('change',()=>{
   const files=Array.from(picker.files||[]);
   picker.value='';
