@@ -2641,7 +2641,94 @@ try {
   const ext=(name.split('.').pop()||'').toLowerCase();
   const mime=selection.mime&&selection.mime!=='application/octet-stream'?selection.mime:
    ({mp3:'audio/mpeg',mp4:'video/mp4',m4v:'video/x-m4v',webm:'video/webm',mov:'video/quicktime','3gp':'video/3gpp'}[ext]||'application/octet-stream');
-  return new File(chunks,name,{type:mime,lastModified:Date.now()});
+  return new File(chunks,name,{type:mime,lastModified:Number(selection.lastModified||Date.now())});
+ }
+
+ async function readNativePlaylistFolder(fs){
+  if(!fs||typeof fs.list!=='function'||typeof fs.readBytes!=='function'){
+   throw new Error('Akses baca folder Android tidak tersedia pada APK ini.');
+  }
+  const queue=[{path:'',display:''}];
+  const picked=[];
+  while(queue.length){
+   const current=queue.shift();
+   const entries=fs.list(current.path)||[];
+   for(const entry of entries){
+    const relative=current.path?current.path+'/'+entry.name:entry.name;
+    const display=current.display?current.display+'/'+entry.name:entry.name;
+    if(entry.isDirectory){
+     queue.push({path:relative,display});
+     continue;
+    }
+    if(!/\.mp4$/i.test(entry.name||''))continue;
+    if(!entry.uri)continue;
+    const file=await fileFromWebToApkFS({
+     name:entry.name,
+     uri:entry.uri,
+     size:Number(entry.length||0),
+     mime:'video/mp4',
+     lastModified:Number(entry.lastModified||Date.now())
+    },fs);
+    picked.push({file,displayName:display});
+   }
+  }
+  picked.sort((a,b)=>a.displayName.localeCompare(b.displayName,undefined,{numeric:true,sensitivity:'base'}));
+  playlist.splice(0,playlist.length);
+  currentIndex=-1;
+  playlistIsPlaying=false;
+  if(picked.length)importFiles(picked);
+  else render();
+  const label=selectedNativeFolderName||'Folder dipilih';
+  const buttonLabel=addButton&&addButton.querySelector('.micon-folder-label');
+  if(buttonLabel)buttonLabel.textContent=label;
+  if(!picked.length)msg('Folder yang dipilih tidak berisi file MP4.',true);
+  else msg(picked.length+' video MP4 berhasil dibaca dari folder '+label+'.');
+  return picked.length;
+ }
+ let selectedNativeFolderName='';
+ function nativeFolderName(uri){
+  try{
+   const tree=String(uri||'').split('/tree/')[1]||'';
+   const decoded=decodeURIComponent(tree);
+   const finalPart=decoded.split(':').pop().split('/').filter(Boolean).pop();
+   return finalPart||'Folder dipilih';
+  }catch(_){return 'Folder dipilih';}
+ }
+ async function chooseMobileFolder(){
+  if(!mobile){openPlaylistPicker();return;}
+  const fs=window.WebToApkFS;
+  if(!fs||typeof fs.requestAccess!=='function'){
+   msg('Pemilih folder Android tidak tersedia. Pastikan APK menggunakan fitur Native Folder Access (SAF).',true);
+   return;
+  }
+  const result=await fs.requestAccess();
+  if(!result||!result.success){
+   const errors={
+    cancelled:'Pemilihan folder dibatalkan.',
+    busy:'Pemilih folder Android sedang terbuka.',
+    not_persisted:'Android tidak dapat menyimpan izin folder ini. Silakan pilih folder lain.',
+    disabled:'Native Folder Access (SAF) belum aktif pada APK ini.',
+    no_picker:'Pemilih folder tidak tersedia pada perangkat ini.',
+    foreign_origin:'Akses folder hanya tersedia dari halaman aplikasi MicOn.'
+   };
+   if(result&&result.error==='cancelled')return;
+   msg(errors[result&&result.error]||'Folder tidak berhasil dipilih.',true);
+   return;
+  }
+  selectedNativeFolderName=nativeFolderName(result.folderUri);
+  await readNativePlaylistFolder(fs);
+ }
+ async function restoreNativePlaylistFolder(){
+  if(!mobile)return;
+  const fs=window.WebToApkFS;
+  if(!fs||typeof fs.hasAccess!=='function'||!fs.hasAccess())return;
+  try{
+   const uri=typeof fs.getAccessUri==='function'?fs.getAccessUri():'';
+   selectedNativeFolderName=nativeFolderName(uri);
+   await readNativePlaylistFolder(fs);
+  }catch(error){
+   console.warn('MicOn: folder playlist tersimpan belum dapat dibaca:',error);
+  }
  }
 
  async function openPlaylistPicker(){
@@ -2728,11 +2815,25 @@ try {
   picker.click();
  }
 
- window.MicOnChoosePlaylistFolder=openPlaylistPicker;
+ window.MicOnChoosePlaylistFolder=chooseMobileFolder;
  addButton.addEventListener('click',event=>{
   event.preventDefault();
-  openPlaylistPicker();
+  if(mobile){
+   chooseMobileFolder().catch(error=>{
+    console.error('MicOn: pemilihan folder Android gagal:',error);
+    msg('Folder tidak dapat dibuka: '+(error.message||error),true);
+   });
+  }else openPlaylistPicker();
  });
+ if(mobile){
+  const restoreWhenReady=()=>{
+   if(window.WebToApkFS&&typeof window.WebToApkFS.hasAccess==='function'){
+    restoreNativePlaylistFolder();
+   }
+  };
+  if(document.readyState==='complete')restoreWhenReady();
+  else window.addEventListener('load',restoreWhenReady,{once:true});
+ }
  picker.addEventListener('change',()=>{
   const files=Array.from(picker.files||[]);
   picker.value='';
