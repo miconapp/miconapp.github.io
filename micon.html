@@ -863,6 +863,14 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
         if(shell)shell.style.removeProperty('display');
         main.classList.remove('hidden');main.style.removeProperty('display');
         if(action==='transpose'&&pitch)pitch.scrollIntoView({behavior:'smooth',block:'start'});
+        if(action==='upload'){
+          if(typeof window.MicOnChoosePlaylistFolder==='function')window.MicOnChoosePlaylistFolder();
+          else {
+            const fallback=document.querySelector('.mobile-folder-picker');
+            if(fallback){fallback.removeAttribute('webkitdirectory');fallback.removeAttribute('directory');fallback.multiple=true;fallback.click();}
+            else console.warn('MicOn: pemilih folder belum siap.');
+          }
+        }
       }else if(action==='download'){
         main.classList.add('hidden');main.style.setProperty('display','none','important');
         if(shell)shell.style.setProperty('display','none','important');
@@ -2458,9 +2466,11 @@ try {
   headingRow.append(heading,durationBox);
   list=document.createElement('div');list.className='mobile-playlist-list';
   makePicker();
-  folderPicker=document.createElement('input');folderPicker.type='file';folderPicker.hidden=true;
+  folderPicker=document.createElement('input');folderPicker.type='file';
   folderPicker.multiple=true;folderPicker.setAttribute('webkitdirectory','');folderPicker.setAttribute('directory','');
   folderPicker.accept='video/mp4,.mp4';folderPicker.className='mobile-folder-picker';
+  folderPicker.setAttribute('aria-label','Pilih folder video MP4');
+  folderPicker.style.cssText='position:fixed!important;left:0!important;bottom:0!important;width:2px!important;height:2px!important;opacity:0.01!important;z-index:1!important;';
   panel.append(addButton,headingRow,list,picker,folderPicker);
   grid.insertAdjacentElement('afterend',panel);
   return panel;
@@ -2742,20 +2752,39 @@ try {
   if(!mp4.length)msg('Folder yang dipilih tidak berisi file MP4.',true);
   else msg(mp4.length+' video MP4 berhasil dibaca dari folder '+(name||'pilihan')+'.');
  }
- async function chooseMobileFolder(){
+ function openMobileFileFallback(){
+  if(!folderPicker)return;
+  /* Android WebView sering tidak menyediakan showDirectoryPicker/webkitdirectory.
+     Fallback ini membuka pemilih video native dan mengizinkan multi-select. */
+  folderPicker.removeAttribute('webkitdirectory');
+  folderPicker.removeAttribute('directory');
+  folderPicker.multiple=true;
+  folderPicker.accept='video/mp4,.mp4';
+  folderPicker.value='';
+  folderPicker.click();
+ }
+ function chooseMobileFolder(){
   if(!mobile){openPlaylistPicker();return;}
   if(typeof window.showDirectoryPicker==='function'){
-   try{
-    const handle=await window.showDirectoryPicker({id:'micon-playlist-folder',mode:'read'});
+   let request;
+   try{request=window.showDirectoryPicker({id:'micon-playlist-folder',mode:'read'});}
+   catch(error){console.warn('Folder picker tidak tersedia:',error);openMobileFileFallback();return;}
+   request.then(async handle=>{
     const permission=await handle.requestPermission({mode:'read'});
     if(permission!=='granted')throw new Error('Izin membaca folder belum diberikan.');
     await saveFolderHandle(handle);
-    const files=[];for await(const entry of handle.values()){if(entry.kind==='file'&&/\.mp4$/i.test(entry.name))files.push(await entry.getFile());}
-    await importFolderFiles(files,handle.name);return;
-   }catch(error){if(error&&error.name==='AbortError')return;console.warn('Folder picker:',error);}
+    const files=[];for await(const entry of handle.values()){if(entry.kind==='file'&&/\\.mp4$/i.test(entry.name))files.push(await entry.getFile());}
+    await importFolderFiles(files,handle.name);
+   }).catch(error=>{
+    if(error&&error.name==='AbortError')return;
+    console.warn('Folder picker gagal:',error);
+    openMobileFileFallback();
+   });
+   return;
   }
-  if(folderPicker){folderPicker.value='';folderPicker.click();}
+  openMobileFileFallback();
  }
+ window.MicOnChoosePlaylistFolder=chooseMobileFolder;
  async function restoreSelectedFolder(){
   if(!mobile||typeof window.showDirectoryPicker!=='function')return;
   try{const handle=await getFolderHandle();if(!handle)return;
@@ -2765,8 +2794,19 @@ try {
   }catch(error){console.warn('Folder playlist belum bisa dipulihkan:',error);}
  }
  if(mobile){
-  addButton.addEventListener('click',chooseMobileFolder);
-  folderPicker.addEventListener('change',async()=>{const files=Array.from(folderPicker.files||[]);const name=(files[0]?.webkitRelativePath||'').split('/')[0]||'Folder dipilih';await importFolderFiles(files,name);});
+  addButton.addEventListener('click',event=>{
+   event.preventDefault();
+   chooseMobileFolder().catch(error=>{console.error('MicOn: pemilihan folder gagal:',error);msg('Folder tidak dapat dibuka: '+(error.message||error),true);});
+  });
+  folderPicker.addEventListener('change',async()=>{
+   const files=Array.from(folderPicker.files||[]);
+   const relative=(files.find(f=>f.webkitRelativePath)?.webkitRelativePath||'');
+   const folderName=relative.split('/')[0];
+   const label=folderName||((files.length||0)+' video dipilih');
+   await importFolderFiles(files,label);
+   /* Restore directory attribute for supported browsers on the next tap. */
+   folderPicker.setAttribute('webkitdirectory','');folderPicker.setAttribute('directory','');
+  });
   restoreSelectedFolder();
  }else addButton.addEventListener('click',openPlaylistPicker);
  picker.addEventListener('change',()=>{
@@ -2858,19 +2898,7 @@ try {
   }
  };
 
- /* Upload dock pada desktop dan floating dock smartphone masuk ke antrean
-    playlist yang sama; tidak membuka pemilih video tunggal. */
- document.addEventListener('click',event=>{
-  const target=event.target;
-  const dockUpload=target&&target.closest&&(
-   target.closest('.upload-dock[data-upload-video]')||
-   target.closest('#micon-floating-dock [data-action="upload"]')
-  );
-  if(!dockUpload)return;
-  event.preventDefault();event.stopPropagation();
-  if(typeof event.stopImmediatePropagation==='function')event.stopImmediatePropagation();
-  if(mobile)chooseMobileFolder();else picker.click();
- },true);
+ /* Upload folder ditangani oleh click handler dock utama setelah halaman utama ditampilkan. */
 
  const clearButton=document.getElementById('clearBtn');
  if(clearButton)clearButton.addEventListener('click',()=>{
