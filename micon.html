@@ -511,7 +511,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
   .micon-reference-stack .mobile-playlist-panel>.mobile-playlist-import,.micon-reference-stack .mobile-playlist-panel>#clearBtn{display:flex!important;position:static!important;align-items:center!important;justify-content:center!important;order:initial!important;width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0 0 10px!important;padding:0 16px!important;border:0!important;border-radius:999px!important;background:var(--micon-panel)!important;color:#fff!important;font:600 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important;box-shadow:none!important;opacity:1!important}
   .micon-reference-stack .mobile-playlist-heading{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:102px!important;height:30px!important;min-height:30px!important;margin:4px 0 7px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:var(--micon-panel)!important;color:#fff!important;font:500 12px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important}
 
-  .micon-reference-stack .mobile-playlist-head-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important;align-items:stretch!important;margin:4px 0 7px!important}
+  .micon-reference-stack .mobile-playlist-head-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important;align-items:stretch!important;margin:4px 0 20px!important}
   .micon-reference-stack .mobile-playlist-head-row .mobile-playlist-heading,
   .micon-reference-stack .mobile-playlist-head-row .mobile-package-duration{display:flex!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;width:100%!important;height:30px!important;min-height:30px!important;margin:0!important;padding:0 8px!important;border:0!important;border-radius:999px!important;background:var(--micon-panel)!important;color:#fff!important;text-align:center!important}
   .micon-reference-stack .mobile-playlist-head-row .mobile-playlist-heading{font:500 12px/1 system-ui,-apple-system,"Segoe UI",sans-serif!important}
@@ -2509,9 +2509,7 @@ try {
  const panel=mobile?makeMobilePanel():makeDesktopPanel();
 
  function render(){
-  /* Jangan mencabut URL preview ketika daftar dirender ulang. Render dipicu
-     oleh scroll-state/playback dan pergantian file; URL yang dicabut membuat
-     seluruh video thumbnail kehilangan sumber secara bersamaan. */
+  playlist.forEach(entry=>{if(entry.previewUrl){URL.revokeObjectURL(entry.previewUrl);entry.previewUrl=null;}});
   list.replaceChildren();
   if(!playlist.length){
    const empty=document.createElement('div');
@@ -2523,57 +2521,10 @@ try {
    row.className=(mobile?'mobile-playlist-item':'desktop-playlist-item')+(index===currentIndex?' active':'');
    if(mobile){
     const thumb=document.createElement('span');thumb.className='mobile-playlist-thumb';
-    if(entry.thumbnailData){
-     const image=document.createElement('img');
-     image.alt='Thumbnail '+(entry.displayName||entry.file.name||'video');
-     image.loading='eager';image.decoding='async';image.src=entry.thumbnailData;
-     image.style.cssText='display:block;width:100%;height:100%;object-fit:cover;background:#111;pointer-events:none';
-     thumb.append(image);
-    }else{
-     const preview=document.createElement('video');
-     preview.muted=true;preview.defaultMuted=true;preview.playsInline=true;
-     preview.preload='auto';preview.setAttribute('playsinline','');
-     preview.disablePictureInPicture=true;
-     if(!entry.previewUrl)entry.previewUrl=URL.createObjectURL(entry.file);
-     preview.src=entry.previewUrl;
-     let captureQueued=false;
-     const capture=()=>{
-      if(entry.thumbnailData||captureQueued||!preview.isConnected||preview.readyState<2||!preview.videoWidth||!preview.videoHeight)return;
-      captureQueued=true;
-      const draw=()=>{
-       captureQueued=false;
-       if(entry.thumbnailData||!preview.isConnected||preview.readyState<2)return;
-       try{
-        const maxSide=480,scale=Math.min(1,maxSide/Math.max(preview.videoWidth,preview.videoHeight));
-        const canvas=document.createElement('canvas');
-        canvas.width=Math.max(1,Math.round(preview.videoWidth*scale));
-        canvas.height=Math.max(1,Math.round(preview.videoHeight*scale));
-        const ctx=canvas.getContext('2d');if(!ctx)return;
-        ctx.drawImage(preview,0,0,canvas.width,canvas.height);
-        const data=canvas.toDataURL('image/jpeg',.84);
-        if(!data||data==='data:,')return;
-        entry.thumbnailData=data;
-        const image=document.createElement('img');
-        image.alt='Thumbnail '+(entry.displayName||entry.file.name||'video');
-        image.loading='eager';image.decoding='async';image.src=data;
-        image.style.cssText='display:block;width:100%;height:100%;object-fit:cover;background:#111;pointer-events:none';
-        if(thumb.isConnected)thumb.replaceChildren(image);
-       }catch(error){console.warn('MicOn: thumbnail gagal dibuat:',error);}
-      };
-      if(typeof preview.requestVideoFrameCallback==='function')preview.requestVideoFrameCallback(draw);
-      else window.setTimeout(draw,100);
-     };
-     preview.addEventListener('loadedmetadata',()=>{
-      if(preview.duration>0){
-       const target=Math.min(1,Math.max(.15,preview.duration*.08));
-       try{preview.currentTime=target;}catch(_){capture();}
-      }else capture();
-     },{once:true});
-     preview.addEventListener('loadeddata',capture,{once:true});
-     preview.addEventListener('seeked',capture,{once:true});
-     preview.addEventListener('error',()=>{preview.style.opacity='.25';},{once:true});
-     thumb.append(preview);
-    }
+    const preview=document.createElement('video');preview.muted=true;preview.playsInline=true;preview.preload='metadata';
+    const objectUrl=URL.createObjectURL(entry.file);entry.previewUrl=objectUrl;preview.src=objectUrl;
+    preview.addEventListener('loadedmetadata',()=>{try{preview.currentTime=Math.min(.15,preview.duration||.15);}catch(_){}},{once:true});
+    thumb.append(preview);
     const name=document.createElement('strong');name.className='mobile-playlist-card-name';
     name.textContent=entry.displayName||entry.file.name||'Video tanpa nama';name.title=name.textContent;
     const meta=document.createElement('span');meta.className='mobile-playlist-card-meta';
@@ -2655,7 +2606,7 @@ try {
    const rawName=String(suppliedName||file.name||file.webkitRelativePath&&file.webkitRelativePath.split('/').pop()||'Video tanpa nama');
    if(mobile?!/\.mp4$/i.test(rawName):(!(file.type||'').startsWith('video/')&&!(file.type||'').startsWith('audio/')&&!/\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(rawName)))return;
    const key=fileKey(file);
-   if(!playlist.some(entry=>entry.key===key))playlist.push({file,key,displayName:rawName,previewUrl:null,thumbnailData:null});
+   if(!playlist.some(entry=>entry.key===key))playlist.push({file,key,displayName:rawName});
   });
   render();
   window.__miconPlaylistHasNext=currentIndex>=0&&currentIndex<playlist.length-1;
