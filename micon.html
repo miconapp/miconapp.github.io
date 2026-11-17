@@ -583,7 +583,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
  .micon-reference-stack .mobile-playlist-panel>.mobile-playlist-import{
    gap:9px!important;justify-content:center!important;font-size:14px!important;font-weight:750!important;
  }
- .micon-reference-stack .mobile-playlist-import .micon-folder-ico{font-size:17px!important;line-height:1}
+ .micon-reference-stack .mobile-playlist-import .micon-folder-ico{display:grid!important;place-items:center!important;width:18px!important;height:18px!important;flex:0 0 18px!important;line-height:1!important}\n .micon-reference-stack .mobile-playlist-import .micon-folder-ico svg{display:block!important;width:18px!important;height:18px!important;stroke:currentColor!important}
  .micon-reference-stack .mobile-playlist-import .micon-folder-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:82%}
  .micon-reference-stack .mobile-playlist-list{
    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
@@ -2450,7 +2450,7 @@ try {
   const panel=document.createElement('section');
   panel.className='mobile-playlist-panel';panel.setAttribute('aria-label','Playlist video');
   addButton=document.createElement('button');addButton.type='button';
-  addButton.className='mobile-playlist-import';addButton.innerHTML='<span class="micon-folder-ico" aria-hidden="true">📁</span><span class="micon-folder-label">Pilih Folder</span>';
+  addButton.className='mobile-playlist-import';addButton.innerHTML='<span class="micon-folder-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5v-11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 9h17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="micon-folder-label">Pilih Folder</span>';
   const headingRow=document.createElement('div');headingRow.className='mobile-playlist-head-row';
   const heading=document.createElement('div');heading.className='mobile-playlist-heading';heading.textContent='Playlist';
   const durationBox=document.createElement('div');durationBox.className='mobile-package-duration';
