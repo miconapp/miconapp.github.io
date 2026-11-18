@@ -601,8 +601,8 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
    display:block!important;position:relative!important;width:100%!important;aspect-ratio:1/1!important;
    overflow:hidden!important;background:#111827!important;
  }
- .micon-reference-stack .mobile-playlist-thumb video{
-   display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;
+ .micon-reference-stack .mobile-playlist-thumb img{
+   display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;
    background:#111!important;pointer-events:none!important;
  }
  .micon-reference-stack .mobile-playlist-card-name{
@@ -1061,6 +1061,62 @@ function waitForMobileVideoBuffer(target){
  });
 }
 
+/* Satu pengendali playback khusus smartphone/APK.
+   Iklan pembuka disimpan per elemen video sehingga percobaan ulang setelah
+   pembatasan autoplay tidak memutar iklan yang sama untuk kedua kalinya. */
+async function startMobilePlayback(targetVideo,{fromGesture=false}={}){
+ if(!targetVideo||targetVideo!==video||!targetVideo.isConnected)return false;
+ if(targetVideo.__miconStartPromise)return targetVideo.__miconStartPromise;
+ const gestureResumeTask=fromGesture?resumeAudioContextFromGesture():Promise.resolve(true);
+ targetVideo.__miconStartPromise=(async()=>{
+  const openingAdTask=targetVideo.__miconOpeningAdPassed
+   ?Promise.resolve(true)
+   :(targetVideo.__miconOpeningAdPromise||Promise.resolve(true));
+  const [adPassed,bufferReady,audioReady]=await Promise.all([
+   openingAdTask,
+   waitForMobileVideoBuffer(targetVideo).catch(()=>false),
+   Promise.resolve(audioReadyPromise).catch(()=>false)
+  ]);
+  if(targetVideo!==video||!targetVideo.isConnected)return false;
+  if(!adPassed||!bufferReady){
+   $('playBtn').disabled=false;
+   $('fileStatus').textContent='File siap · tekan Putar video';
+   return false;
+  }
+  if(audioReady&&targetVideo.__miconAudioGraph){
+   configurePitchControls(true);
+  }else{
+   configurePitchControls(false);
+   $('fileStatus').textContent='Video siap · transpose tidak tersedia di WebView ini';
+  }
+  await gestureResumeTask;
+  if(audioContext&&audioContext.state!=='running'){
+   try{await audioContext.resume();}catch(_){}
+  }
+  if(targetVideo!==video||!targetVideo.isConnected)return false;
+  targetVideo.__miconOpeningAdPassed=true;
+  targetVideo.__miconUserPaused=false;
+  window.__miconAdForFileDone=true;
+  targetVideo.__miconPlaybackAuthorized=true;
+  if(!targetVideo.__miconFirstPlaybackAttempted){
+   targetVideo.currentTime=0;
+   targetVideo.__miconFirstPlaybackAttempted=true;
+  }
+  await targetVideo.play();
+  $('playBtn').disabled=false;
+  $('fileStatus').textContent='Video sedang diputar';
+  return true;
+ })().catch(error=>{
+  targetVideo.__miconPlaybackAuthorized=false;
+  $('playBtn').disabled=false;
+  $('fileStatus').textContent='Video siap · tekan Putar video';
+  if(error&&error.name!=='NotAllowedError'&&error.name!=='AbortError')
+   msg('Gagal menyiapkan atau memulai video: '+(error.message||error),true);
+  return false;
+ }).finally(()=>{targetVideo.__miconStartPromise=null;});
+ return targetVideo.__miconStartPromise;
+}
+
 function applyPitch(value){
  const range=$('pitchRange');
  const min=range?Number(range.min):-6,max=range?Number(range.max):6;
@@ -1211,6 +1267,9 @@ async function setupVideo(){
  $('videoStage').appendChild(video);
  const targetVideo=video;
  const isMobileAudioTarget=isMobilePlaybackTarget();
+ if(isMobileAudioTarget){
+  targetVideo.__miconOpeningAdPromise=Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
+ }
  audioReadyPromise=connectVideoToAudioWorklet(targetVideo).then(ready=>{
   if(targetVideo===video){
    updatePitchDisplay();
@@ -1272,9 +1331,9 @@ async function setupVideo(){
     if(targetVideo!==video||!targetVideo.isConnected||!mobilePlaybackWanted||
        targetVideo.__miconUserPaused||targetVideo.__miconAdGatePausing)return;
     if(targetVideo.paused){
-     window.__miconAdAuthorized=true;
+     targetVideo.__miconPlaybackAuthorized=true;
      try{await targetVideo.play();}
-     catch(_){window.__miconAdAuthorized=false;mobileBufferRecovery=true;}
+     catch(_){targetVideo.__miconPlaybackAuthorized=false;mobileBufferRecovery=true;}
     }
    }finally{mobileRecoveryBusy=false;}
   };
@@ -1340,10 +1399,19 @@ async function setupVideo(){
  }
 
  video.addEventListener('play',()=>{
+  if(isMobilePlaybackTarget()){
+   if(video.__miconPlaybackAuthorized){
+    video.__miconPlaybackAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;
+   }
+   const targetVideo=video;
+   targetVideo.pause();
+   startMobilePlayback(targetVideo,{fromGesture:true}).catch(error=>msg('Gagal memulai video: '+(error.message||error),true));
+   return;
+  }
   if(window.__miconAdAuthorized||window.__miconAdForFileDone){
    window.__miconAdAuthorized=false;playing=true;$('playBtn').textContent='Ⅱ Jeda video';return;
   }
-  /* Mulai resume saat event play masih berada dalam gesture pengguna. */
+  /* Jalur iklan native desktop tetap dipertahankan. */
   const gestureResumeTask=resumeAudioContextFromGesture();
   video.__miconAdGatePausing=true;
   video.pause();
@@ -1417,144 +1485,106 @@ async function clearVideo(){
  $('progressBar').style.width='0%';$('alert').className='alert';
 }
 $('videoFile').addEventListener('change',async event=>{
- const picker=event.currentTarget,selectedFile=window.__miconPlaylistFileOverride||(picker.files&&picker.files[0]);
+ const picker=event.currentTarget;
+ const selectedFile=window.__miconPlaylistFileOverride||(picker.files&&picker.files[0]);
  if(window.__miconPlaylistFileOverride===selectedFile)window.__miconPlaylistFileOverride=null;
  if(!selectedFile)return;
- /* Smartphone menggunakan alur impor lokal tunggal yang baru; desktop
-    tetap memakai handler lama tanpa perubahan. */
- if(window.matchMedia('(max-width:760px)').matches){
+
+ if(isMobilePlaybackTarget()){
   event.stopImmediatePropagation();
   picker.value='';
   try{
    await clearVideo();
    file=selectedFile;
-   window.__miconAdAuthorized=false;window.__miconAdForFileDone=false;
-   window.__miconEndAdShown=false;window.__miconOpeningAdRunning=true;
-   window.__miconOpeningAdPromise=Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
+   window.__miconAdAuthorized=false;
+   window.__miconAdForFileDone=false;
+   window.__miconEndAdShown=false;
    url=URL.createObjectURL(selectedFile);
    $('fileName').textContent=selectedFile.name;
    $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||'video');
-   $('fileStatus').textContent='Memuat video lokal…';$('clearBtn').disabled=false;
+   $('fileStatus').textContent='Memuat video lokal…';
+   $('clearBtn').disabled=false;
+
+   /* setupVideo membuat satu gerbang iklan per elemen video; hasilnya
+      dipakai bersama oleh autoplay awal, kontrol native, dan tombol Putar. */
    await setupVideo();
    const activeVideo=video;
-   activeVideo.addEventListener('loadedmetadata',()=>{
-    if(activeVideo!==video||!activeVideo.isConnected)return;
+
+   let startHandled=false;
+   const startWhenReady=()=>{
+    if(startHandled||activeVideo!==video||!activeVideo.isConnected)return;
+    startHandled=true;
     $('duration').textContent=fmt(activeVideo.duration);
     $('playBtn').disabled=false;
-    const adTask=window.__miconOpeningAdPromise||Promise.resolve(true);
-    const bufferTask=waitForMobileVideoBuffer(activeVideo).catch(()=>false);
-    Promise.all([audioReadyPromise,adTask,bufferTask]).then(async([audioReady,adPassed,bufferReady])=>{
-     if(activeVideo!==video||!activeVideo.isConnected)return;
-     if(!adPassed||!bufferReady){$('fileStatus').textContent='File siap · tekan Putar';return;}
-     if(audioReady&&activeVideo.__miconAudioGraph){
-      if(audioContext&&audioContext.state!=='running')try{await audioContext.resume();}catch(_){}
-      configurePitchControls(true);
-     }else{
-      configurePitchControls(false);
-      $('fileStatus').textContent='Video siap · transpose tidak tersedia di WebView ini';
-     }
-     window.__miconAdForFileDone=true;window.__miconAdAuthorized=true;
-     try{await activeVideo.play();$('fileStatus').textContent='Video sedang diputar';}
-     catch(playError){$('playBtn').disabled=false;$('fileStatus').textContent='File siap · tekan Putar';}
-    }).catch(error=>{
-     $('playBtn').disabled=false;$('fileStatus').textContent='File siap · tekan Putar';
-     msg('Video lokal berhasil dimuat; audio sedang disiapkan: '+(error.message||error),true);
-    }).finally(()=>{window.__miconOpeningAdRunning=false;});
+    startMobilePlayback(activeVideo).catch(error=>msg('Gagal memulai playlist: '+(error.message||error),true));
+   };
+   activeVideo.addEventListener('loadedmetadata',startWhenReady,{once:true});
+   activeVideo.addEventListener('error',()=>{
+    $('fileStatus').textContent='Format video tidak didukung';
+    msg('HP tidak dapat memutar file ini. Coba MP4 H.264 dengan audio AAC.',true);
    },{once:true});
-   /* File playlist berikutnya dapat berasal dari cache lokal dan metadata
-      kadang sudah tersedia sebelum listener di atas terpasang. Pastikan alur
-      iklan -> persiapan audio/buffer -> autoplay tetap dijalankan satu kali. */
    if(activeVideo.error){
     $('fileStatus').textContent='Format video tidak didukung';
    }else if(activeVideo.readyState>=HTMLMediaElement.HAVE_METADATA){
-    activeVideo.dispatchEvent(new Event('loadedmetadata'));
+    startWhenReady();
    }
-   activeVideo.addEventListener('error',()=>{
-    $('fileStatus').textContent='Format video tidak didukung';
-    msg('HP tidak dapat memutar codec video ini. Coba MP4 H.264 dengan audio AAC.',true);
-   },{once:true});
   }catch(error){
    $('fileStatus').textContent='Gagal memuat video';
    msg('Gagal membuka file dari penyimpanan HP: '+(error.message||error),true);
   }
   return;
  }
+
  if(!(/\.(mp3|mp4)$/i.test(selectedFile.name)||selectedFile.type==='video/mp4'||selectedFile.type==='application/mp4'||selectedFile.type==='audio/mpeg'||selectedFile.type==='audio/mp3')){
   msg('Pilih file MP3 atau MP4.',true);picker.value='';return;
  }
  try{
   await clearVideo();
-  /* FILE MASTER TETAP ASLI:
-     Simpan objek File yang dipilih apa adanya dan biarkan browser membacanya
-     langsung melalui object URL. Tidak ada FileReader, arrayBuffer, konversi
-     Blob, kompresi, penulisan ulang, atau perubahan byte pada file sumber.
-     AudioWorklet/SoundTouch hanya memproses audio saat playback. */
-  const masterFile=selectedFile;
-  file=masterFile;
-  window.__miconAdAuthorized=false;window.__miconAdForFileDone=false;
-  window.__miconEndAdShown=false;window.__miconOpeningAdRunning=false;window.__miconOpeningAdPromise=null;
-  url=URL.createObjectURL(masterFile);
+  /* FILE MASTER TETAP ASLI: simpan objek File apa adanya dan gunakan URL
+     langsung tanpa pembacaan ulang atau perubahan byte pada file sumber. */
+  file=selectedFile;
+  window.__miconAdAuthorized=false;
+  window.__miconAdForFileDone=false;
+  window.__miconEndAdShown=false;
+  url=URL.createObjectURL(selectedFile);
   $('fileName').textContent=selectedFile.name;
   $('fileSize').textContent=(selectedFile.size/1048576).toFixed(2)+' MB · '+(selectedFile.type||(/\.mp3$/i.test(selectedFile.name)?'audio/mpeg':'video/mp4'));
-  $('fileStatus').textContent='Memuat video…';$('clearBtn').disabled=false;
-  const isMobileImport=window.matchMedia('(max-width:760px)').matches;
-  if(isMobileImport){
-   /* Mulai iklan pada saat import dipilih, bersamaan dengan inisialisasi
-      Worklet. Audio graph harus selesai sebelum src video mulai di-decode. */
-   window.__miconOpeningAdRunning=true;
-   window.__miconOpeningAdPromise=Promise.resolve(
-    window.miconAdGate?window.miconAdGate('opening'):true
-   );
-  }
+  $('fileStatus').textContent='Memuat video…';
+  $('clearBtn').disabled=false;
   await setupVideo();
   const loadedVideo=video;
   loadedVideo.addEventListener('loadedmetadata',()=>{
-   if(loadedVideo!==video||!loadedVideo.isConnected)return;
-   if((window.__miconOpeningAdRunning||!isMobileImport)&&!window.__miconAdForFileDone){
-
-    /* AudioWorklet telah terhubung sebelum video smartphone dimuat.
-       Iklan berjalan paralel dengan persiapan graph dan buffer video. */
-    window.__miconOpeningAdRunning=true;
-    const workletReadyTask=audioReadyPromise;
-    const openingAdTask=isMobileImport
-     ?(window.__miconOpeningAdPromise||Promise.resolve(true))
-     :Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
-    const mobileBufferTask=waitForMobileVideoBuffer(loadedVideo);
-
-    Promise.all([workletReadyTask,openingAdTask,mobileBufferTask]).then(async([audioReady,passed,bufferReady])=>{
-     if(!passed||!bufferReady||loadedVideo!==video||!loadedVideo.isConnected)return;
-     if(!audioReady||!loadedVideo.__miconAudioGraph||!loadedVideo.__miconAudioGraph.worklet){
-      throw new Error('SoundTouch AudioWorklet belum siap setelah iklan selesai.');
-     }
-     if(audioContext&&audioContext.state==='suspended'){
-      try{await audioContext.resume();}catch(_){}
-     }
-     if(loadedVideo!==video||!loadedVideo.isConnected)return;
-     window.__miconAdForFileDone=true;
-     $('fileStatus').textContent='File siap diputar';
-     loadedVideo.currentTime=0;window.__miconAdAuthorized=true;
-     try{await loadedVideo.play();}
-     catch(playError){
-      $('playBtn').disabled=false;
-      $('fileStatus').textContent='Video siap diputar · tekan Putar video';
-      if(playError&&playError.name!=='NotAllowedError'&&playError.name!=='AbortError')throw playError;
-     }
-    }).catch(error=>msg('Gagal menyiapkan audio atau memulai video: '+(error.message||error),true))
-      .finally(()=>{window.__miconOpeningAdRunning=false;});
-   }
+   if(loadedVideo!==video||!loadedVideo.isConnected||window.__miconAdForFileDone)return;
+   const workletReadyTask=audioReadyPromise;
+   const openingAdTask=Promise.resolve(window.miconAdGate?window.miconAdGate('opening'):true);
+   const bufferTask=waitForMobileVideoBuffer(loadedVideo);
+   Promise.all([workletReadyTask,openingAdTask,bufferTask]).then(async([audioReady,adPassed,bufferReady])=>{
+    if(!adPassed||!bufferReady||loadedVideo!==video||!loadedVideo.isConnected)return;
+    if(!audioReady||!loadedVideo.__miconAudioGraph||!loadedVideo.__miconAudioGraph.worklet)
+     throw new Error('SoundTouch AudioWorklet belum siap setelah iklan selesai.');
+    if(audioContext&&audioContext.state==='suspended'){
+     try{await audioContext.resume();}catch(_){}
+    }
+    if(loadedVideo!==video||!loadedVideo.isConnected)return;
+    window.__miconAdForFileDone=true;
+    $('fileStatus').textContent='File siap diputar';
+    loadedVideo.currentTime=0;
+    window.__miconAdAuthorized=true;
+    try{await loadedVideo.play();}
+    catch(playError){
+     $('playBtn').disabled=false;
+     $('fileStatus').textContent='Video siap diputar · tekan Putar video';
+     if(playError&&playError.name!=='NotAllowedError'&&playError.name!=='AbortError')throw playError;
+    }
+   }).catch(error=>msg('Gagal menyiapkan audio atau memulai video: '+(error.message||error),true));
   },{once:true});
   loadedVideo.addEventListener('error',()=>{
    msg('Browser tidak dapat membaca video ini. Coba MP4 dengan codec H.264 dan audio AAC.',true);
    $('fileStatus').textContent='Video gagal dibaca';
   },{once:true});
-  /* Pada perpindahan playlist yang cepat, Android WebView kadang sudah
-     mengirim loadedmetadata sebelum listener di atas terpasang. Akibatnya
-     gate iklan menunggu event yang sudah lewat dan video berikutnya tertahan
-     pada tampilan kosong. Jalankan jalur kesiapan yang sama bila metadata
-     ternyata sudah tersedia, tanpa memuat ulang atau mengganti File sumber. */
   if(loadedVideo.error){
    $('fileStatus').textContent='Video gagal dibaca';
-   msg('Browser tidak dapat membaca file video berikutnya (kode '+loadedVideo.error.code+').',true);
+   msg('Browser tidak dapat membaca file video (kode '+loadedVideo.error.code+').',true);
   }else if(loadedVideo.readyState>=HTMLMediaElement.HAVE_METADATA){
    loadedVideo.dispatchEvent(new Event('loadedmetadata'));
   }
@@ -1564,19 +1594,20 @@ $('playBtn').addEventListener('click',async()=>{
  if(!video)return;
  if(!video.paused){video.__miconUserPaused=true;video.pause();return;}
  video.__miconUserPaused=false;
- /* Panggil resume sebelum await agar aktivasi tap tidak hilang di WebView. */
+ if(isMobilePlaybackTarget()){
+  startMobilePlayback(video,{fromGesture:true});
+  return;
+ }
+ /* Jalur tombol putar desktop tetap sama. */
  const gestureResumeTask=resumeAudioContextFromGesture();
  try{
   const targetVideo=video;
   const ready=await audioReadyPromise;
-  if((!ready||!targetVideo.__miconAudioGraph)&&!isAndroidAppShell)
-   throw new Error('SoundTouch AudioWorklet belum siap.');
-  if(isAndroidAppShell){targetVideo.muted=false;targetVideo.volume=1;}
+  if(!ready||!targetVideo.__miconAudioGraph)throw new Error('SoundTouch AudioWorklet belum siap.');
   await waitForMobileVideoBuffer(targetVideo);
   await gestureResumeTask;
   if(audioContext&&audioContext.state!=='running'){
-   try{await audioContext.resume();}
-   catch(error){if(!isAndroidAppShell)throw error;}
+   try{await audioContext.resume();}catch(error){throw error;}
   }
   if(targetVideo!==video||!targetVideo.isConnected)return;
   window.__miconAdAuthorized=true;
@@ -2508,8 +2539,8 @@ try {
  }
  const panel=mobile?makeMobilePanel():makeDesktopPanel();
 
+ const playlistThumbnailUrl='https://raw.githubusercontent.com/miconapp/miconapp.github.io/main/src/Logo%20apk.png';
  function render(){
-  playlist.forEach(entry=>{if(entry.previewUrl){URL.revokeObjectURL(entry.previewUrl);entry.previewUrl=null;}});
   list.replaceChildren();
   if(!playlist.length){
    const empty=document.createElement('div');
@@ -2521,9 +2552,8 @@ try {
    row.className=(mobile?'mobile-playlist-item':'desktop-playlist-item')+(index===currentIndex?' active':'');
    if(mobile){
     const thumb=document.createElement('span');thumb.className='mobile-playlist-thumb';
-    const preview=document.createElement('video');preview.muted=true;preview.playsInline=true;preview.preload='metadata';
-    const objectUrl=URL.createObjectURL(entry.file);entry.previewUrl=objectUrl;preview.src=objectUrl;
-    preview.addEventListener('loadedmetadata',()=>{try{preview.currentTime=Math.min(.15,preview.duration||.15);}catch(_){}},{once:true});
+    const preview=document.createElement('img');preview.alt='Logo MicOn';preview.loading='lazy';preview.decoding='async';
+    preview.src=playlistThumbnailUrl;
     thumb.append(preview);
     const name=document.createElement('strong');name.className='mobile-playlist-card-name';
     name.textContent=entry.displayName||entry.file.name||'Video tanpa nama';name.title=name.textContent;
