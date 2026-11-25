@@ -2521,16 +2521,19 @@ try {
    youtubeWrap.className='desktop-youtube-url-wrap';
    youtubeWrap.innerHTML='<span class="desktop-youtube-url-icon" aria-hidden="true">⌕</span><input id="miconYoutubeUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Tempel Link YouTube Disini (place Holder)" aria-label="Tempel URL YouTube">';
 
+   const panelHeading=document.createElement('div');
+   panelHeading.className='desktop-transpose-heading';
+   panelHeading.textContent='TRANPOSE NADA';
+
    const controls=[
-    youtubeWrap,
-    document.getElementById('dropZone'),filemeta,
+    document.getElementById('dropZone'),youtubeWrap,filemeta,
     transpose.querySelector('.noteBox'),
     transpose.querySelector('.stepper'),transpose.querySelector('.rangeLabels'),
     transpose.querySelector('.row'),transpose.querySelector('#alert'),
     desktopBanner,videoInput
    ];
    controls.filter(Boolean).forEach(node=>transposeView.appendChild(node));
-   panel.appendChild(transposeView);
+   panel.append(panelHeading,transposeView);
    scroll.insertBefore(panel,grid);
    grid.style.display='none';
 
@@ -2563,11 +2566,49 @@ try {
     meta.innerHTML='<span class="mobile-playlist-mp4">MP4</span><span>'+formatSize(entry.file)+'</span>';
     row.append(thumb,name,meta);
    }else{
-    const icon=document.createElement('span');icon.className='desktop-playlist-icon';icon.textContent='♫';
+    const thumb=document.createElement('span');thumb.className='desktop-playlist-thumb';
+    const fileName=String(entry.displayName||entry.file.name||'');
+    const isVideo=(entry.file.type||'').startsWith('video/')||/\\.(mp4|m4v|webm|mov|3gp)$/i.test(fileName);
+    if(isVideo){
+     const image=document.createElement('img');
+     image.alt='Thumbnail '+fileName;
+     image.loading='lazy';
+     image.decoding='async';
+     image.className='desktop-playlist-thumbnail-image';
+     image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="178" height="100" viewBox="0 0 178 100"><rect width="178" height="100" fill="#e8edf4"/><path d="M75 34v32l28-16z" fill="#64748b"/></svg>');
+     thumb.appendChild(image);
+     /* Ambil frame awal dari file video lokal sebagai thumbnail, tanpa mengubah
+        URL pemutaran utama maupun jalur AudioWorklet/transpose. */
+     try{
+      const objectUrl=URL.createObjectURL(entry.file);
+      const probe=document.createElement('video');
+      probe.muted=true;probe.playsInline=true;probe.preload='metadata';
+      probe.addEventListener('loadeddata',()=>{
+       try{
+        const canvas=document.createElement('canvas');
+        canvas.width=356;canvas.height=200;
+        const context=canvas.getContext('2d');
+        if(context){
+         const sourceW=probe.videoWidth||356,sourceH=probe.videoHeight||200;
+         const scale=Math.max(canvas.width/sourceW,canvas.height/sourceH);
+         const drawW=sourceW*scale,drawH=sourceH*scale;
+         context.drawImage(probe,(canvas.width-drawW)/2,(canvas.height-drawH)/2,drawW,drawH);
+         image.src=canvas.toDataURL('image/jpeg',0.78);
+        }
+       }catch(thumbnailError){console.debug('Thumbnail lokal tidak dapat dibuat:',thumbnailError);}
+       probe.removeAttribute('src');probe.load();URL.revokeObjectURL(objectUrl);
+      },{once:true});
+      probe.addEventListener('error',()=>URL.revokeObjectURL(objectUrl),{once:true});
+      probe.src=objectUrl;
+     }catch(thumbnailError){console.debug('Thumbnail video tidak tersedia:',thumbnailError);}
+    }else{
+     thumb.classList.add('desktop-playlist-audio-thumb');
+     thumb.textContent='♫';
+    }
     const copy=document.createElement('span');copy.className='desktop-playlist-copy';
-    const name=document.createElement('strong');name.textContent=entry.displayName||entry.file.name||'Video tanpa nama';name.title=name.textContent;
-    const size=document.createElement('small');size.textContent=formatSize(entry.file);
-    copy.append(name,size);row.append(icon,copy);
+    const name=document.createElement('strong');name.textContent=fileName||'Video tanpa nama';name.title=name.textContent;
+    const size=document.createElement('small');size.textContent='Size File (misal 5MB) · '+formatSize(entry.file);
+    copy.append(name,size);row.append(thumb,copy);
    }
    row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
   });
@@ -3400,7 +3441,43 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 })();
 </script>
 
-</body></html>';
+
+<style id="micon-desktop-preview-scroll-thumbnail-final">
+@media (min-width:761px){
+  #mainContent>.home-layout>.home-preview-column{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+    overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;-ms-overflow-style:none!important;
+  }
+  #mainContent>.home-layout>.home-preview-column::-webkit-scrollbar{display:none!important;width:0!important}
+  #mainContent>.home-layout>.home-preview-column #videoStage{
+    flex:0 0 auto!important;width:100%!important;min-height:0!important;
+  }
+  #mainContent>.home-layout>.home-preview-column .desktop-playlist-view{
+    display:flex!important;flex:0 0 auto!important;width:100%!important;
+    min-height:0!important;overflow:visible!important;
+  }
+  .desktop-playlist-thumb{
+    display:block!important;position:relative!important;flex:0 0 178px!important;
+    width:178px!important;height:100px!important;overflow:hidden!important;
+    border-radius:7px!important;background:#e8edf4!important;
+  }
+  .desktop-playlist-thumb img{
+    display:block!important;width:100%!important;height:100%!important;
+    object-fit:cover!important;background:#e8edf4!important;
+  }
+  .desktop-playlist-audio-thumb{
+    display:grid!important;place-items:center!important;
+    color:#142b50!important;font-size:30px!important;
+  }
+  .desktop-playlist-item{min-height:112px!important;height:auto!important}
+}
+@media(max-width:760px){
+  #mainContent>.home-layout>.home-preview-column{overflow:visible!important}
+}
+</style>
+\n</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
     };
@@ -3937,3 +4014,143 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 </body>
 </html>
+
+
+<style id="micon-desktop-layout-exact-reference">
+@media (min-width:761px){
+  /* Desktop follows the supplied screenshot: video + playlist left, transpose panel right. */
+  .wrap{width:100%!important;max-width:none!important;padding:0 3px 0 36px!important}
+  .top{height:59px!important;min-height:59px!important;margin:0 -3px 0 -36px!important;padding:8px 45px 8px 28px!important}
+  #mainContent>.home-layout{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.53fr) minmax(390px,1fr)!important;
+    column-gap:20px!important;
+    align-items:stretch!important;
+    width:100%!important;
+    height:calc(100vh - 59px)!important;
+    min-height:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  #mainContent>.home-layout>.home-preview-column{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    min-width:0!important;height:100%!important;min-height:0!important;
+    padding:23px 0 0!important;margin:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    scrollbar-width:none!important;-ms-overflow-style:none!important;
+  }
+  #mainContent>.home-layout>.home-preview-column::-webkit-scrollbar{display:none!important}
+  #mainContent>.home-layout>.home-preview-column #videoStage{
+    display:block!important;position:relative!important;flex:0 0 auto!important;
+    width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
+    aspect-ratio:16/9!important;margin:0!important;padding:0!important;
+    border:1px dashed #d7e2f1!important;border-radius:20px!important;
+    background:#f8fafc!important;overflow:hidden!important;
+  }
+  #mainContent>.home-layout>.home-preview-column #videoStage:empty{display:block!important}
+  #mainContent>.home-layout>.home-preview-column #videoStage:empty::before{
+    content:""!important;display:none!important;
+  }
+  #mainContent>.home-layout>.home-preview-column #videoStage #karaokeVideo,
+  #mainContent>.home-layout>.home-preview-column #videoStage .micon-youtube-preview{
+    display:block!important;width:100%!important;height:100%!important;min-height:0!important;
+    aspect-ratio:16/9!important;object-fit:contain!important;border:0!important;
+    border-radius:19px!important;margin:0!important;background:#000!important;
+  }
+  #mainContent>.home-layout>.home-preview-column .desktop-playlist-view{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    flex:0 0 auto!important;width:100%!important;min-width:0!important;
+    margin:20px 0 0!important;padding:0 0 18px!important;
+    border-top:1px solid #dbe3ef!important;background:#fff!important;color:#111!important;
+  }
+  .desktop-playlist-view::before{
+    content:"PLAYLIST KARAOKE"!important;display:block!important;box-sizing:border-box!important;
+    width:100%!important;height:32px!important;min-height:32px!important;
+    padding:0 8px!important;border-bottom:1px solid #dbe3ef!important;
+    color:#050505!important;text-align:center!important;
+    font:800 19px/31px Arial,system-ui,sans-serif!important;
+  }
+  .desktop-playlist-list{
+    display:flex!important;flex-direction:column!important;gap:12px!important;
+    width:100%!important;min-width:0!important;padding:12px 15px 8px!important;
+  }
+  .desktop-playlist-item{
+    display:flex!important;align-items:center!important;gap:12px!important;
+    width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;
+    padding:2px 10px!important;border:0!important;border-radius:0!important;
+    background:#fff!important;color:#111!important;text-align:left!important;
+  }
+  .desktop-playlist-icon{
+    display:grid!important;place-items:center!important;flex:0 0 178px!important;
+    width:178px!important;height:100px!important;border-radius:7px!important;
+    background:#eaf0ff!important;color:#142b50!important;font-size:28px!important;
+  }
+  .desktop-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
+  .desktop-playlist-copy strong{display:block!important;white-space:normal!important;color:#050505!important;font-size:16px!important;line-height:1.35!important;font-weight:800!important}
+  .desktop-playlist-copy small{display:block!important;margin-top:3px!important;color:#111!important;font-size:12px!important;line-height:1.35!important}
+  #mainContent>.home-layout>.home-scroll-column{
+    display:block!important;min-width:0!important;width:100%!important;
+    height:100%!important;min-height:0!important;margin:0!important;padding:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    border-left:1px solid #dbe3ef!important;scrollbar-width:none!important;-ms-overflow-style:none!important;
+  }
+  #mainContent>.home-layout>.home-scroll-column::-webkit-scrollbar{display:none!important}
+  .desktop-player-panel{display:block!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}
+  .desktop-transpose-heading{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    box-sizing:border-box!important;width:100%!important;height:27px!important;
+    margin:0!important;padding:0 8px!important;border-bottom:1px solid #dbe3ef!important;
+    color:#050505!important;font:800 14px/1 Arial,system-ui,sans-serif!important;
+  }
+  .desktop-transpose-view{
+    display:flex!important;flex-direction:column!important;gap:12px!important;
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;
+    min-height:0!important;height:auto!important;padding:9px 22px 18px 15px!important;
+    overflow:visible!important;
+  }
+  .desktop-transpose-view #dropZone{
+    display:flex!important;box-sizing:border-box!important;width:100%!important;
+    height:40px!important;min-height:40px!important;flex:0 0 40px!important;
+    margin:0!important;padding:4px 8px!important;border:1px dashed #9aabc6!important;
+    border-radius:14px!important;background:#f8fafc!important;color:#1e293b!important;
+  }
+  .desktop-transpose-view #dropZone .uploadIcon{display:none!important}
+  .desktop-transpose-view #dropZone strong{font-size:10px!important;line-height:1.25!important}
+  .desktop-transpose-view #dropZone small{font-size:9px!important;line-height:1.2!important;margin-top:2px!important}
+  .desktop-youtube-url-wrap{
+    display:flex!important;align-items:center!important;gap:10px!important;
+    box-sizing:border-box!important;width:100%!important;height:40px!important;min-height:40px!important;
+    flex:0 0 40px!important;margin:0!important;padding:0 11px!important;
+    border:1px dashed #9aabc6!important;border-radius:14px!important;
+    background:#f8fafc!important;color:#111827!important;
+  }
+  .desktop-youtube-url-icon{flex:0 0 auto!important;font-size:19px!important;line-height:1!important;color:#111827!important}
+  #miconYoutubeUrl{display:block!important;flex:1!important;width:100%!important;min-width:0!important;height:36px!important;padding:0!important;border:0!important;outline:0!important;background:transparent!important;color:#172033!important;font:600 11px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif!important}
+  #miconYoutubeUrl::placeholder{color:#111827!important;opacity:1!important}
+  .desktop-transpose-view .filemeta{
+    display:flex!important;box-sizing:border-box!important;width:100%!important;
+    min-height:50px!important;flex:0 0 50px!important;margin:0!important;padding:6px 10px!important;
+    border:1px dashed #9aabc6!important;border-radius:14px!important;background:#f8fafc!important;
+  }
+  .desktop-transpose-view .noteBox{
+    display:flex!important;box-sizing:border-box!important;width:100%!important;
+    height:112px!important;min-height:112px!important;flex:0 0 112px!important;
+    margin:0!important;padding:10px!important;border:1px solid #d8e2f0!important;
+    border-radius:17px!important;background:#f8fafc!important;
+  }
+  .desktop-transpose-view .noteBox small{font-size:13px!important}
+  .desktop-transpose-view .note{font-size:40px!important;line-height:1.1!important}
+  .desktop-transpose-view .stepper{display:grid!important;grid-template-columns:68px minmax(0,1fr) 68px!important;gap:14px!important;margin:0!important}
+  .desktop-transpose-view .step{height:64px!important;border:0!important;border-radius:17px!important;background:#aeb5c1!important;color:#fff!important;font-size:29px!important}
+  .desktop-transpose-view .range{height:10px!important;accent-color:#c4c4c4!important}
+  .desktop-transpose-view .rangeLabels{display:flex!important;justify-content:space-between!important;margin:0!important;color:#64748b!important;font-size:12px!important}
+  .desktop-transpose-view .row{display:flex!important;width:100%!important;margin:0!important}
+  .desktop-transpose-view .row .btn{width:100%!important;min-height:42px!important;background:#cfd3d8!important;color:#fff!important;border:0!important;border-radius:11px!important;font-size:12px!important}
+  .desktop-transpose-view .desktop-ad-banner{
+    display:block!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+    height:115px!important;min-height:115px!important;max-height:115px!important;flex:0 0 115px!important;
+    margin:14px 0 0!important;border:1px solid #d8e2f0!important;border-radius:18px!important;background:#f8fafc!important;
+  }
+}
+@media(max-width:760px){.desktop-transpose-heading{display:none!important}}
+</style>
