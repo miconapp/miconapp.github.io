@@ -662,7 +662,7 @@ header.top .brand .brand-logo{display:block!important;width:auto!important;heigh
 </label>
 <div class="noteBox"><small>Nada relatif</small><div class="note" id="noteName">Original</div><div class="mini" id="noteDesc">Nada asli</div></div>
 <div class="stepper"><button class="step" id="downBtn" aria-label="Turunkan nada" disabled>−</button><input class="range" id="pitchRange" type="range" min="-6" max="6" step="1" value="0" disabled><button class="step" id="upBtn" aria-label="Naikkan nada" disabled>+</button></div>
-<div class="rangeLabels"><span>−6 semitone</span><span>0</span><span>+6 semitone</span></div>
+<div class="rangeLabels"><span>−6 semitone</span><span id="pitchStepIndicator">0</span><span>+6 semitone</span></div>
 <div class="row" style="margin-top:14px"><button class="btn secondary" id="clearBtn" disabled>Hapus video</button></div>
 <div id="alert" class="alert"></div>
 <div class="semitone"><span id="pitchValue">0</span><small>semitone</small></div>
@@ -975,6 +975,8 @@ function updatePitchDisplay(){
  const range=$('pitchRange'),value=$('pitchValue'),name=$('noteName'),desc=$('noteDesc');
  if(range)range.value=String(pitch);
  if(value)value.textContent=String(pitch);
+ const stepIndicator=$('pitchStepIndicator');
+ if(stepIndicator)stepIndicator.textContent=pitch>0?'+'+pitch:String(pitch);
 
  /* Tampilan nada relatif saja: gunakan nama tangga nada/chord yang sudah tersedia.
     Tidak mengubah nilai pitch, AudioWorklet, SoundTouch, maupun alur kontrol nada. */
