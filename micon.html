@@ -2507,8 +2507,11 @@ try {
    list=document.createElement('div');list.className='desktop-playlist-list';
    addButton=document.createElement('button');addButton.type='button';
    addButton.className='desktop-playlist-add';addButton.textContent='TAMBAH MP3 / MP4';
+   const playlistHeading=document.createElement('div');
+   playlistHeading.className='desktop-playlist-heading';
+   playlistHeading.textContent='PLAYLIST KARAOKE';
    makePicker();
-   playlistView.append(list,addButton,picker);
+   playlistView.append(addButton,playlistHeading,list,picker);
 
    const importSection=document.getElementById('importSection');
    const filemeta=importSection&&importSection.querySelector('.filemeta');
@@ -4165,6 +4168,49 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   .desktop-transpose-view #micon-desktop-ad-banner iframe{
     display:block!important;width:100%!important;height:100%!important;
     min-height:0!important;max-height:100%!important;border:0!important;
+  }
+}
+</style>
+
+
+<style id="micon-desktop-playlist-button-heading-font-final">
+@media (min-width:761px){
+  /* Tombol tambah ditempatkan sebelum judul playlist. */
+  .desktop-playlist-view{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+  .desktop-playlist-view::before{content:none!important;display:none!important}
+  .desktop-playlist-view .desktop-playlist-add{
+    order:0!important;
+    flex:0 0 auto!important;
+    width:calc(100% - 30px)!important;
+    height:40px!important;
+    margin:8px 15px 8px!important;
+    font-weight:500!important;
+  }
+  .desktop-playlist-view .desktop-playlist-heading{
+    order:1!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:32px!important;
+    margin:0!important;
+    padding:2px 8px!important;
+    border-top:1px solid #dbe3ef!important;
+    border-bottom:1px solid #dbe3ef!important;
+    color:#050505!important;
+    text-align:center!important;
+    font:400 19px/1.5 Arial,system-ui,sans-serif!important;
+  }
+  .desktop-playlist-view .desktop-playlist-list{order:2!important}
+  .desktop-playlist-view .desktop-playlist-item,
+  .desktop-playlist-view .desktop-playlist-copy strong{
+    font-weight:400!important;
+  }
+  .desktop-transpose-heading{
+    font-weight:400!important;
   }
 }
 </style>
