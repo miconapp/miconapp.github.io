@@ -2568,7 +2568,7 @@ try {
    }else{
     const thumb=document.createElement('span');thumb.className='desktop-playlist-thumb';
     const fileName=String(entry.displayName||entry.file.name||'');
-    const isVideo=(entry.file.type||'').startsWith('video/')||/\\.(mp4|m4v|webm|mov|3gp)$/i.test(fileName);
+    const isVideo=(entry.file.type||'').startsWith('video/')||/\.(mp4|m4v|webm|mov|3gp)$/i.test(fileName);
     if(isVideo){
      const image=document.createElement('img');
      image.alt='Thumbnail '+fileName;
@@ -2577,30 +2577,58 @@ try {
      image.className='desktop-playlist-thumbnail-image';
      image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="178" height="100" viewBox="0 0 178 100"><rect width="178" height="100" fill="#e8edf4"/><path d="M75 34v32l28-16z" fill="#64748b"/></svg>');
      thumb.appendChild(image);
-     /* Ambil frame awal dari file video lokal sebagai thumbnail, tanpa mengubah
-        URL pemutaran utama maupun jalur AudioWorklet/transpose. */
+     /* Thumbnail dibuat langsung dari file video lokal yang dipilih pengguna.
+        Ambil frame pada sekitar detik pertama agar tidak menangkap frame hitam pembuka. */
      try{
       const objectUrl=URL.createObjectURL(entry.file);
       const probe=document.createElement('video');
-      probe.muted=true;probe.playsInline=true;probe.preload='metadata';
-      probe.addEventListener('loadeddata',()=>{
+      let thumbnailReleased=false;
+      const releaseThumbnailProbe=()=>{
+       if(thumbnailReleased)return;
+       thumbnailReleased=true;
+       probe.pause();
+       probe.removeAttribute('src');
+       probe.load();
+       URL.revokeObjectURL(objectUrl);
+      };
+      probe.muted=true;probe.playsInline=true;probe.preload='auto';
+      probe.addEventListener('loadedmetadata',()=>{
        try{
+        const duration=Number(probe.duration);
+        const targetTime=Number.isFinite(duration)&&duration>1.2?1:0;
+        if(targetTime>0){
+         probe.currentTime=targetTime;
+        }else if(probe.readyState>=2){
+         probe.dispatchEvent(new Event('seeked'));
+        }
+       }catch(seekError){
+        console.debug('Pencarian frame thumbnail gagal:',seekError);
+       }
+      },{once:true});
+      const captureLocalThumbnail=()=>{
+       try{
+        if(!probe.videoWidth||!probe.videoHeight)return;
         const canvas=document.createElement('canvas');
         canvas.width=356;canvas.height=200;
         const context=canvas.getContext('2d');
-        if(context){
-         const sourceW=probe.videoWidth||356,sourceH=probe.videoHeight||200;
-         const scale=Math.max(canvas.width/sourceW,canvas.height/sourceH);
-         const drawW=sourceW*scale,drawH=sourceH*scale;
-         context.drawImage(probe,(canvas.width-drawW)/2,(canvas.height-drawH)/2,drawW,drawH);
-         image.src=canvas.toDataURL('image/jpeg',0.78);
-        }
-       }catch(thumbnailError){console.debug('Thumbnail lokal tidak dapat dibuat:',thumbnailError);}
-       probe.removeAttribute('src');probe.load();URL.revokeObjectURL(objectUrl);
+        if(!context)return;
+        const scale=Math.max(canvas.width/probe.videoWidth,canvas.height/probe.videoHeight);
+        const drawW=probe.videoWidth*scale,drawH=probe.videoHeight*scale;
+        context.drawImage(probe,(canvas.width-drawW)/2,(canvas.height-drawH)/2,drawW,drawH);
+        const generated=canvas.toDataURL('image/jpeg',0.82);
+        if(generated&&generated.length>100)image.src=generated;
+       }catch(thumbnailError){
+        console.debug('Thumbnail lokal tidak dapat dibuat:',thumbnailError);
+       }finally{releaseThumbnailProbe();}
+      };
+      probe.addEventListener('seeked',captureLocalThumbnail,{once:true});
+      probe.addEventListener('loadeddata',()=>{
+       if(probe.currentTime===0)captureLocalThumbnail();
       },{once:true});
-      probe.addEventListener('error',()=>URL.revokeObjectURL(objectUrl),{once:true});
+      probe.addEventListener('error',releaseThumbnailProbe,{once:true});
       probe.src=objectUrl;
-     }catch(thumbnailError){console.debug('Thumbnail video tidak tersedia:',thumbnailError);}
+      probe.load();
+     }catch(thumbnailError){console.debug('Thumbnail video lokal tidak tersedia:',thumbnailError);}
     }else{
      thumb.classList.add('desktop-playlist-audio-thumb');
      thumb.textContent='♫';
@@ -3475,6 +3503,93 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 @media(max-width:760px){
   #mainContent>.home-layout>.home-preview-column{overflow:visible!important}
+}
+</style>
+\n
+<style id="micon-desktop-transpose-alignment-thumbnail-final">
+@media (min-width:761px){
+  /* Kartu nada disusun vertikal dan terpusat agar label tidak bertabrakan. */
+  .desktop-transpose-view .noteBox{
+    display:flex!important;
+    position:relative!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:112px!important;
+    min-height:112px!important;
+    margin:0 0 12px!important;
+    padding:10px 12px!important;
+    text-align:center!important;
+    overflow:hidden!important;
+  }
+  .desktop-transpose-view .noteBox>small{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:13px!important;
+    line-height:1.3!important;
+    color:#7b8798!important;
+  }
+  .desktop-transpose-view .noteBox>.note{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:40px!important;
+    line-height:1.12!important;
+    font-weight:800!important;
+    color:#0b1c36!important;
+  }
+  .desktop-transpose-view .noteBox>#noteDesc{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:11px!important;
+    line-height:1.3!important;
+    color:#64748b!important;
+  }
+  .desktop-transpose-view .stepper{
+    display:grid!important;
+    align-items:center!important;
+    width:100%!important;
+    margin:0!important;
+  }
+  .desktop-transpose-view .rangeLabels{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    width:100%!important;
+    margin:8px 0 0!important;
+  }
+  .desktop-transpose-view .row{
+    display:flex!important;
+    width:100%!important;
+    margin:18px 0 0!important;
+  }
+  .desktop-playlist-item{
+    align-items:center!important;
+    min-height:112px!important;
+    font-weight:400!important;
+  }
+  .desktop-playlist-copy strong{
+    font-weight:400!important;
+    font-size:16px!important;
+    line-height:1.35!important;
+  }
+  .desktop-playlist-copy small{
+    font-weight:400!important;
+  }
 }
 </style>
 \n</body></html>';
