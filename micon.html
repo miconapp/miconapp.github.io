@@ -3592,7 +3592,22 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   }
 }
 </style>
-\n</body></html>';
+\n
+<style id="micon-desktop-playlist-font-footer-final">
+@media (min-width:761px){
+  /* Judul lagu playlist memakai ketebalan normal, bukan bold. */
+  .desktop-playlist-copy strong{
+    font-weight:400!important;
+  }
+  /* Hilangkan bagian Tentang MicOn dan Panduan Singkat pada desktop saja. */
+  #mainContent>.home-layout>.home-scroll-column>.foot,
+  #mainContent>.home-layout>.home-preview-column>.foot{
+    display:none!important;
+  }
+}
+</style>
+
+</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
     };
