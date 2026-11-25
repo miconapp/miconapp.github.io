@@ -2522,7 +2522,7 @@ try {
 
    const youtubeWrap=document.createElement('label');
    youtubeWrap.className='desktop-youtube-url-wrap';
-   youtubeWrap.innerHTML='<span class="desktop-youtube-url-icon" aria-hidden="true">⌕</span><input id="miconYoutubeUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Tempel Link YouTube Disini . . ." aria-label="Tempel URL YouTube">';
+   youtubeWrap.innerHTML='<span class="desktop-youtube-url-icon" aria-hidden="true">⌕</span><input id="miconYoutubeUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Tempel Link YouTube Disini (place Holder)" aria-label="Tempel URL YouTube">';
 
    const panelHeading=document.createElement('div');
    panelHeading.className='desktop-transpose-heading';
@@ -2638,7 +2638,7 @@ try {
     }
     const copy=document.createElement('span');copy.className='desktop-playlist-copy';
     const name=document.createElement('strong');name.textContent=fileName||'Video tanpa nama';name.title=name.textContent;
-    const size=document.createElement('small');size.textContent='Size File · '+formatSize(entry.file);
+    const size=document.createElement('small');size.textContent='Size File (misal 5MB) · '+formatSize(entry.file);
     copy.append(name,size);row.append(thumb,copy);
    }
    row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
@@ -4057,7 +4057,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
     frame.allowFullscreen=true;
     frame.referrerPolicy='strict-origin-when-cross-origin';
-    frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1';
+    frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1';
     stage.appendChild(frame);
     activeYoutube=true;pendingYoutubeId='';
     if(name)name.textContent='Video YouTube';
