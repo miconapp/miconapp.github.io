@@ -2708,7 +2708,7 @@ try {
    if(!file)return;
    const suppliedName=item&&item.file?item.displayName:'';
    const rawName=String(suppliedName||file.name||file.webkitRelativePath&&file.webkitRelativePath.split('/').pop()||'Video tanpa nama');
-   if(mobile?!/\.mp4$/i.test(rawName):(!(file.type||'').startsWith('video/')&&!(file.type||'').startsWith('audio/')&&!/\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(rawName)))return;
+   if(!((file.type||'').startsWith('video/')||(file.type||'').startsWith('audio/')||/\.(mp3|mp4|m4v|webm|mov|3gp)$/i.test(rawName)))return;
    const key=fileKey(file);
    if(!playlist.some(entry=>entry.key===key))playlist.push({file,key,displayName:rawName});
   });
@@ -2831,6 +2831,20 @@ try {
   }
   picker.click();
  }
+
+ /* Semua file yang dipilih lewat kotak "Tekan untuk pilih MP3 atau MP4"
+    masuk ke playlist melalui mesin importFiles yang sama dengan tombol
+    TAMBAH MP3 / MP4. Event sintetis dari klik item playlist tidak diimpor
+    ulang, sehingga tidak membuat duplikat atau loop pemutaran. */
+ document.addEventListener('change',event=>{
+  if(event.target!==videoInput||!event.isTrusted)return;
+  const selected=Array.from(videoInput.files||[]);
+  if(!selected.length)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  videoInput.value='';
+  importFiles(selected);
+ },true);
 
  window.MicOnChoosePlaylistFolder=openPlaylistPicker;
  addButton.addEventListener('click',event=>{
