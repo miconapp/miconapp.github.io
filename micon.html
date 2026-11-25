@@ -3130,6 +3130,9 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     return selected;
   }
   async function showAd(config,uid,phase){
+    /* Pemutar file dan preview YouTube dapat mengganti isi #videoStage.
+       Pasang kembali overlay iklan sebelum iklan ditampilkan. */
+    if(videoStage&&overlay&&overlay.parentElement!==videoStage)videoStage.appendChild(overlay);
     if(showing)return false;
     if(!config.enabled)return true;
     const selectedAd=selectAccountAd(config,uid);
@@ -3272,342 +3275,7 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
       frame.setAttribute('scrolling','no');
       frame.setAttribute('aria-label',name);
       frame.style.cssText='display:block;width:100%;height:100%;min-height:0;max-height:100%;border:0;border-radius:inherit;background:transparent;contain:strict;isolation:isolate;overflow:hidden';
-      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:'+imageFit+';object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'
-<style id="micon-desktop-reference-youtube-scroll-fix">
-@media (min-width:761px){
-  #mainContent>.home-layout{
-    grid-template-columns:minmax(0,1.62fr) minmax(390px,.98fr)!important;
-    column-gap:20px!important;
-    height:100%!important;
-    min-height:0!important;
-  }
-  #mainContent>.home-layout>.home-preview-column{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    min-width:0!important;height:100%!important;min-height:0!important;
-    overflow-y:auto!important;overflow-x:hidden!important;
-    padding:25px 0 18px!important;scrollbar-width:thin!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #videoStage{
-    flex:0 0 auto!important;width:100%!important;aspect-ratio:16/9!important;
-    min-height:0!important;border:1px dashed #d7e2f1!important;border-radius:20px!important;
-    background:#f8fafc!important;overflow:hidden!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #videoStage #karaokeVideo,
-  #mainContent>.home-layout>.home-preview-column #videoStage .micon-youtube-preview{
-    display:block!important;width:100%!important;height:100%!important;min-height:0!important;
-    aspect-ratio:16/9!important;object-fit:contain!important;border:0!important;
-    border-radius:19px!important;margin:0!important;background:#000!important;
-  }
-  #mainContent>.home-layout>.home-preview-column #videoStage:has(.micon-youtube-preview)::before{display:none!important}
-  #mainContent>.home-layout>.home-scroll-column{
-    min-width:0!important;height:100%!important;min-height:0!important;
-    padding:0!important;overflow-y:auto!important;overflow-x:hidden!important;
-    border-left:1px solid #dbe3ef!important;scrollbar-width:thin!important;
-  }
-  .desktop-player-panel{display:block!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}
-  .desktop-transpose-view{
-    display:flex!important;flex:0 0 auto!important;min-height:0!important;height:auto!important;
-    overflow:visible!important;padding:9px 22px 18px 15px!important;gap:0!important;
-  }
-  .desktop-youtube-url-wrap{
-    display:flex!important;align-items:center!important;gap:10px!important;
-    box-sizing:border-box!important;width:100%!important;height:40px!important;min-height:40px!important;
-    margin:0 0 10px!important;padding:0 11px!important;border:1px dashed #9aabc6!important;
-    border-radius:14px!important;background:#f8fafc!important;color:#111827!important;
-  }
-  .desktop-youtube-url-icon{flex:0 0 auto!important;font-size:22px!important;line-height:1!important;color:#111827!important}
-  #miconYoutubeUrl{
-    display:block!important;flex:1!important;width:100%!important;min-width:0!important;height:36px!important;
-    padding:0!important;border:0!important;outline:0!important;background:transparent!important;
-    color:#172033!important;font:600 11px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif!important;
-  }
-  #miconYoutubeUrl::placeholder{color:#111827!important;opacity:1!important}
-  .desktop-transpose-view #dropZone{margin:0 0 10px!important}
-  .desktop-transpose-view .filemeta{margin:0 0 10px!important}
-  .desktop-transpose-view .noteBox{margin:2px 0 12px!important;height:112px!important}
-  .desktop-transpose-view .stepper{margin:0!important}
-  .desktop-transpose-view .row{margin:18px 0 0!important}
-  .desktop-transpose-view .desktop-ad-banner{
-    width:100%!important;max-width:100%!important;height:115px!important;min-height:115px!important;
-    max-height:115px!important;flex:0 0 115px!important;margin:18px 0 0!important;
-    border:1px solid #d8e2f0!important;border-radius:18px!important;background:#f8fafc!important;
-  }
-  .desktop-playlist-view{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    flex:0 0 auto!important;width:100%!important;min-width:0!important;margin:20px 0 0!important;
-    padding:0 0 18px!important;border-top:1px solid #dbe3ef!important;
-    background:#fff!important;color:#111827!important;
-  }
-  .desktop-playlist-view::before{
-    content:"PLAYLIST KARAOKE";display:block;box-sizing:border-box;width:100%!important;
-    min-height:40px!important;padding:5px 8px!important;border-bottom:1px solid #dbe3ef!important;
-    color:#050505!important;text-align:center!important;font:800 19px/1.5 Arial,system-ui,sans-serif!important;
-  }
-  .desktop-playlist-list{
-    display:flex!important;flex-direction:column!important;gap:12px!important;
-    width:100%!important;min-width:0!important;padding:12px 15px 8px!important;
-  }
-  .desktop-playlist-item{
-    display:flex!important;align-items:center!important;gap:12px!important;
-    width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;
-    padding:8px 10px!important;border:0!important;border-radius:0!important;
-    background:#fff!important;color:#111!important;text-align:left!important;cursor:pointer!important;
-  }
-  .desktop-playlist-item.active{background:#f8fafc!important}
-  .desktop-playlist-icon{
-    display:grid!important;place-items:center!important;flex:0 0 178px!important;
-    width:178px!important;height:100px!important;border-radius:8px!important;
-    background:#eaf0ff!important;color:#142b50!important;font-size:28px!important;
-  }
-  .desktop-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
-  .desktop-playlist-copy strong{
-    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
-    white-space:normal!important;color:#050505!important;font-size:16px!important;line-height:1.35!important;font-weight:800!important;
-  }
-  .desktop-playlist-copy small{display:block!important;margin-top:3px!important;color:#111!important;font-size:12px!important;line-height:1.35!important}
-  .desktop-playlist-add{
-    flex:0 0 auto!important;width:calc(100% - 30px)!important;height:40px!important;
-    margin:8px 15px 0!important;border:0!important;border-radius:10px!important;
-    background:#9ca3af!important;color:#fff!important;font:750 11px system-ui!important;
-  }
-  .desktop-playlist-empty{padding:22px 8px!important;text-align:center!important;color:#64748b!important;font-size:13px!important}
-}
-@media(max-width:760px){
-  .desktop-youtube-url-wrap,.desktop-playlist-view{display:none!important}
-}
-</style>
-<script id="micon-desktop-youtube-url-preview">
-(function(){
-  'use strict';
-  if(!window.matchMedia('(min-width:761px)').matches)return;
-  const field=document.getElementById('miconYoutubeUrl');
-  const stage=document.getElementById('videoStage');
-  const fileInput=document.getElementById('videoFile');
-  const clearButton=document.getElementById('clearBtn');
-  const name=document.getElementById('fileName');
-  const size=document.getElementById('fileSize');
-  const status=document.getElementById('fileStatus');
-  const note=document.getElementById('noteName');
-  const noteDesc=document.getElementById('noteDesc');
-  const range=document.getElementById('pitchRange');
-  const down=document.getElementById('downBtn');
-  const up=document.getElementById('upBtn');
-  if(!field||!stage)return;
-  let activeYoutube=false;
-  function youtubeId(raw){
-    try{
-      const url=new URL(String(raw||'').trim());
-      if(!/(^|\.)youtube\.com$/i.test(url.hostname)&&url.hostname.toLowerCase()!=='youtu.be'&&!url.hostname.toLowerCase().endsWith('.youtube.com'))return '';
-      if(url.hostname.toLowerCase()==='youtu.be')return url.pathname.split('/').filter(Boolean)[0]||'';
-      const parts=url.pathname.split('/').filter(Boolean);
-      if(url.searchParams.get('v'))return url.searchParams.get('v');
-      const marker=parts.findIndex(part=>['embed','shorts','live','v'].includes(part));
-      return marker>=0?parts[marker+1]||'':'';
-    }catch(_){return '';}
-  }
-  function setPitchAvailability(enabled){
-    if(range)range.disabled=!enabled;
-    if(down)down.disabled=!enabled;
-    if(up)up.disabled=!enabled;
-    if(note)note.textContent=enabled?'Original':'YouTube';
-    if(noteDesc)noteDesc.textContent=enabled?'Nada asli':'Transpose tidak tersedia untuk pemutar YouTube';
-  }
-  function clearYoutubePreview(){
-    if(!activeYoutube)return;
-    activeYoutube=false;
-    const frame=stage.querySelector('.micon-youtube-preview');
-    if(frame)frame.remove();
-    if(field)field.value='';
-    setPitchAvailability(true);
-  }
-  function loadYoutube(){
-    const id=youtubeId(field.value);
-    if(!id)return;
-    if(clearButton)clearButton.click();
-    stage.replaceChildren();
-    const frame=document.createElement('iframe');
-    frame.className='micon-youtube-preview';
-    frame.title='Preview video YouTube';
-    frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-    frame.allowFullscreen=true;
-    frame.referrerPolicy='strict-origin-when-cross-origin';
-    frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1';
-    stage.appendChild(frame);
-    activeYoutube=true;
-    if(name)name.textContent='Video YouTube';
-    if(size)size.textContent='Preview dari tautan YouTube';
-    if(status)status.textContent='Video YouTube dimuat · audio YouTube tidak dapat diproses oleh transpose lokal';
-    if(clearButton)clearButton.disabled=false;
-    setPitchAvailability(false);
-  }
-  field.addEventListener('paste',()=>setTimeout(loadYoutube,0));
-  field.addEventListener('change',loadYoutube);
-  field.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();loadYoutube();}});
-  field.addEventListener('input',()=>{
-    if(!field.value.trim()&&activeYoutube){
-      const frame=stage.querySelector('.micon-youtube-preview');
-      if(frame)frame.remove();
-      activeYoutube=false;setPitchAvailability(true);
-      if(name)name.textContent='Belum ada lagu dipilih';
-      if(size)size.textContent='File audio akan tampil di sini';
-      if(status)status.textContent='Menunggu file';
-      if(clearButton)clearButton.disabled=true;
-    }
-  });
-  document.addEventListener('change',event=>{
-    if(event.target!==fileInput||!activeYoutube)return;
-    const frame=stage.querySelector('.micon-youtube-preview');
-    if(frame)frame.remove();
-    activeYoutube=false;field.value='';setPitchAvailability(true);
-  },true);
-  if(clearButton)clearButton.addEventListener('click',()=>{
-    if(!activeYoutube)return;
-    const frame=stage.querySelector('.micon-youtube-preview');
-    if(frame)frame.remove();
-    activeYoutube=false;field.value='';setPitchAvailability(true);
-  },true);
-})();
-</script>
-
-
-<style id="micon-desktop-preview-scroll-thumbnail-final">
-@media (min-width:761px){
-  #mainContent>.home-layout>.home-preview-column{
-    display:flex!important;flex-direction:column!important;align-items:stretch!important;
-    height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
-    overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
-    scrollbar-width:none!important;-ms-overflow-style:none!important;
-  }
-  #mainContent>.home-layout>.home-preview-column::-webkit-scrollbar{display:none!important;width:0!important}
-  #mainContent>.home-layout>.home-preview-column #videoStage{
-    flex:0 0 auto!important;width:100%!important;min-height:0!important;
-  }
-  #mainContent>.home-layout>.home-preview-column .desktop-playlist-view{
-    display:flex!important;flex:0 0 auto!important;width:100%!important;
-    min-height:0!important;overflow:visible!important;
-  }
-  .desktop-playlist-thumb{
-    display:block!important;position:relative!important;flex:0 0 178px!important;
-    width:178px!important;height:100px!important;overflow:hidden!important;
-    border-radius:7px!important;background:#e8edf4!important;
-  }
-  .desktop-playlist-thumb img{
-    display:block!important;width:100%!important;height:100%!important;
-    object-fit:cover!important;background:#e8edf4!important;
-  }
-  .desktop-playlist-audio-thumb{
-    display:grid!important;place-items:center!important;
-    color:#142b50!important;font-size:30px!important;
-  }
-  .desktop-playlist-item{min-height:112px!important;height:auto!important}
-}
-@media(max-width:760px){
-  #mainContent>.home-layout>.home-preview-column{overflow:visible!important}
-}
-</style>
-\n
-<style id="micon-desktop-transpose-alignment-thumbnail-final">
-@media (min-width:761px){
-  /* Kartu nada disusun vertikal dan terpusat agar label tidak bertabrakan. */
-  .desktop-transpose-view .noteBox{
-    display:flex!important;
-    position:relative!important;
-    flex-direction:column!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:2px!important;
-    box-sizing:border-box!important;
-    width:100%!important;
-    height:112px!important;
-    min-height:112px!important;
-    margin:0 0 12px!important;
-    padding:10px 12px!important;
-    text-align:center!important;
-    overflow:hidden!important;
-  }
-  .desktop-transpose-view .noteBox>small{
-    display:block!important;
-    position:static!important;
-    width:100%!important;
-    margin:0!important;
-    padding:0!important;
-    text-align:center!important;
-    font-size:13px!important;
-    line-height:1.3!important;
-    color:#7b8798!important;
-  }
-  .desktop-transpose-view .noteBox>.note{
-    display:block!important;
-    position:static!important;
-    width:100%!important;
-    margin:0!important;
-    padding:0!important;
-    text-align:center!important;
-    font-size:40px!important;
-    line-height:1.12!important;
-    font-weight:800!important;
-    color:#0b1c36!important;
-  }
-  .desktop-transpose-view .noteBox>#noteDesc{
-    display:block!important;
-    position:static!important;
-    width:100%!important;
-    margin:0!important;
-    padding:0!important;
-    text-align:center!important;
-    font-size:11px!important;
-    line-height:1.3!important;
-    color:#64748b!important;
-  }
-  .desktop-transpose-view .stepper{
-    display:grid!important;
-    align-items:center!important;
-    width:100%!important;
-    margin:0!important;
-  }
-  .desktop-transpose-view .rangeLabels{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-    width:100%!important;
-    margin:8px 0 0!important;
-  }
-  .desktop-transpose-view .row{
-    display:flex!important;
-    width:100%!important;
-    margin:18px 0 0!important;
-  }
-  .desktop-playlist-item{
-    align-items:center!important;
-    min-height:112px!important;
-    font-weight:400!important;
-  }
-  .desktop-playlist-copy strong{
-    font-weight:400!important;
-    font-size:16px!important;
-    line-height:1.35!important;
-  }
-  .desktop-playlist-copy small{
-    font-weight:400!important;
-  }
-}
-</style>
-\n
-<style id="micon-desktop-playlist-font-footer-final">
-@media (min-width:761px){
-  /* Judul lagu playlist memakai ketebalan normal, bukan bold. */
-  .desktop-playlist-copy strong{
-    font-weight:400!important;
-  }
-  /* Hilangkan bagian Tentang MicOn dan Panduan Singkat pada desktop saja. */
-  #mainContent>.home-layout>.home-scroll-column>.foot,
-  #mainContent>.home-layout>.home-preview-column>.foot{
-    display:none!important;
-  }
-}
-</style>
-
-</body></html>';
+      frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html, body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}a{display:block;width:100%;height:100%;overflow:hidden}img{display:block;width:100%;height:100%;margin:0;padding:0;border:0;object-fit:'+imageFit+';object-position:center;decoding:async}</style></head><body>'+clickMarkup+'<img src="'+imageUrl+'" alt="'+title+'" decoding="async" fetchpriority="low">'+closeLink+'</body></html>';
       banner.replaceChildren(frame);
       banner.title=name;
     };
@@ -4138,6 +3806,365 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 @media screen and (max-width:760px){
   .micon-reference-stack{
     padding-top:calc(56.25vw + 163px)!important;
+  }
+}
+</style>
+
+
+<style id="micon-desktop-reference-youtube-scroll-fix">
+@media (min-width:761px){
+  #mainContent>.home-layout{
+    grid-template-columns:minmax(0,1.62fr) minmax(390px,.98fr)!important;
+    column-gap:20px!important;
+    height:100%!important;
+    min-height:0!important;
+  }
+  #mainContent>.home-layout>.home-preview-column{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    min-width:0!important;height:100%!important;min-height:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    padding:25px 0 18px!important;scrollbar-width:thin!important;
+  }
+  #mainContent>.home-layout>.home-preview-column #videoStage{
+    flex:0 0 auto!important;width:100%!important;aspect-ratio:16/9!important;
+    min-height:0!important;border:1px dashed #d7e2f1!important;border-radius:20px!important;
+    background:#f8fafc!important;overflow:hidden!important;
+  }
+  #mainContent>.home-layout>.home-preview-column #videoStage #karaokeVideo,
+  #mainContent>.home-layout>.home-preview-column #videoStage .micon-youtube-preview{
+    display:block!important;width:100%!important;height:100%!important;min-height:0!important;
+    aspect-ratio:16/9!important;object-fit:contain!important;border:0!important;
+    border-radius:19px!important;margin:0!important;background:#000!important;
+  }
+  #mainContent>.home-layout>.home-preview-column #videoStage:has(.micon-youtube-preview)::before{display:none!important}
+  #mainContent>.home-layout>.home-scroll-column{
+    min-width:0!important;height:100%!important;min-height:0!important;
+    padding:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+    border-left:1px solid #dbe3ef!important;scrollbar-width:thin!important;
+  }
+  .desktop-player-panel{display:block!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}
+  .desktop-transpose-view{
+    display:flex!important;flex:0 0 auto!important;min-height:0!important;height:auto!important;
+    overflow:visible!important;padding:9px 22px 18px 15px!important;gap:0!important;
+  }
+  .desktop-youtube-url-wrap{
+    display:flex!important;align-items:center!important;gap:10px!important;
+    box-sizing:border-box!important;width:100%!important;height:40px!important;min-height:40px!important;
+    margin:0 0 10px!important;padding:0 11px!important;border:1px dashed #9aabc6!important;
+    border-radius:14px!important;background:#f8fafc!important;color:#111827!important;
+  }
+  .desktop-youtube-url-icon{flex:0 0 auto!important;font-size:22px!important;line-height:1!important;color:#111827!important}
+  #miconYoutubeUrl{
+    display:block!important;flex:1!important;width:100%!important;min-width:0!important;height:36px!important;
+    padding:0!important;border:0!important;outline:0!important;background:transparent!important;
+    color:#172033!important;font:600 11px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  }
+  #miconYoutubeUrl::placeholder{color:#111827!important;opacity:1!important}
+  .desktop-transpose-view #dropZone{margin:0 0 10px!important}
+  .desktop-transpose-view .filemeta{margin:0 0 10px!important}
+  .desktop-transpose-view .noteBox{margin:2px 0 12px!important;height:112px!important}
+  .desktop-transpose-view .stepper{margin:0!important}
+  .desktop-transpose-view .row{margin:18px 0 0!important}
+  .desktop-transpose-view .desktop-ad-banner{
+    width:100%!important;max-width:100%!important;height:115px!important;min-height:115px!important;
+    max-height:115px!important;flex:0 0 115px!important;margin:18px 0 0!important;
+    border:1px solid #d8e2f0!important;border-radius:18px!important;background:#f8fafc!important;
+  }
+  .desktop-playlist-view{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    flex:0 0 auto!important;width:100%!important;min-width:0!important;margin:20px 0 0!important;
+    padding:0 0 18px!important;border-top:1px solid #dbe3ef!important;
+    background:#fff!important;color:#111827!important;
+  }
+  .desktop-playlist-view::before{
+    content:"PLAYLIST KARAOKE";display:block;box-sizing:border-box;width:100%!important;
+    min-height:40px!important;padding:5px 8px!important;border-bottom:1px solid #dbe3ef!important;
+    color:#050505!important;text-align:center!important;font:800 19px/1.5 Arial,system-ui,sans-serif!important;
+  }
+  .desktop-playlist-list{
+    display:flex!important;flex-direction:column!important;gap:12px!important;
+    width:100%!important;min-width:0!important;padding:12px 15px 8px!important;
+  }
+  .desktop-playlist-item{
+    display:flex!important;align-items:center!important;gap:12px!important;
+    width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;
+    padding:8px 10px!important;border:0!important;border-radius:0!important;
+    background:#fff!important;color:#111!important;text-align:left!important;cursor:pointer!important;
+  }
+  .desktop-playlist-item.active{background:#f8fafc!important}
+  .desktop-playlist-icon{
+    display:grid!important;place-items:center!important;flex:0 0 178px!important;
+    width:178px!important;height:100px!important;border-radius:8px!important;
+    background:#eaf0ff!important;color:#142b50!important;font-size:28px!important;
+  }
+  .desktop-playlist-copy{display:block!important;flex:1!important;min-width:0!important}
+  .desktop-playlist-copy strong{
+    display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:normal!important;color:#050505!important;font-size:16px!important;line-height:1.35!important;font-weight:800!important;
+  }
+  .desktop-playlist-copy small{display:block!important;margin-top:3px!important;color:#111!important;font-size:12px!important;line-height:1.35!important}
+  .desktop-playlist-add{
+    flex:0 0 auto!important;width:calc(100% - 30px)!important;height:40px!important;
+    margin:8px 15px 0!important;border:0!important;border-radius:10px!important;
+    background:#9ca3af!important;color:#fff!important;font:750 11px system-ui!important;
+  }
+  .desktop-playlist-empty{padding:22px 8px!important;text-align:center!important;color:#64748b!important;font-size:13px!important}
+}
+@media(max-width:760px){
+  .desktop-youtube-url-wrap,.desktop-playlist-view{display:none!important}
+}
+</style>
+<script id="micon-desktop-youtube-url-preview">
+(function(){
+  'use strict';
+  if(!window.matchMedia('(min-width:761px)').matches)return;
+  const field=document.getElementById('miconYoutubeUrl');
+  const stage=document.getElementById('videoStage');
+  const fileInput=document.getElementById('videoFile');
+  const clearButton=document.getElementById('clearBtn');
+  const name=document.getElementById('fileName');
+  const size=document.getElementById('fileSize');
+  const status=document.getElementById('fileStatus');
+  const note=document.getElementById('noteName');
+  const noteDesc=document.getElementById('noteDesc');
+  const range=document.getElementById('pitchRange');
+  const down=document.getElementById('downBtn');
+  const up=document.getElementById('upBtn');
+  if(!field||!stage)return;
+  let activeYoutube=false,pendingYoutubeId='',requestId=0;
+  function youtubeId(raw){
+    try{
+      const url=new URL(String(raw||'').trim()),host=url.hostname.toLowerCase();
+      if(host!=='youtu.be'&&!host.endsWith('youtube.com'))return '';
+      if(host==='youtu.be')return url.pathname.split('/').filter(Boolean)[0]||'';
+      const parts=url.pathname.split('/').filter(Boolean);
+      if(url.searchParams.get('v'))return url.searchParams.get('v');
+      const marker=parts.findIndex(part=>['embed','shorts','live','v'].includes(part));
+      return marker>=0?parts[marker+1]||'':'';
+    }catch(_){return '';}
+  }
+  function setPitchAvailability(enabled){
+    if(range)range.disabled=!enabled;
+    if(down)down.disabled=!enabled;
+    if(up)up.disabled=!enabled;
+    if(note)note.textContent=enabled?'Original':'YouTube';
+    if(noteDesc)noteDesc.textContent=enabled?'Nada asli':'Transpose tidak tersedia untuk pemutar YouTube';
+  }
+  function clearYoutubePreview(){
+    if(!activeYoutube&&!pendingYoutubeId)return;
+    activeYoutube=false;pendingYoutubeId='';requestId++;
+    const frame=stage.querySelector('.micon-youtube-preview');
+    if(frame)frame.remove();
+    if(field)field.value='';
+    setPitchAvailability(true);
+  }
+  async function loadYoutube(){
+    const id=youtubeId(field.value);
+    if(!id||id===pendingYoutubeId||(activeYoutube&&stage.querySelector('.micon-youtube-preview')))return;
+    const thisRequest=++requestId;
+    pendingYoutubeId=id;
+    if(clearButton)clearButton.click();
+    stage.replaceChildren();
+    try{
+      /* Iklan pembuka memakai konfigurasi videoAd Firestore yang sama
+         dengan iklan sebelum pemutaran file lokal. */
+      if(typeof window.miconAdGate==='function'){
+        const allowed=await window.miconAdGate('opening');
+        if(!allowed||thisRequest!==requestId)return;
+      }
+    }catch(error){
+      console.warn('Iklan pembuka YouTube gagal diproses:',error);
+    }
+    if(thisRequest!==requestId)return;
+    const frame=document.createElement('iframe');
+    frame.className='micon-youtube-preview';
+    frame.title='Preview video YouTube';
+    frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    frame.allowFullscreen=true;
+    frame.referrerPolicy='strict-origin-when-cross-origin';
+    frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1';
+    stage.appendChild(frame);
+    activeYoutube=true;pendingYoutubeId='';
+    if(name)name.textContent='Video YouTube';
+    if(size)size.textContent='Preview dari tautan YouTube';
+    if(status)status.textContent='Video YouTube dimuat · audio YouTube tidak dapat diproses oleh transpose lokal';
+    if(clearButton)clearButton.disabled=false;
+    setPitchAvailability(false);
+  }
+  field.addEventListener('paste',()=>setTimeout(loadYoutube,0));
+  field.addEventListener('change',loadYoutube);
+  field.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();loadYoutube();}});
+  field.addEventListener('input',()=>{
+    if(!field.value.trim()&&(activeYoutube||pendingYoutubeId)){
+      clearYoutubePreview();
+      if(name)name.textContent='Belum ada lagu dipilih';
+      if(size)size.textContent='File audio akan tampil di sini';
+      if(status)status.textContent='Menunggu file';
+      if(clearButton)clearButton.disabled=true;
+    }
+  });
+  document.addEventListener('change',event=>{
+    if(event.target===fileInput&&(activeYoutube||pendingYoutubeId))clearYoutubePreview();
+  },true);
+  if(clearButton)clearButton.addEventListener('click',()=>{
+    if(activeYoutube||pendingYoutubeId)clearYoutubePreview();
+  },true);
+})();
+</script>
+
+
+<style id="micon-desktop-preview-scroll-thumbnail-final">
+@media (min-width:761px){
+  #mainContent>.home-layout>.home-preview-column{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+    overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;-ms-overflow-style:none!important;
+  }
+  #mainContent>.home-layout>.home-preview-column::-webkit-scrollbar{display:none!important;width:0!important}
+  #mainContent>.home-layout>.home-preview-column #videoStage{
+    flex:0 0 auto!important;width:100%!important;min-height:0!important;
+  }
+  #mainContent>.home-layout>.home-preview-column .desktop-playlist-view{
+    display:flex!important;flex:0 0 auto!important;width:100%!important;
+    min-height:0!important;overflow:visible!important;
+  }
+  .desktop-playlist-thumb{
+    display:block!important;position:relative!important;flex:0 0 178px!important;
+    width:178px!important;height:100px!important;overflow:hidden!important;
+    border-radius:7px!important;background:#e8edf4!important;
+  }
+  .desktop-playlist-thumb img{
+    display:block!important;width:100%!important;height:100%!important;
+    object-fit:cover!important;background:#e8edf4!important;
+  }
+  .desktop-playlist-audio-thumb{
+    display:grid!important;place-items:center!important;
+    color:#142b50!important;font-size:30px!important;
+  }
+  .desktop-playlist-item{min-height:112px!important;height:auto!important}
+}
+@media(max-width:760px){
+  #mainContent>.home-layout>.home-preview-column{overflow:visible!important}
+}
+</style>
+\n
+<style id="micon-desktop-transpose-alignment-thumbnail-final">
+@media (min-width:761px){
+  /* Kartu nada disusun vertikal dan terpusat agar label tidak bertabrakan. */
+  .desktop-transpose-view .noteBox{
+    display:flex!important;
+    position:relative!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:112px!important;
+    min-height:112px!important;
+    margin:0 0 12px!important;
+    padding:10px 12px!important;
+    text-align:center!important;
+    overflow:hidden!important;
+  }
+  .desktop-transpose-view .noteBox>small{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:13px!important;
+    line-height:1.3!important;
+    color:#7b8798!important;
+  }
+  .desktop-transpose-view .noteBox>.note{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:40px!important;
+    line-height:1.12!important;
+    font-weight:800!important;
+    color:#0b1c36!important;
+  }
+  .desktop-transpose-view .noteBox>#noteDesc{
+    display:block!important;
+    position:static!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    font-size:11px!important;
+    line-height:1.3!important;
+    color:#64748b!important;
+  }
+  .desktop-transpose-view .stepper{
+    display:grid!important;
+    align-items:center!important;
+    width:100%!important;
+    margin:0!important;
+  }
+  .desktop-transpose-view .rangeLabels{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    width:100%!important;
+    margin:8px 0 0!important;
+  }
+  .desktop-transpose-view .row{
+    display:flex!important;
+    width:100%!important;
+    margin:18px 0 0!important;
+  }
+  .desktop-playlist-item{
+    align-items:center!important;
+    min-height:112px!important;
+    font-weight:400!important;
+  }
+  .desktop-playlist-copy strong{
+    font-weight:400!important;
+    font-size:16px!important;
+    line-height:1.35!important;
+  }
+  .desktop-playlist-copy small{
+    font-weight:400!important;
+  }
+}
+</style>
+\n
+<style id="micon-desktop-playlist-font-footer-final">
+@media (min-width:761px){
+  /* Judul lagu playlist memakai ketebalan normal, bukan bold. */
+  .desktop-playlist-copy strong{
+    font-weight:400!important;
+  }
+  /* Hilangkan bagian Tentang MicOn dan Panduan Singkat pada desktop saja. */
+  #mainContent>.home-layout>.home-scroll-column>.foot,
+  #mainContent>.home-layout>.home-preview-column>.foot{
+    display:none!important;
+  }
+}
+</style>
+
+
+
+<style id="micon-desktop-superadmin-banner-visible-final">
+@media (min-width:761px){
+  .desktop-transpose-view #micon-desktop-ad-banner{
+    display:block!important;visibility:visible!important;opacity:1!important;
+    box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+    height:115px!important;min-height:115px!important;max-height:115px!important;
+    flex:0 0 115px!important;margin:14px 0 0!important;
+    overflow:hidden!important;border:1px solid #d8e2f0!important;
+    border-radius:18px!important;background:#f8fafc!important;
+  }
+  .desktop-transpose-view #micon-desktop-ad-banner iframe{
+    display:block!important;width:100%!important;height:100%!important;
+    min-height:0!important;max-height:100%!important;border:0!important;
   }
 }
 </style>
