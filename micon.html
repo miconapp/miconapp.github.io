@@ -3744,12 +3744,12 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 
 
 <style id="micon-subscription-desktop-transpose-placement">
-/* Desktop only: place expired-subscription card inside the actual Transpose panel. */
+/* Desktop: kartu kunci mengikuti referensi; hanya area fitur kunci yang disentuh. */
 @media screen and (min-width:761px){
   .desktop-player-panel .desktop-transpose-view.subscription-inline-mode{
     display:flex!important;flex-direction:column!important;align-items:stretch!important;
     justify-content:flex-start!important;gap:0!important;min-width:0!important;
-    padding:18px 22px 22px!important;overflow-y:auto!important;overflow-x:hidden!important;
+    padding:0 22px 22px!important;overflow-y:auto!important;overflow-x:hidden!important;
     background:#fff!important;
   }
   .desktop-player-panel .desktop-transpose-view.subscription-inline-mode > :not(#micon-subscription-gate){
@@ -3763,30 +3763,81 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate.show{display:block!important}
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner{
+    display:none!important;position:relative!important;box-sizing:border-box!important;
+    width:calc(100% + 44px)!important;min-width:calc(100% + 44px)!important;max-width:calc(100% + 44px)!important;
+    height:72px!important;min-height:72px!important;max-height:72px!important;
+    margin:0 -22px 60px!important;padding:0!important;overflow:hidden!important;
+    border:0!important;border-radius:0!important;background:#f1f5f9!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner.is-configured{
+    display:block!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner iframe,
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner img,
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner a{
+    display:block!important;position:absolute!important;inset:0!important;
+    width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+    max-width:100%!important;max-height:100%!important;margin:0!important;padding:0!important;
+    border:0!important;object-fit:fill!important;
+  }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .msg-card{
     display:block!important;box-sizing:border-box!important;width:100%!important;max-width:none!important;
     height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;
-    padding:22px!important;overflow:visible!important;border:1px solid #dbe3ef!important;
-    border-radius:18px!important;background:#fff!important;color:#172033!important;
-    box-shadow:0 8px 24px rgba(15,23,42,.08)!important;
+    padding:0 22px 22px!important;overflow:visible!important;border:0!important;
+    border-radius:0!important;background:#fff!important;color:#172033!important;
+    box-shadow:none!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .msg-logo{
-    width:46px!important;height:46px!important;margin:0 0 12px!important;
+    display:grid!important;width:46px!important;height:46px!important;margin:0 0 12px!important;
+    border-radius:15px!important;background:linear-gradient(135deg,#2563eb,#7658ff)!important;
+    color:#fff!important;font-size:25px!important;
   }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-logo{display:none!important}
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate h2{
-    font-size:22px!important;line-height:1.2!important;margin:0 0 9px!important;
+    font-size:22px!important;line-height:1.2!important;margin:0 0 9px!important;color:#172033!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate p{
-    font-size:12px!important;line-height:1.55!important;margin:0 0 11px!important;
+    font-size:12px!important;line-height:1.55!important;margin:0 0 11px!important;color:#64748b!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-reminder{
+    margin-bottom:12px!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .package-list{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
     gap:10px!important;margin:13px 0!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .package-row{
-    min-height:36px!important;padding:8px 12px!important;gap:18px!important;
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    box-sizing:border-box!important;width:100%!important;min-height:38px!important;height:38px!important;
+    padding:8px 12px!important;gap:18px!important;border:1px solid #dbe3ef!important;
+    border-radius:12px!important;background:#fff!important;color:#475569!important;font-size:12px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .package-row b{
+    color:#1d4ed8!important;font-size:12px!important;font-weight:800!important;white-space:nowrap!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate #micon-gate-status{
+    display:block!important;margin:0 0 10px!important;color:#64748b!important;font-size:11px!important;line-height:1.4!important;
   }
   .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions{
-    gap:10px!important;margin-top:14px!important;
+    display:flex!important;align-items:stretch!important;gap:10px!important;margin:10px 0 0!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions button,
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions .whatsapp-contact{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    flex:1 1 0!important;min-width:0!important;height:43px!important;min-height:43px!important;
+    margin:0!important;padding:10px 12px!important;border-radius:11px!important;
+    font-size:12px!important;font-weight:750!important;line-height:1!important;text-decoration:none!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions button.secondary{
+    background:#f1f5f9!important;color:#334155!important;border:1px solid #e2e8f0!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions .whatsapp-contact{
+    gap:8px!important;background:#20ce68!important;color:#fff!important;border:1px solid transparent!important;
+    box-shadow:0 4px 10px rgba(32,206,104,.22)!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .gate-actions .whatsapp-contact svg{
+    display:block!important;width:17px!important;height:17px!important;flex:0 0 17px!important;fill:currentColor!important;
   }
 }
 </style>
