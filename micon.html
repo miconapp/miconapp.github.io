@@ -2638,7 +2638,7 @@ try {
     }
     const copy=document.createElement('span');copy.className='desktop-playlist-copy';
     const name=document.createElement('strong');name.textContent=fileName||'Video tanpa nama';name.title=name.textContent;
-    const size=document.createElement('small');size.textContent='Size File (misal 5MB) · '+formatSize(entry.file);
+    const size=document.createElement('small');size.textContent='Size File (file hasil download bisalangsung di tranpose) · '+formatSize(entry.file);
     copy.append(name,size);row.append(thumb,copy);
    }
    row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
