@@ -3842,6 +3842,31 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 </style>
 
+<style id="micon-subscription-banner-at-transpose-heading">
+/* Saat terkunci, banner menempati posisi judul TRANPOSE NADA pada panel desktop. */
+@media screen and (min-width:761px){
+  .desktop-player-panel:has(.desktop-transpose-view.subscription-inline-mode){
+    position:relative!important;
+  }
+  .desktop-player-panel:has(.desktop-transpose-view.subscription-inline-mode)>.desktop-transpose-heading{
+    display:none!important;
+  }
+  .desktop-player-panel .desktop-transpose-view.subscription-inline-mode{
+    padding:132px 22px 22px!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .micon-gate-banner{
+    position:absolute!important;
+    top:0!important;left:0!important;right:0!important;
+    width:100%!important;min-width:100%!important;max-width:100%!important;
+    height:72px!important;min-height:72px!important;max-height:72px!important;
+    margin:0!important;border-radius:0!important;
+  }
+  .desktop-player-panel .desktop-transpose-view #micon-subscription-gate .msg-card{
+    padding:0 22px 22px!important;
+  }
+}
+</style>
+
 
 <style id="micon-subscription-lock-full-white-mobile">
 /* Ketika akses terkunci, latar halaman mobile putih sampai bawah viewport. */
