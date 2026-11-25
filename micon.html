@@ -2638,7 +2638,7 @@ try {
     }
     const copy=document.createElement('span');copy.className='desktop-playlist-copy';
     const name=document.createElement('strong');name.textContent=fileName||'Video tanpa nama';name.title=name.textContent;
-    const size=document.createElement('small');size.textContent='Size File (misal 5MB) · '+formatSize(entry.file);
+    const size=document.createElement('small');size.textContent='Size File · '+formatSize(entry.file);
     copy.append(name,size);row.append(thumb,copy);
    }
    row.addEventListener('click',()=>loadItem(index));list.appendChild(row);
@@ -3076,11 +3076,18 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
   let db=null, showing=false, timer=null, resolveGate=null, elapsed=0, adConfig=null;
   let activeDuration=30, activeSkipAfter=5;
   let activeAdPhase="opening";
+  let adPlaybackRequested=false;
+  let adRecoveryTimer=null;
+  let adNetworkRetryCount=0;
+  let adRecoveryBusy=false;
 
   function finishAd(){
     if(!showing)return;
     showing=false;
+    adPlaybackRequested=false;
+    adRecoveryBusy=false;
     if(timer){clearInterval(timer);timer=null;}
+    if(adRecoveryTimer){clearTimeout(adRecoveryTimer);adRecoveryTimer=null;}
     adVideo.pause();
     adVideo.removeAttribute("src");
     adVideo.load();
@@ -3146,8 +3153,15 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
     activeDuration=Math.max(1,Math.min(600,Number(selectedAd.durationSeconds)||Number(config.durationSeconds)||30));
     activeSkipAfter=Math.max(0,Math.min(120,Number(config.skipAfterSeconds)||0));
     elapsed=0;
+    adNetworkRetryCount=0;
+    adPlaybackRequested=true;
     activeAdPhase=phase==="ending"?"ending":"opening";
     showing=true;
+    adVideo.preload="auto";
+    adVideo.playsInline=true;
+    adVideo.setAttribute("playsinline","");
+    adVideo.setAttribute("webkit-playsinline","");
+    adVideo.setAttribute("disablepictureinpicture","");
     resolveGate=null;
     overlay.classList.add("is-open");
     document.body.style.overflow="";
@@ -3225,9 +3239,67 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
      tetap menjadi cadangan untuk browser yang jarang mengirim timeupdate. */
   adVideo.addEventListener("timeupdate",updateClock);
   adVideo.addEventListener("ended",finishAd);
+  function requestAdPlaybackRecovery(){
+    if(!showing||!adPlaybackRequested||adRecoveryBusy)return;
+    if(adRecoveryTimer)clearTimeout(adRecoveryTimer);
+    adRecoveryTimer=setTimeout(async()=>{
+      adRecoveryTimer=null;
+      if(!showing||!adPlaybackRequested||adRecoveryBusy)return;
+      if(adVideo.readyState<2)return;
+      if(!adVideo.paused)return;
+      adRecoveryBusy=true;
+      try{
+        await adVideo.play();
+        errorBox.style.display="none";
+        start.style.display="none";
+      }catch(playError){
+        console.warn("MicOn ad playback recovery is waiting for browser permission:",playError);
+      }finally{adRecoveryBusy=false;}
+    },220);
+  }
+  adVideo.addEventListener("waiting",()=>{
+    if(!showing)return;
+    count.textContent="Iklan sedang memuat, pemutaran akan dilanjutkan otomatis…";
+  });
+  adVideo.addEventListener("stalled",()=>{
+    if(!showing)return;
+    count.textContent="Koneksi iklan terhenti sementara, mencoba melanjutkan…";
+  });
+  adVideo.addEventListener("canplay",requestAdPlaybackRecovery);
+  adVideo.addEventListener("playing",()=>{
+    if(!showing)return;
+    errorBox.style.display="none";
+    start.style.display="none";
+  });
+  adVideo.addEventListener("pause",()=>{
+    if(showing&&adPlaybackRequested&&!adVideo.ended)requestAdPlaybackRecovery();
+  });
   adVideo.addEventListener("error",()=>{
     if(!showing)return;
-    errorBox.textContent="Video iklan gagal dimuat. Iklan akan dilewati otomatis setelah waktu yang ditentukan.";
+    const mediaError=adVideo.error;
+    const retryable=!mediaError||mediaError.code===MediaError.MEDIA_ERR_NETWORK;
+    if(retryable&&adNetworkRetryCount<2){
+      adNetworkRetryCount++;
+      const source=String(adVideo.currentSrc||adVideo.src||"");
+      const resumeAt=Number(adVideo.currentTime)||0;
+      count.textContent="Koneksi iklan terganggu, mencoba memuat ulang ("+adNetworkRetryCount+"/2)…";
+      setTimeout(()=>{
+        if(!showing||!source)return;
+        try{
+          adVideo.src=source;
+          adVideo.load();
+          const resume=()=>{
+            if(!showing)return;
+            try{if(resumeAt>0&&Number.isFinite(adVideo.duration)&&resumeAt<adVideo.duration)adVideo.currentTime=resumeAt;}catch(_){}
+            requestAdPlaybackRecovery();
+            adVideo.play().catch(()=>{});
+          };
+          adVideo.addEventListener("canplay",resume,{once:true});
+        }catch(retryError){console.warn("MicOn ad retry failed:",retryError);}
+      },700);
+      return;
+    }
+    errorBox.textContent="Video iklan tidak dapat dimuat. MicOn akan melanjutkan video setelah proses iklan selesai.";
     errorBox.style.display="block";
   });
 
@@ -4357,3 +4429,35 @@ import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/f
 }
 @media(max-width:760px){.desktop-transpose-heading{display:none!important}}
 </style>
+
+<style id="micon-desktop-playlist-single-heading-and-ad-smooth-final">
+@media (min-width:761px){
+  .desktop-playlist-view::before{
+    content:none!important;
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+  .desktop-playlist-view{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+  .desktop-playlist-view>.desktop-playlist-add{
+    order:0!important;
+    margin:0 15px 8px!important;
+    width:calc(100% - 30px)!important;
+  }
+  .desktop-playlist-view>.desktop-playlist-heading{
+    order:1!important;
+    font-weight:400!important;
+  }
+  .desktop-playlist-view>.desktop-playlist-list{order:2!important}
+  .desktop-transpose-heading{
+    font-weight:400!important;
+  }
+}
+</style>
+
